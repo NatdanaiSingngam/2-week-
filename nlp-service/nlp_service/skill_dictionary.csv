@@ -1,0 +1,69 @@
+skill,aliases,category
+Java,,programming
+Python,,programming
+JavaScript,js,programming
+TypeScript,ts,programming
+C#,,programming
+C++,,programming
+PHP,,programming
+Kotlin,,programming
+Swift,,programming
+Dart,,programming
+SQL,,database
+MySQL,,database
+PostgreSQL,postgres,database
+MongoDB,,database
+Firebase,,database
+HTML,html5,frontend
+CSS,css3,frontend
+React,react.js|reactjs,frontend
+Vue,vue.js|vuejs,frontend
+Angular,,frontend
+Bootstrap,,frontend
+Tailwind CSS,tailwind,frontend
+Thymeleaf,,frontend
+Spring Boot,springboot,backend
+Node.js,nodejs|node,backend
+Laravel,,backend
+Django,,backend
+Flask,,backend
+FastAPI,,backend
+REST API,restful|rest,backend
+Flutter,,mobile
+Android,,mobile
+Git,,tools
+GitHub,,tools
+Docker,,tools
+Linux,,tools
+Postman,,tools
+Figma,,design
+Photoshop,,design
+Illustrator,,design
+UI/UX,ux|ui,design
+Excel,,office
+Microsoft Office,ms office,office
+Power BI,powerbi,data
+Tableau,,data
+pandas,,data
+NumPy,,data
+scikit-learn,sklearn,data
+Machine Learning,ml,data
+Data Analysis,การวิเคราะห์ข้อมูล,data
+TensorFlow,,data
+PyTorch,,data
+NLP,,data
+Selenium,,testing
+Software Testing,การทดสอบซอฟต์แวร์,testing
+Networking,เครือข่าย,infrastructure
+Cybersecurity,ความปลอดภัยไซเบอร์,infrastructure
+การสื่อสาร,สื่อสาร,soft
+การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น,soft
+การแก้ปัญหา,แก้ปัญหา,soft
+ความรับผิดชอบ,,soft
+การบริหารเวลา,จัดการเวลา,soft
+ความคิดสร้างสรรค์,,soft
+ภาวะผู้นำ,ผู้นำ,soft
+การคิดวิเคราะห์,,soft
+ภาษาอังกฤษ,english,language
+ภาษาจีน,chinese,language
+การนำเสนอ,,soft
