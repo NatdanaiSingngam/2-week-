@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="th" xmlns:th="http://www.thymeleaf.org"><head th:fragment="head(title)"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title th:text="${title + ' | Workmatch'}">Workmatch</title><link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}" /></head><body>
+<header class="site-header" th:fragment="navbar"><a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a><div class="container nav-wrap">
+  <a class="brand" href="/login" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})"><img src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch" width="178" height="36" /></a>
+  <nav class="nav-links" aria-label="เมนูหลัก">
+    <th:block th:if="${role == 'STUDENT'}"><a th:href="@{/student/resume}">แบบฟอร์ม resume</a><a th:href="@{/student/dashboard}">ผลจับคู่</a></th:block>
+    <a th:if="${role == 'COMPANY'}" th:href="@{/company/jobs}">ตำแหน่งงานของฉัน</a>
+    <th:block th:if="${role == null}"><a th:href="@{/login}">เข้าสู่ระบบ</a><a th:href="@{/register}">สมัครสมาชิก</a></th:block>
+  </nav>
+  <div class="account" th:if="${role != null}"><span th:text="${displayName}">ชื่อผู้ใช้</span><form method="post" th:action="@{/logout}"><button class="quiet" type="submit">ออกจากระบบ</button></form></div>
+</div></header>
+<footer class="footer" th:fragment="footer"><div class="container"><span>Workmatch · เชื่อมทักษะ สู่โอกาสสหกิจศึกษา</span><span>โครงงานมหาวิทยาลัยพะเยา</span></div><script src="/js/app.js" th:src="@{/js/app.js}" defer="defer"></script></footer></body></html>
