@@ -22,10 +22,10 @@ public class Resume {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // ตั้งเวลาอัตโนมัติทั้งตอนสร้างและตอนแก้ไข
+    // ตั้งเวลาอัตโนมัติทั้งตอนสร้างและตอนแก้ไข (เรียกเองได้ เผื่อข้อความเหมือนเดิมแต่อยากอัปเดตเวลา)
     @PrePersist
     @PreUpdate
-    void touch() {
+    public void touch() {
         updatedAt = LocalDateTime.now();
     }
 

@@ -13,8 +13,13 @@ backend/
 └── src/
     ├── main/java/com/workmatch/
     │   ├── WorkmatchApplication.java
-    │   ├── config/SecurityConfig.java      # ชั่วคราว: เปิดทุก URL (A2 จะเปลี่ยน)
-    │   ├── controller/HomeController.java  # GET / -> redirect:/login
+    │   ├── config/SecurityConfig.java      # form login + BCrypt + สิทธิ์ STUDENT/COMPANY
+    │   ├── security/                       # โหลดผู้ใช้จากอีเมล, ส่งไปหน้าแรกตามบทบาท
+    │   ├── controller/                     # Auth, Resume, Job, StudentDashboard, Home, GlobalModelAdvice
+    │   ├── service/                        # Registration, Resume, Job, CurrentUser
+    │   ├── nlp/                            # NlpClient เรียก /extract (timeout 2s/5s)
+    │   ├── dto/                            # ข้อมูลที่ส่งให้หน้าเว็บ (ชื่อ field ตามข้อตกลง)
+    │   ├── exception/                      # JobNotFoundException -> 404
     │   ├── entity/                         # User, Role, Resume, ResumeSkill, Job, JobSkill, Match
     │   └── repository/                     # Repository ของทุก entity
     ├── main/resources/
@@ -82,7 +87,19 @@ cd backend
 ```
 
 รอจนเห็น `Started WorkmatchApplication` แล้วเปิด http://localhost:8080
-จะถูกส่งไป `/login` (ถ้ายังไม่มี `login.html` จะขึ้นหน้า error 404 ถือว่าปกติ)
+จะถูกส่งไปหน้า `/login` สมัครสมาชิกได้ที่ `/register`
+
+**ต้องรัน service NLP ก่อน** ไม่อย่างนั้นการบันทึก resume / ประกาศงานจะขึ้น
+"ระบบวิเคราะห์ทักษะยังไม่พร้อม ลองใหม่อีกครั้ง" (ดูวิธีรันใน `../nlp-service/README.md`)
+
+```powershell
+cd nlp-service
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn nlp_service.api_server:app --port 8000
+```
+เปิด http://localhost:8000/health ต้องได้ `{"status":"ok"}`
 
 ## 5. ตรวจว่าตารางครบ
 
@@ -108,11 +125,21 @@ SHOW TABLES;
 | `Communications link failure` | MySQL ยังไม่เปิด หรือไม่ได้อยู่ที่พอร์ต 3306 |
 | `Unknown database 'workmatch'` | ยังไม่ได้รันขั้นตอนที่ 2 |
 | `Port 8080 was already in use` | ปิดโปรแกรมอื่นที่ใช้พอร์ต 8080 หรือปิดแอปที่รันค้างไว้ |
+| บันทึก resume แล้วขึ้น "ระบบวิเคราะห์ทักษะยังไม่พร้อม" | service NLP ไม่ได้รันที่พอร์ต 8000 |
+| กดส่งฟอร์มแล้วได้ 403 | ฟอร์มไม่ได้ใช้ `th:action` จึงไม่มี CSRF token |
+
+## หมายเหตุหน้าเว็บ
+
+ไฟล์ใน `src/main/resources/templates` และ `static` คัดลอกมาจาก `frontend-draft/` ของชญาณัตถพลโดยไม่แก้ไข
+(ตามขั้นตอนใน `frontend-draft/README.md`) ถ้าจะแก้หน้าเว็บให้แก้ที่นี่ แล้วลบ `frontend-draft` ทีหลัง
+
+`job.skills` ในหน้า `company/job-detail` ส่งเป็น list ของ `{name, category}` ตามที่หน้าเว็บใช้ `skill.name`
+(เอกสารสั่งงานเขียนว่า list ข้อความ)
 
 ## สถานะงาน
 
 - [x] A1 โปรเจกต์ ต่อ MySQL และ entity/repository ครบ 6 ตาราง
-- [ ] A2 สมัครสมาชิก / login (SecurityConfig ตอนนี้เปิดทุก URL ชั่วคราว)
-- [ ] A3 เรซูเม่ ประกาศงาน และ /extract
+- [x] A2 สมัครสมาชิก / login / logout แยกสิทธิ์ STUDENT/COMPANY รหัสผ่าน BCrypt
+- [x] A3 เรซูเม่ ประกาศงาน และ /extract (`/student/dashboard` ตอนนี้บอกแค่ hasResume, matches รอ A4)
 - [ ] A4 จับคู่ด้วย /match
 - [ ] A5 ข้อมูลตัวอย่างและเตรียมเดโม
