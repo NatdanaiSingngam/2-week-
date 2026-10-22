@@ -128,6 +128,19 @@ SHOW TABLES;
 | บันทึก resume แล้วขึ้น "ระบบวิเคราะห์ทักษะยังไม่พร้อม" | service NLP ไม่ได้รันที่พอร์ต 8000 |
 | กดส่งฟอร์มแล้วได้ 403 | ฟอร์มไม่ได้ใช้ `th:action` จึงไม่มี CSRF token |
 
+## TODO การเชื่อม frontend กับ backend (ยังไม่ได้แก้)
+
+ทดสอบจริงแล้ว 22 ต.ค. ผ่านหน้าเว็บจริง (สมัคร, login, resume, dashboard, ประกาศงาน, ผู้สมัคร) ใช้งานได้ครบ เหลือจุดเหล่านี้
+
+| # | จุด | ใครแก้ | ไฟล์ |
+|---|---|---|---|
+| 1 | หน้า 403/404/500 เป็น Whitelabel ภาษาอังกฤษ และ JSON error มี stack trace | เรา (A5) | `application.properties`, `SecurityConfig.java`, `JobNotFoundException.java` |
+| 2 | หัวข้อหมวดทักษะในหน้า resume แสดงคีย์อังกฤษ (programming, database, soft ...) | เพื่อน | `templates/student/resume.html` |
+| 3 | ส่วน "ไม่พบตำแหน่งงาน" (job == null) ใน job-detail ไม่เคยถูกใช้ | ตกลงร่วมกัน | `templates/company/job-detail.html` |
+| 4 | templates/static มี 2 ชุด (`frontend-draft/` กับ `backend/`) เสี่ยงแก้ไม่ตรงกัน | เพื่อน | `frontend-draft/README.md` |
+| 5 | `job.skills` เป็น `{name, category}` แต่เอกสารสั่งงานเขียนว่า list ข้อความ | แก้เอกสาร | `dto/JobDetail.java` |
+| 6 | `static/images/workmatch.svg` ใน backend มี metadata เกินมาตอนคัดลอก (แสดงผลเหมือนเดิม) ควรคัดลอกไฟล์จาก `frontend-draft/static/images/` ทับ | เรา | `static/images/workmatch.svg` |
+
 ## หมายเหตุหน้าเว็บ
 
 ไฟล์ใน `src/main/resources/templates` และ `static` คัดลอกมาจาก `frontend-draft/` ของชญาณัตถพลโดยไม่แก้ไข

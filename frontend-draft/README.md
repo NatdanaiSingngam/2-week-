@@ -11,6 +11,12 @@
 
 ตัวอย่างหน้าครบ 7 หน้า: login, register, resume, dashboard, jobs, job-form, job-detail
 
+> **TODO(integration, ฝั่งเพื่อน/ชญาณัตถพล):** ตอนนี้ templates และ static ถูกคัดลอกไปไว้ใน
+> `backend/src/main/resources/` แล้ว (งาน A2–A4) และ backend ใช้ชุดนั้นจริง
+> ถ้าแก้หน้าเว็บต่อ ให้แก้ใน `backend/src/main/resources/templates` และ `static` แทน
+> แล้วลบ `frontend-draft/templates` กับ `frontend-draft/static` ออก จะได้ไม่มีสองชุดที่ไม่ตรงกัน
+> (ไฟล์ตัวอย่าง `*.html` ที่ root และ `fixtures.js` เก็บไว้ดู preview ได้)
+
 ## ส่งต่อให้ฝั่ง backend
 
 ยังไม่มี backend ใน repository จึงวางทุกไฟล์ไว้ใน frontend-draft ตามแผน ห้ามนำหน้าสาธิตที่ root ไปแทน templates

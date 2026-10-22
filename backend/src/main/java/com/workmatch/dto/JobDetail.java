@@ -2,7 +2,12 @@ package com.workmatch.dto;
 
 import java.util.List;
 
-/** หน้า company/job-detail: {id, title, description, skills} (skills เป็น {name, category} ตามที่หน้าเว็บใช้ skill.name) */
+/**
+ * หน้า company/job-detail: {id, title, description, skills}
+ * TODO(integration, เอกสาร - ธนวัฒน์ + ชญาณัตถพล): เอกสารสั่งงานเขียนว่า skills เป็น "list ข้อความ"
+ *   แต่ job-detail.html ใช้ skill.name จึงส่งเป็น list ของ {name, category} (ใช้ได้แล้ว)
+ *   ต้องแก้เอกสารข้อตกลงให้ตรงกับของจริง ไม่ต้องแก้โค้ด
+ */
 public class JobDetail {
     private final Long id;
     private final String title;
