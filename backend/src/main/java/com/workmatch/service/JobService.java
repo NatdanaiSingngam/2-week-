@@ -11,9 +11,11 @@ import com.workmatch.nlp.ExtractedSkill;
 import com.workmatch.nlp.NlpClient;
 import com.workmatch.repository.JobRepository;
 import com.workmatch.repository.JobSkillRepository;
+import com.workmatch.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,11 +29,13 @@ public class JobService {
     private final JobRepository jobs;
     private final JobSkillRepository jobSkills;
     private final NlpClient nlpClient;
+    private final MatchRepository matches;
 
-    public JobService(JobRepository jobs, JobSkillRepository jobSkills, NlpClient nlpClient) {
+    public JobService(JobRepository jobs, JobSkillRepository jobSkills, NlpClient nlpClient, MatchRepository matches) {
         this.jobs = jobs;
         this.jobSkills = jobSkills;
         this.nlpClient = nlpClient;
+        this.matches = matches;
     }
 
     /** สร้างประกาศงาน เรียก NLP กับ description แล้วบันทึก jobs + job_skills คืน id ของประกาศ */
@@ -60,12 +64,13 @@ public class JobService {
         return job.getId();
     }
 
-    /** รายการประกาศของบริษัท ใหม่สุดอยู่บน (applicantCount ใส่ 0 ไปก่อน งาน A4 จะทำจริง) */
+    /** รายการประกาศของบริษัท ใหม่สุดอยู่บน applicantCount = จำนวนผู้ที่จับคู่ได้คะแนนมากกว่า 0 */
     @Transactional(readOnly = true)
     public List<JobListItem> listJobs(User company) {
         return jobs.findByCompanyId(company.getId()).stream()
                 .sorted(Comparator.comparing(Job::getId).reversed())
-                .map(j -> new JobListItem(j.getId(), j.getTitle(), jobSkills.countByJobId(j.getId()), 0))
+                .map(j -> new JobListItem(j.getId(), j.getTitle(), jobSkills.countByJobId(j.getId()),
+                        matches.countByJobIdAndScoreGreaterThan(j.getId(), BigDecimal.ZERO)))
                 .toList();
     }
 

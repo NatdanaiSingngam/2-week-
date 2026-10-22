@@ -42,6 +42,25 @@ public class NlpClient {
         }
     }
 
+    /**
+     * POST /match {"resume_skills":[...],"job_skills":[...]} -> {score, cosine, matched, missing}
+     * คะแนนคำนวณฝั่ง NLP เท่านั้น ห้ามคำนวณเองใน Java
+     */
+    public MatchResult match(List<String> resumeSkills, List<String> jobSkills) {
+        try {
+            MatchResult body = restClient.post()
+                    .uri("/match")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("resume_skills", resumeSkills, "job_skills", jobSkills))
+                    .retrieve()
+                    .body(MatchResult.class);
+            if (body == null) throw new NlpUnavailableException();
+            return body;
+        } catch (RestClientException e) {
+            throw new NlpUnavailableException(e);
+        }
+    }
+
     record ExtractResponse(List<ExtractedSkill> skills) {
     }
 }

@@ -16,8 +16,8 @@ backend/
     │   ├── config/SecurityConfig.java      # form login + BCrypt + สิทธิ์ STUDENT/COMPANY
     │   ├── security/                       # โหลดผู้ใช้จากอีเมล, ส่งไปหน้าแรกตามบทบาท
     │   ├── controller/                     # Auth, Resume, Job, StudentDashboard, Home, GlobalModelAdvice
-    │   ├── service/                        # Registration, Resume, Job, CurrentUser
-    │   ├── nlp/                            # NlpClient เรียก /extract (timeout 2s/5s)
+    │   ├── service/                        # Registration, Resume, Job, Match, CurrentUser
+    │   ├── nlp/                            # NlpClient เรียก /extract และ /match (timeout 2s/5s)
     │   ├── dto/                            # ข้อมูลที่ส่งให้หน้าเว็บ (ชื่อ field ตามข้อตกลง)
     │   ├── exception/                      # JobNotFoundException -> 404
     │   ├── entity/                         # User, Role, Resume, ResumeSkill, Job, JobSkill, Match
@@ -140,6 +140,13 @@ SHOW TABLES;
 
 - [x] A1 โปรเจกต์ ต่อ MySQL และ entity/repository ครบ 6 ตาราง
 - [x] A2 สมัครสมาชิก / login / logout แยกสิทธิ์ STUDENT/COMPANY รหัสผ่าน BCrypt
-- [x] A3 เรซูเม่ ประกาศงาน และ /extract (`/student/dashboard` ตอนนี้บอกแค่ hasResume, matches รอ A4)
-- [ ] A4 จับคู่ด้วย /match
+- [x] A3 เรซูเม่ ประกาศงาน และ /extract
+- [x] A4 จับคู่ด้วย /match เก็บลง matches แล้วส่งให้ Dashboard / หน้าผู้สมัคร
 - [ ] A5 ข้อมูลตัวอย่างและเตรียมเดโม
+
+## การจับคู่ (A4)
+
+- บันทึก resume -> คำนวณกับทุกประกาศงาน / สร้างประกาศงาน -> คำนวณกับทุก resume
+- คะแนนมาจาก `/match` ของ NLP เท่านั้น (ไม่คำนวณใน Java) เก็บใน `matches` คู่ละ 1 แถว
+- ประกาศที่ไม่มีทักษะจะถูกข้าม ถ้าคำนวณไม่สำเร็จ การบันทึก resume / ประกาศงานยังสำเร็จ และหน้า resume จะขึ้นข้อความเตือน
+- หน้า company/job-detail แสดงเฉพาะผู้ที่ได้คะแนนมากกว่า 0 (ตรงกับ applicantCount)

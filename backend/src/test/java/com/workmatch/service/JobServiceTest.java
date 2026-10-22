@@ -11,6 +11,7 @@ import com.workmatch.nlp.NlpClient;
 import com.workmatch.nlp.NlpUnavailableException;
 import com.workmatch.repository.JobRepository;
 import com.workmatch.repository.JobSkillRepository;
+import com.workmatch.repository.MatchRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,6 +32,7 @@ class JobServiceTest {
     @Mock JobRepository jobs;
     @Mock JobSkillRepository jobSkills;
     @Mock NlpClient nlpClient;
+    @Mock MatchRepository matches;
     @InjectMocks JobService service;
 
     private User company(long id) {

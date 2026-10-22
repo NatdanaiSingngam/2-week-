@@ -9,4 +9,7 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByResumeId(Long resumeId);
     List<Match> findByJobId(Long jobId);
     Optional<Match> findByResumeIdAndJobId(Long resumeId, Long jobId);
+
+    // จำนวนผู้ที่จับคู่ได้คะแนนมากกว่า 0 (ใช้เป็น applicantCount)
+    long countByJobIdAndScoreGreaterThan(Long jobId, java.math.BigDecimal score);
 }
