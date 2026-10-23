@@ -1,0 +1,1 @@
+มีพื้นฐานการวิเคราะห์ข้อมูลด้วย Python (pandas, scikit-learn) และ SQL เคยทำโปรเจกต์ Machine Learning ใช้ Excel ได้ สื่อสารภาษาอังกฤษได้ดี

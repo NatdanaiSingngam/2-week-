@@ -26,8 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                // TODO(integration, ฝั่งเรา - A5): /error ยังไม่มี template ของเรา จึงขึ้นหน้า Whitelabel ภาษาอังกฤษ
-                //   ตอนโดนห้าม (403) หรือไม่พบหน้า (404) ให้เพิ่ม templates/error/403.html, 404.html และ error.html
+                // /error ต้องเปิดไว้ เพื่อให้หน้า error ภาษาไทย (templates/error/403.html, 404.html, error.html) แสดงได้
                 .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()
                 .requestMatchers("/student/**").hasRole("STUDENT")
                 .requestMatchers("/company/**").hasRole("COMPANY")
