@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!--/* งาน A5 (ธนวัฒน์): ไม่มีสิทธิ์เข้าหน้า เช่น นักศึกษาเปิดหน้าของบริษัท หรือฟอร์มไม่มี CSRF token */-->
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ไม่มีสิทธิ์เข้าถึง')}"><title>ไม่มีสิทธิ์เข้าถึง | Workmatch</title></head>
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main"><section class="card empty content-narrow" style="margin:0 auto">
+<div class="symbol" aria-hidden="true">✕</div>
+<p class="eyebrow">ERROR 403</p>
+<h1>คุณไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
+<p>หน้านี้สำหรับผู้ใช้อีกบทบาทหนึ่ง (นักศึกษา หรือ บริษัท) หรือเซสชันหมดอายุ ลองกลับหน้าหลักหรือเข้าสู่ระบบใหม่</p>
+<div class="form-actions" style="justify-content:center"><a class="button" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})">กลับหน้าหลัก</a><a class="button secondary" th:href="@{/login}">เข้าสู่ระบบใหม่</a></div>
+</section></main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

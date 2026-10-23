@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<!--/* งาน A5 (ธนวัฒน์): หน้า error ทั่วไปภาษาไทย ใช้ layout เดียวกับหน้าอื่นของชญาณัตถพล
+     ข้อมูลที่ได้: errorTitle, errorMessage (จาก GlobalExceptionHandler) หรือ status (จาก Spring Boot)
+     ไม่แสดง stack trace หรือรายละเอียดภายในของระบบ */-->
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('เกิดข้อผิดพลาด')}"><title>เกิดข้อผิดพลาด | Workmatch</title></head>
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main"><section class="card empty content-narrow" style="margin:0 auto">
+<div class="symbol" aria-hidden="true">!</div>
+<p class="eyebrow" th:text="${status != null ? 'ERROR ' + status : 'ERROR'}">ERROR</p>
+<h1 th:text="${errorTitle != null ? errorTitle : (status == 503 ? 'ระบบยังไม่พร้อมใช้งาน' : 'เกิดข้อผิดพลาดในระบบ')}">เกิดข้อผิดพลาดในระบบ</h1>
+<p th:text="${errorMessage != null ? errorMessage : 'ขออภัย ระบบทำงานผิดพลาด ลองใหม่อีกครั้ง หรือกลับไปหน้าหลัก'}">ขออภัย ระบบทำงานผิดพลาด</p>
+<div class="form-actions" style="justify-content:center"><a class="button" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})">กลับหน้าหลัก</a><a class="button secondary" href="javascript:history.back()">ย้อนกลับ</a></div>
+</section></main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

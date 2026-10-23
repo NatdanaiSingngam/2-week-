@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('สร้างตำแหน่งงาน')}"><title>สร้างตำแหน่งงาน | Workmatch</title></head>
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main"><div class="page-heading"><div><p class="eyebrow">NEW OPPORTUNITY</p><h1>สร้างตำแหน่งงาน</h1><p>ระบุรายละเอียดและทักษะที่ต้องการ เพื่อค้นหานักศึกษาที่ตรงกับงาน</p></div><a class="button secondary" th:href="@{/company/jobs}">กลับไปรายการตำแหน่ง</a></div>
+<section class="card content-narrow"><div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div><form method="post" th:action="@{/company/jobs}" data-busy="กำลังบันทึก...">
+<div class="field"><label for="title">ชื่อตำแหน่ง</label><input id="title" name="title" maxlength="200" required="required" th:value="${job?.title}" placeholder="เช่น Frontend Developer (สหกิจศึกษา)" /></div>
+<div class="field"><label for="description">รายละเอียดงานและทักษะที่ต้องการ</label><textarea id="description" name="description" rows="12" required="required" th:text="${job?.description}" aria-describedby="description-help" placeholder="อธิบายหน้าที่ ความรับผิดชอบ และทักษะที่ต้องการ เช่น Python, Java และ SQL"></textarea><p id="description-help" class="field-note">ใส่ทักษะที่ต้องการในข้อความได้เลย ระบบจะดึงทักษะให้อัตโนมัติหลังบันทึก</p></div><div class="form-actions"><button type="submit">บันทึกตำแหน่งงาน →</button><a class="button secondary" th:href="@{/company/jobs}">ยกเลิก</a></div></form></section></main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>
