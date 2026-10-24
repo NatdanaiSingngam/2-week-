@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!--/* งาน A5 (ธนวัฒน์): ไม่พบหน้า / ไม่พบตำแหน่งงาน (รวมกรณีบริษัทเปิดประกาศของบริษัทอื่น) */-->
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ไม่พบหน้าที่ต้องการ')}"><title>ไม่พบหน้าที่ต้องการ | Workmatch</title></head>
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main"><section class="card empty content-narrow" style="margin:0 auto">
+<div class="symbol" aria-hidden="true">?</div>
+<p class="eyebrow">ERROR 404</p>
+<h1>ไม่พบหน้าที่ต้องการ</h1>
+<p>หน้านี้อาจถูกลบไปแล้ว ลิงก์ไม่ถูกต้อง หรือเป็นข้อมูลที่บัญชีของคุณเปิดดูไม่ได้</p>
+<div class="form-actions" style="justify-content:center"><a class="button" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})">กลับหน้าหลัก</a></div>
+</section></main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>
