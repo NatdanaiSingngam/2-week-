@@ -31,7 +31,7 @@
     if(page==='resume') {
       const list = ['empty','no-resume'].includes(mode)?[]:skills;
       document.querySelector('.card-title .badge').textContent=`พบ ${list.length} ทักษะ`;
-      document.getElementById('skill-results').innerHTML = list.length ? [...new Set(list.map(s=>s.category))].map(category=>`<section class="skill-group"><h3>${category}</h3>${badges(list.filter(s=>s.category===category).map(s=>s.name))}</section>`).join('') : '<div class="empty"><p>ยังไม่พบทักษะ ลองเพิ่มรายละเอียดทักษะใน resume</p></div>';
+      document.getElementById('skill-results').innerHTML = list.length ? [...new Set(list.map(s=>s.category))].map(category=>`<section class="skill-group"><h3>${({programming:'ภาษาโปรแกรม',database:'ฐานข้อมูล',frontend:'พัฒนาหน้าเว็บ (Frontend)',backend:'พัฒนาระบบหลังบ้าน (Backend)',mobile:'แอปพลิเคชันมือถือ',data:'ข้อมูลและ AI',tools:'เครื่องมือพัฒนา',design:'ออกแบบ',infrastructure:'เครือข่ายและความปลอดภัย',testing:'การทดสอบซอฟต์แวร์',language:'ภาษาต่างประเทศ',office:'โปรแกรมสำนักงาน',soft:'ทักษะทางสังคม (Soft skills)'})[category] || category || 'อื่น ๆ'}</h3>${badges(list.filter(s=>s.category===category).map(s=>s.name))}</section>`).join('') : '<div class="empty"><p>ยังไม่พบทักษะ ลองเพิ่มรายละเอียดทักษะใน resume</p></div>';
     }
     if(page==='dashboard') {
       let html='<section class="hero"><span class="hero-line" aria-hidden="true"></span><p class="eyebrow">YOUR NEXT OPPORTUNITY</p><h1>ค้นพบงานที่ใช่<br />และเตรียมพร้อมไปด้วยกัน</h1><p>ดูว่าทักษะของคุณตรงกับตำแหน่งใด และควรพัฒนาอะไรเพิ่มก่อนเริ่มสหกิจศึกษา</p><a class="button accent" href="resume.html">อัปเดต resume →</a></section>';

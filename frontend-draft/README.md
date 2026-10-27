@@ -11,17 +11,17 @@
 
 ตัวอย่างหน้าครบ 7 หน้า: login, register, resume, dashboard, jobs, job-form, job-detail
 
-> **TODO(integration, ฝั่งเพื่อน/ชญาณัตถพล):** ตอนนี้ templates และ static ถูกคัดลอกไปไว้ใน
-> `backend/src/main/resources/` แล้ว (งาน A2–A4) และ backend ใช้ชุดนั้นจริง
-> ถ้าแก้หน้าเว็บต่อ ให้แก้ใน `backend/src/main/resources/templates` และ `static` แทน
-> แล้วลบ `frontend-draft/templates` กับ `frontend-draft/static` ออก จะได้ไม่มีสองชุดที่ไม่ตรงกัน
-> (ไฟล์ตัวอย่าง `*.html` ที่ root และ `fixtures.js` เก็บไว้ดู preview ได้)
+> **หน้าเว็บที่ใช้จริงอยู่ใน `backend/src/main/resources/` ชุดเดียวแล้ว** (แก้ 27 ต.ค. ตาม TODO ข้อ 4)
+> - Thymeleaf templates: `backend/src/main/resources/templates/`
+> - CSS / JS / รูป: `backend/src/main/resources/static/`
+> - ไฟล์ตัวอย่าง `*.html` และ `fixtures.js` ในโฟลเดอร์นี้เก็บไว้ดู preview แบบไม่ต้องรัน backend
+>   และดึง CSS/JS/รูปจาก `backend/src/main/resources/static/` โดยตรง (ไม่มีสำเนาซ้ำแล้ว)
+> - ถ้าจะแก้หน้าตา ให้แก้ที่ `backend/src/main/resources/` เท่านั้น
 
 ## ส่งต่อให้ฝั่ง backend
 
-ยังไม่มี backend ใน repository จึงวางทุกไฟล์ไว้ใน frontend-draft ตามแผน ห้ามนำหน้าสาธิตที่ root ไปแทน templates
-
-เมื่อโครง Spring Boot พร้อม ให้คัดลอก **เนื้อหาภายใน** `frontend-draft/templates/` ไป `backend/src/main/resources/templates/` และ **เนื้อหาภายใน** `frontend-draft/static/` ไป `backend/src/main/resources/static/` อย่าคัดลอก `fixtures.js` หรือไฟล์ HTML ตัวอย่างไป production
+templates และ static ย้ายไปอยู่ใน `backend/src/main/resources/` แล้ว (backend ใช้ชุดนั้นจริง) ห้ามนำหน้าสาธิตในโฟลเดอร์นี้ไปแทน templates
+และอย่าคัดลอก `fixtures.js` หรือไฟล์ HTML ตัวอย่างไป production
 
 ทุกหน้าใช้ `fragments/layout :: head(title)`, `navbar`, `footer` ร่วมกัน CSS มีไฟล์เดียวคือ `static/css/style.css` ฟอร์มจริงใช้ `th:action` เพื่อให้ Spring Security แนบ CSRF token
 
