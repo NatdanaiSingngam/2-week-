@@ -188,7 +188,7 @@ cd backend
 |---|---|---|---|
 | 1 | หน้า 403/404/500 เป็น Whitelabel ภาษาอังกฤษ / JSON error มี stack trace | เรา | **แก้แล้ว** (stack trace 22 ต.ค., หน้า error ภาษาไทย 24 ต.ค. งาน A5) |
 | 2 | หัวข้อหมวดทักษะในหน้า resume แสดงคีย์อังกฤษ (programming, database, soft ...) | เพื่อน | **แก้แล้ว** 27 ต.ค. (แสดงชื่อไทย) — `templates/student/resume.html` |
-| 3 | ส่วน "ไม่พบตำแหน่งงาน" (job == null) ใน job-detail ไม่เคยถูกใช้ (ตอนนี้ 404 ไปที่ `error/404.html` แทน) | ตกลงร่วมกัน | ยังไม่แก้ — `templates/company/job-detail.html` |
+| 3 | ส่วน "ไม่พบตำแหน่งงาน" (job == null) ใน job-detail ไม่เคยถูกใช้ | ตกลงร่วมกัน | **แก้แล้ว** 27 ต.ค. (แบบที่ 2: ตอบ 404 แต่แสดงส่วน "ไม่พบตำแหน่งงาน" + ปุ่มกลับรายการตำแหน่ง) — `JobController.java` |
 | 4 | templates/static มี 2 ชุด (`frontend-draft/` กับ `backend/`) เสี่ยงแก้ไม่ตรงกัน | เพื่อน | **แก้แล้ว** 27 ต.ค. (เหลือชุดเดียวใน `backend/`, preview ใน `frontend-draft/` ดึง static จาก backend) |
 | 5 | `job.skills` เป็น `{name, category}` แต่เอกสารสั่งงานเขียนว่า list ข้อความ | แก้เอกสาร | ยังไม่แก้ — `dto/JobDetail.java` |
 | 6 | `static/images/workmatch.svg` มี metadata เกินมาตอนคัดลอก | เรา | **แก้แล้ว** 22 ต.ค. |
