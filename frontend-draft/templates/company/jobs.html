@@ -1,9 +1,0 @@
-<!DOCTYPE html>
-<html lang="th" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('ตำแหน่งงานของฉัน')}"><title>ตำแหน่งงานของฉัน | Workmatch</title></head>
-<body><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="container main"><div class="page-heading"><div><p class="eyebrow">COMPANY WORKSPACE</p><h1>ตำแหน่งงานของฉัน</h1><p>จัดการโอกาสสหกิจศึกษา และค้นหานักศึกษาที่มีทักษะตรงกับทีมของคุณ</p></div><a class="button" th:href="@{/company/jobs/new}">+ สร้างตำแหน่งใหม่</a></div>
-<section class="card"><div class="card-title"><h2>ตำแหน่งงานทั้งหมด</h2><span class="badge" th:text="${(jobs == null ? 0 : #lists.size(jobs)) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div>
-<div class="empty" th:if="${#lists.isEmpty(jobs)}"><div class="symbol" aria-hidden="true">＋</div><h2>ยังไม่มีตำแหน่งงาน</h2><p>เริ่มสร้างตำแหน่งแรก เพื่อค้นหานักศึกษาที่เหมาะกับบริษัท</p><a class="button" th:href="@{/company/jobs/new}">สร้างตำแหน่งแรก</a></div>
-<div class="table-wrap" th:if="${not #lists.isEmpty(jobs)}"><table><thead><tr><th scope="col">ชื่อตำแหน่ง</th><th scope="col">จำนวนทักษะ</th><th scope="col">ผู้สมัครที่จับคู่ได้</th></tr></thead><tbody><tr th:each="item : ${jobs}"><td><a th:href="@{/company/jobs/{id}(id=${item.id})}" th:text="${item.title}">ชื่อตำแหน่ง</a></td><td th:text="${item.skillCount}">0</td><td th:text="${item.applicantCount}">0</td></tr></tbody></table></div></section></main>
-<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

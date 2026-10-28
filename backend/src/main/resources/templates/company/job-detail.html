@@ -2,9 +2,7 @@
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('รายละเอียดตำแหน่งงาน')}"><title>รายละเอียดตำแหน่งงาน | Workmatch</title></head>
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
-<!--/* TODO(integration, ตกลงร่วมกัน): ส่วน th:if="${job == null}" ด้านล่างไม่เคยถูกใช้
-     เพราะ backend ตอบ 404 (ประกาศไม่มีหรือเป็นของบริษัทอื่น) -> ผู้ใช้จะเห็นหน้า error แทน
-     ถ้าอยากใช้หน้านี้ ให้ backend (ธนวัฒน์) render job-detail พร้อม status 404 หรือย้ายข้อความนี้ไปไว้ใน templates/error/404.html */-->
+<!--/* job == null: backend ตอบ 404 เมื่อไม่พบตำแหน่งงานหรือเป็นของบริษัทอื่น แล้วแสดงส่วน "ไม่พบตำแหน่งงาน" ด้านล่าง (TODO ข้อ 3 แก้ 27 ต.ค.) */-->
 <main id="main" class="container main"><div th:if="${job == null}" class="empty"><h1>ไม่พบตำแหน่งงาน</h1><a class="button" th:href="@{/company/jobs}">กลับไปรายการตำแหน่ง</a></div><th:block th:if="${job != null}">
 <div class="page-heading"><div><p class="eyebrow">JOB OVERVIEW</p><h1 th:text="${job.title}">ชื่อตำแหน่ง</h1><p>ทักษะที่ต้องการ และนักศึกษาที่จับคู่กับตำแหน่งนี้</p></div><a class="button secondary" th:href="@{/company/jobs}">กลับไปรายการตำแหน่ง</a></div>
 <section class="card"><h2>รายละเอียดงาน</h2><p class="pre-line" th:text="${job.description}">รายละเอียดงาน</p><h3>ทักษะที่ต้องการ</h3><p th:if="${#lists.isEmpty(job.skills)}" class="muted">ยังไม่พบทักษะในรายละเอียดงาน</p><span class="badge" th:each="skill : ${job.skills}" th:text="${skill.name}">ทักษะ</span></section>

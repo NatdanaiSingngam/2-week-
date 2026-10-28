@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * ไม่พบประกาศงาน หรือเป็นประกาศของบริษัทอื่น -> ตอบ 404 และแสดง templates/error/404.html (ภาษาไทย, งาน A5)
- * TODO(integration, ตกลงร่วมกับชญาณัตถพล): ส่วน th:if="${job == null}" ใน job-detail.html ยังไม่ถูกใช้
- *   ถ้าอยากให้แสดงหน้านั้นแทน error/404.html ให้ controller render job-detail พร้อม status 404 และ job = null
+ * ไม่พบประกาศงาน หรือเป็นประกาศของบริษัทอื่น -> 404
+ * หน้า /company/jobs/{id} จับไว้แล้วแสดง job-detail ส่วน "ไม่พบตำแหน่งงาน" (JobController.detail)
+ * ที่อื่นที่หลุดมาจะใช้ templates/error/404.html
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class JobNotFoundException extends RuntimeException {

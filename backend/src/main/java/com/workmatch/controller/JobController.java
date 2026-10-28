@@ -2,10 +2,12 @@ package com.workmatch.controller;
 
 import com.workmatch.dto.JobForm;
 import com.workmatch.entity.User;
+import com.workmatch.exception.JobNotFoundException;
 import com.workmatch.nlp.NlpUnavailableException;
 import com.workmatch.service.CurrentUserService;
 import com.workmatch.service.JobService;
 import com.workmatch.service.MatchService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class JobController {
@@ -65,9 +69,17 @@ public class JobController {
     }
 
     @GetMapping("/company/jobs/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        // getJobDetail ตรวจว่าเป็นประกาศของบริษัทนี้ก่อน (ไม่ใช่ -> 404) แล้วค่อยดึงผู้สมัคร
-        model.addAttribute("job", jobService.getJobDetail(currentUserService.getCurrentUser(), id));
+    public String detail(@PathVariable Long id, Model model, HttpServletResponse response) {
+        // getJobDetail ตรวจว่าเป็นประกาศของบริษัทนี้ก่อน แล้วค่อยดึงผู้สมัคร
+        try {
+            model.addAttribute("job", jobService.getJobDetail(currentUserService.getCurrentUser(), id));
+        } catch (JobNotFoundException e) {
+            // ไม่มีประกาศนี้ หรือเป็นของบริษัทอื่น: ตอบ 404 แต่ใช้หน้า job-detail ส่วน job == null ของชญาณัตถพล
+            // ("ไม่พบตำแหน่งงาน" + ปุ่มกลับไปรายการตำแหน่ง) ไม่ส่งข้อมูลงานหรือผู้สมัครใด ๆ ออกไป (TODO ข้อ 3)
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            model.addAttribute("applicants", List.of());
+            return "company/job-detail";
+        }
         model.addAttribute("applicants", matchService.applicantsFor(id));
         return "company/job-detail";
     }
