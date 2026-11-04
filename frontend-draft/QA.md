@@ -15,7 +15,7 @@
 
 ## ยังต้องทดสอบร่วมกับ backend
 
-repository ยังไม่มี Spring Boot backend จึงยังไม่ใช่ end-to-end test
+อัปเดต 4 พฤศจิกายน 2026: backend อยู่ใน repository แล้ว และมีการรัน end-to-end ผ่านสคริปต์ 18 ข้อตรวจสอบ (สมัคร, อัปโหลด resume, สกัดทักษะผ่าน NLP, จับคู่, แดชบอร์ด) ผ่านทั้งหมด โดยใช้ฐานข้อมูล H2 โหมด MySQL ส่วนรายการด้านล่างที่ยังไม่ได้ตรวจจริงคือ MySQL จริงและการดูหน้าจอด้วยเบราว์เซอร์
 
 - การสมัคร/เข้าสู่ระบบจริง, BCrypt, สิทธิ์ตาม role, การ redirect
 - การเติม CSRF token ของ Spring Security และการ submit POST จริง (smoke test ใช้ test URL resolver และไม่ได้รัน servlet/security filter)

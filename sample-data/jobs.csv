@@ -1,0 +1,11 @@
+company,title,description
+บริษัท ซอฟต์เวิร์ค จำกัด,Backend Developer Intern,"รับนักศึกษาฝึกงานพัฒนาระบบหลังบ้านด้วย Java และ Spring Boot เขียน REST API เชื่อมต่อฐานข้อมูล MySQL ควบคุมเวอร์ชันด้วย Git และใช้ Docker ในการรันระบบ"
+บริษัท ดาต้าเว็บ จำกัด,Python Developer Intern,ต้องการนักศึกษาที่เขียน Python พัฒนาเว็บด้วย Django จัดเก็บข้อมูลใน PostgreSQL ใช้งาน Linux ได้ และมีพื้นฐาน Docker พร้อมใช้ Git ทำงานร่วมกับทีม
+บริษัท ครีเอทีฟเว็บ จำกัด,Frontend Developer Intern,ฝึกงานพัฒนาหน้าเว็บ ใช้ HTML CSS และ JavaScript ร่วมกับ React ใช้ Git ในการทำงาน และต้องอ่านแบบจาก Figma ได้
+บริษัท ดิจิทัลสตูดิโอ จำกัด,Vue Frontend Intern,พัฒนาเว็บแอปด้วย Vue.js และ TypeScript จัดรูปแบบหน้าด้วย Tailwind CSS ใช้ Git และอ่านเอกสารภาษาอังกฤษได้ดี
+บริษัท ร้านค้าอัจฉริยะ จำกัด,Data Analyst Intern,วิเคราะห์ข้อมูลยอดขายด้วย Python และ pandas ดึงข้อมูลด้วย SQL ทำแดชบอร์ดด้วย Power BI สรุปตัวเลขด้วย Excel และต้องมีการนำเสนอผลวิเคราะห์ต่อทีมงาน
+สถาบันวิจัยปัญญาประดิษฐ์,Machine Learning Intern,ช่วยงานวิจัย Machine Learning ด้วย Python และ TensorFlow หรือ PyTorch ทำงานด้านประมวลผลภาษาธรรมชาติ NLP บนระบบ Linux และใช้ Git เก็บงานทดลอง
+บริษัท ควอลิตี้ซอฟต์ จำกัด,QA Tester Intern,ทดสอบซอฟต์แวร์ ด้วย Selenium และ Postman บันทึกบั๊กลง Jira ตรวจข้อมูลด้วย SQL ใช้ Git และมีความรับผิดชอบต่องานที่ได้รับ
+บริษัท เน็ตเวิร์กโซลูชัน จำกัด,System and Network Intern,ดูแลระบบเครือข่ายและเซิร์ฟเวอร์ Linux ใช้ Docker เขียน Shell Script ศึกษา Cybersecurity อ่านเอกสารภาษาอังกฤษได้ และมีทักษะการแก้ปัญหา
+บริษัท ดีไซน์แล็บ จำกัด,UI/UX Designer Intern,ออกแบบ UI/UX ด้วย Figma ตกแต่งภาพด้วย Photoshop และ Illustrator ต้องมีความคิดสร้างสรรค์และนำเสนองานให้ลูกค้าได้
+บริษัท แอปแฟคทอรี่ จำกัด,Mobile Developer Intern,พัฒนาแอปมือถือด้วย Flutter และ Dart เชื่อมต่อ Firebase มีความรู้ Android และ Kotlin เก็บโค้ดใน GitHub และทำงานเป็นทีมได้
