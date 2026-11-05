@@ -70,3 +70,16 @@ def test_api_extract_and_match():
 
 def test_api_validation_error():
     assert client.post("/extract", json={}).status_code == 422
+
+
+def test_english_resume_with_skills():
+    assert names("Experienced with Python, Django, REST API and Git. Good communication skills.") >= {
+        "Python", "Django", "REST API", "Git"}
+
+
+def test_english_resume_without_skills():
+    text = "I enjoy reading books, traveling and playing football with my friends on weekends."
+    assert extract_skills(text) == []
+    r = client.post("/extract", json={"text": text})
+    assert r.status_code == 200 and r.json() == {"skills": []}
+    assert match_skills([], ["Python", "Git"])["score"] == 0.0

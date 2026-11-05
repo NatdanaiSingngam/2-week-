@@ -106,6 +106,27 @@ def main():
         add(f"| {ri} | {wbest} | {hbest} | {'ใช่' if ok else 'ไม่'} |")
     add(f"\nตรงกัน {agree} จาก 10 resume (นับว่าตรงถ้าตำแหน่งสูงสุดของระบบอยู่ในกลุ่มที่คะแนนสูงสุดเท่ากันตามคำตอบ)")
 
+    # ---------- กรณีพิเศษ ----------
+    add("\n## 4. กรณีพิเศษ\n")
+    add("| กรณี | ข้อความ | ทักษะที่ระบบดึงได้ | ผลที่คาดหวัง | ผ่าน |")
+    add("| --- | --- | --- | --- | --- |")
+    cases = [
+        ("CV ภาษาอังกฤษมีทักษะ", "Final-year computer science student. Experienced with Python, Django, REST API and Git. Good communication skills.",
+         {"Python", "Django", "REST API", "Git"}, "ดึงได้ครบ 4 ทักษะ (ภาษาอังกฤษใช้ได้)"),
+        ("CV ภาษาอังกฤษไม่มีทักษะ", "I enjoy reading books, traveling and playing football with my friends on weekends.",
+         set(), "ไม่พบทักษะ (รายการว่าง ไม่ error)"),
+        ("ข้อความว่าง/ช่องว่าง", "   ", set(), "ไม่พบทักษะ (รายการว่าง ไม่ error)"),
+    ]
+    for name, text_, want, expect in cases:
+        g = {s["name"] for s in extract_skills(text_)}
+        ok = "ใช่" if g == want else "ไม่"
+        add(f"| {name} | {text_.strip()[:60] or '(ว่าง)'} | {sorted(g) or '-'} | {expect} | {ok} |")
+    m1 = match_skills([], ["Python", "Git"])
+    m2 = match_skills(["Python"], [])
+    add("")
+    add(f"- ผู้สมัครไม่มีทักษะ จับคู่กับงานที่ต้องการ Python, Git: score {m1['score']} cosine {m1['cosine']} ขาด {m1['missing']}")
+    add(f"- งานไม่ระบุทักษะ: score {m2['score']} cosine {m2['cosine']} (ไม่หารด้วยศูนย์)")
+
     text = "\n".join(lines) + "\n"
     print(text)
     if out_path:
