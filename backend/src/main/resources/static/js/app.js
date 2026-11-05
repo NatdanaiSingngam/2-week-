@@ -47,6 +47,23 @@
     sync();
     wrap.appendChild(toggle);
   });
+  // Avatar menu (<details>): close when clicking outside or pressing Escape
+  document.querySelectorAll('details.user-menu').forEach(menu => {
+    document.addEventListener('click', event => { if (menu.open && !menu.contains(event.target)) menu.open = false; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+  });
+  // Register: change the name label/placeholder to match the selected role (นักศึกษา / สถานประกอบการ)
+  const nameLabel = document.querySelector('[data-label-student]');
+  if (nameLabel) {
+    const nameInput = document.getElementById(nameLabel.getAttribute('for'));
+    const syncRole = () => {
+      const company = document.querySelector('input[name=role][value=COMPANY]:checked') !== null;
+      nameLabel.textContent = company ? nameLabel.dataset.labelCompany : nameLabel.dataset.labelStudent;
+      if (nameInput) nameInput.placeholder = company ? nameInput.dataset.phCompany : nameInput.dataset.phStudent;
+    };
+    document.querySelectorAll('input[name=role]').forEach(radio => radio.addEventListener('change', syncRole));
+    syncRole();
+  }
   window.addEventListener('pageshow', resetForms);
   const current = location.pathname.replace(/\/$/, '');
   document.querySelectorAll('.nav-links a').forEach(link => {

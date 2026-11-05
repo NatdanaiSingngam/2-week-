@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-/** หน้า Dashboard นักศึกษา: hasResume และ matches เรียงคะแนนมากไปน้อย */
+/** หน้า Dashboard นักศึกษา: hasResume, skills (การ์ดทักษะด้านซ้าย) และ matches เรียงคะแนนมากไปน้อย */
 @Controller
 public class StudentDashboardController {
 
@@ -27,6 +27,7 @@ public class StudentDashboardController {
     public String dashboard(Model model) {
         User student = currentUserService.getCurrentUser();
         model.addAttribute("hasResume", resumeService.findResume(student).isPresent());
+        model.addAttribute("skills", resumeService.findSkills(student));
         model.addAttribute("matches", matchService.dashboardFor(student));
         return "student/dashboard";
     }

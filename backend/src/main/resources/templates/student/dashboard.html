@@ -1,67 +1,76 @@
 <!DOCTYPE html>
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('ผลจับคู่')}"><title>ผลจับคู่ | Workmatch</title></head>
+<head th:replace="~{fragments/layout :: head('หน้าหลัก')}"><title>หน้าหลัก | Workmatch</title></head>
+<!--/* กระดานสรุปผลนักศึกษา ตามเอกสาร รูปที่ 40: การ์ดโปรไฟล์ + ทักษะที่สกัดได้ (ซ้าย), ตำแหน่งงานที่เหมาะกับคุณพร้อมป้าย Match % (ขวา)
+     ปุ่ม "บันทึก" และ "ดูรายละเอียดงาน" ในรูปเป็นฟีเจอร์ช่วงถัดไป (Bookmark / Job Detail) จึงยังไม่แสดง */-->
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="container main">
+<div class="dash">
+  <aside class="dash-side" aria-label="ข้อมูลของฉัน">
+    <section class="card">
+      <div class="profile"><span class="avatar" aria-hidden="true" th:text="${#strings.isEmpty(displayName) ? '?' : #strings.substring(displayName, 0, 1)}">ณ</span><div><strong th:text="${displayName}">ชื่อนักศึกษา</strong><span>นักศึกษาสหกิจศึกษา</span></div></div>
+      <dl class="profile-facts" th:if="${hasResume == true}">
+        <div><dt>ตำแหน่งที่จับคู่ได้</dt><dd th:text="${#lists.size(matches) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
+        <div><dt>คะแนนสูงสุด</dt><dd th:text="${#lists.isEmpty(matches) ? '–' : #numbers.formatDecimal(matches[0].score == null ? 0 : matches[0].score, 1, 1) + '%'}">–</dd></div>
+        <div><dt>เหมาะมาก (70%+)</dt><dd th:text="${#lists.size(matches.?[score != null and score >= 70]) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
+      </dl>
+    </section>
+    <section class="card" aria-labelledby="skills-title">
+      <h2 id="skills-title" class="side-title">ทักษะที่สกัดได้จากเรซูเม่ (NLP)</h2>
+      <div class="tags" th:if="${skills != null and not #lists.isEmpty(skills)}"><span class="chip" th:each="skill : ${skills}" th:text="${skill.name}">Java</span></div>
+      <p class="muted" style="margin:0" th:if="${skills == null or #lists.isEmpty(skills)}">ยังไม่มีทักษะ <a th:href="@{/student/resume}">กรอกเรซูเม่</a> เพื่อให้ระบบสกัดทักษะ</p>
+    </section>
+  </aside>
 
-<div class="page-head">
-  <div><p class="eyebrow">แดชบอร์ดนักศึกษา</p><h1 th:text="${'สวัสดี ' + (displayName != null ? displayName : '')}">สวัสดี</h1><p>ดูว่าทักษะของคุณตรงกับตำแหน่งใด และควรพัฒนาอะไรเพิ่มก่อนเริ่มสหกิจศึกษา</p></div>
-  <div class="actions"><a class="button" th:href="@{/student/resume}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>แก้ไข resume</a></div>
-</div>
-
-<!--/* ยังไม่มี resume: แสดงขั้นตอนเริ่มต้น */-->
-<section class="card empty" th:if="${hasResume != true}">
-  <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg></div>
-  <h2>คุณยังไม่ได้กรอก resume</h2>
-  <p>เพิ่มประสบการณ์และทักษะของคุณ ระบบจะวิเคราะห์และจับคู่กับตำแหน่งสหกิจศึกษาให้ทันที</p>
-  <div class="actions"><a class="button" th:href="@{/student/resume}">เริ่มกรอก resume</a></div>
-</section>
-
-<th:block th:if="${hasResume == true}">
-<section class="card empty" th:if="${#lists.isEmpty(matches)}">
-  <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-  <h2>ยังไม่มีตำแหน่งงานที่จับคู่ได้</h2>
-  <p>ลองเพิ่มรายละเอียดทักษะใน resume หรือกลับมาดูอีกครั้งเมื่อมีตำแหน่งงานใหม่</p>
-  <div class="actions"><a class="button secondary" th:href="@{/student/resume}">แก้ไข resume</a></div>
-</section>
-
-<th:block th:if="${not #lists.isEmpty(matches)}">
-<div class="stats">
-  <div class="stat"><span class="stat-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span><div><span class="stat-label">ตำแหน่งที่จับคู่ได้</span><span class="stat-value" th:text="${#lists.size(matches) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div></div>
-  <div class="stat"><span class="stat-icon green" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></span><div><span class="stat-label">คะแนนสูงสุด</span><span class="stat-value" th:text="${#numbers.formatDecimal((matches[0].score == null ? 0 : matches[0].score), 1, 1) + '%'}">0.0%</span></div></div>
-  <div class="stat"><span class="stat-icon amber" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></span><div><span class="stat-label">ตำแหน่งที่เหมาะมาก (70%+)</span><span class="stat-value" th:text="${#lists.size(matches.?[score != null and score >= 70]) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div></div>
-</div>
-
-<div class="section-title">
-  <h2>โอกาสที่เหมาะกับคุณ</h2>
-  <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะมาก 70%+</span><span class="level medium">ปานกลาง 40–69%</span><span class="level low">ควรพัฒนาเพิ่ม &lt;40%</span></div>
-</div>
-
-<div class="match-list">
-<article class="match-card" th:each="match, it : ${matches}"
-         th:with="s=${match.score == null ? 0 : match.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
-  <div class="match-main">
-    <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความเหมาะสม ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong></div>
-    <div class="match-info">
-      <span class="rank-tag" th:text="${'อันดับ ' + it.count}">อันดับ 1</span>
-      <h3 th:text="${match.jobTitle}">ชื่อตำแหน่ง</h3>
-      <span class="match-company"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg><span th:text="${match.companyName}">บริษัท</span></span>
-      <div class="match-meta">
-        <span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span>
-        <span title="ค่า Cosine similarity ระหว่างทักษะใน resume กับทักษะของตำแหน่ง" th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(match.cosine == null ? 0 : match.cosine, 1, 1) + '%'}">ความคล้ายของทักษะ 0.0%</span>
-      </div>
+  <section aria-labelledby="matches-title">
+    <div class="dash-head">
+      <h1 id="matches-title">ตำแหน่งงานที่เหมาะกับคุณ</h1>
+      <p>ระบบจัดอันดับตำแหน่งงานตามค่าร้อยละความสอดคล้องกับทักษะของคุณ จากมากไปน้อย</p>
     </div>
-  </div>
-  <details class="skills">
-    <summary>ดูทักษะทั้งหมด <span class="summary-count" th:text="${'· ตรง ' + #lists.size(match.matched) + ' จาก ' + (#lists.size(match.matched) + #lists.size(match.missing)) + ' ทักษะ'}">· ตรง 0 จาก 0 ทักษะ</span><svg class="icon-sm chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
-    <div class="skill-cols">
-      <section><h4>ทักษะที่คุณมี</h4><div class="chips"><span class="badge badge-ok" th:each="skill : ${match.matched}" th:text="${skill}">ทักษะ</span></div><p class="muted" th:if="${#lists.isEmpty(match.matched)}">ยังไม่มีทักษะที่ตรงกับตำแหน่งนี้</p></section>
-      <section><h4>ควรเตรียมเพิ่ม</h4><div class="chips"><span class="badge badge-missing" th:each="skill : ${match.missing}" th:text="${skill}">ทักษะ</span><span class="badge badge-ok" th:if="${#lists.isEmpty(match.missing)}">คุณมีทักษะครบทุกข้อ</span></div></section>
+
+    <div class="card empty" th:if="${hasResume != true}">
+      <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg></div>
+      <h2>คุณยังไม่ได้กรอก resume</h2>
+      <p>เพิ่มประสบการณ์และทักษะของคุณ ระบบจะวิเคราะห์และจับคู่กับตำแหน่งสหกิจศึกษาให้ทันที</p>
+      <div class="actions"><a class="button" th:href="@{/student/resume}">เริ่มกรอก resume</a></div>
     </div>
-  </details>
-</article>
+
+    <th:block th:if="${hasResume == true}">
+    <div class="card empty" th:if="${#lists.isEmpty(matches)}">
+      <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+      <h2>ยังไม่มีตำแหน่งงานที่จับคู่ได้</h2>
+      <p>ลองเพิ่มรายละเอียดทักษะใน resume หรือกลับมาดูอีกครั้งเมื่อมีตำแหน่งงานใหม่</p>
+      <div class="actions"><a class="button secondary" th:href="@{/student/resume}">แก้ไข resume</a></div>
+    </div>
+
+    <div class="match-list" th:if="${not #lists.isEmpty(matches)}">
+      <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะมาก 70%+</span><span class="level medium">ปานกลาง 40–69%</span><span class="level low">ควรพัฒนาเพิ่ม &lt;40%</span></div>
+      <article class="match-card" th:each="match, it : ${matches}"
+               th:with="s=${match.score == null ? 0 : match.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+        <span class="match-ribbon" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(s, 1, 1) + '%'}">Match 0.0%</span>
+        <div class="match-body">
+          <span class="mono" th:text="${it.count}" th:aria-label="${'อันดับ ' + it.count}">1</span>
+          <div class="match-info">
+            <h3 th:text="${match.jobTitle}">ชื่อตำแหน่ง</h3>
+            <span class="match-company" th:text="${match.companyName}">บริษัท</span>
+            <div class="tags" th:if="${not #lists.isEmpty(match.matched)}"><span class="tag" th:each="skill : ${match.matched}" th:text="${skill}">Java</span></div>
+            <div class="match-meta">
+              <span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span>
+              <span title="ค่า Cosine similarity ระหว่างทักษะใน resume กับทักษะของตำแหน่ง" th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(match.cosine == null ? 0 : match.cosine, 1, 1) + '%'}">ความคล้ายของทักษะ 0.0%</span>
+            </div>
+          </div>
+        </div>
+        <details class="skills">
+          <summary>ดูทักษะทั้งหมด <span class="summary-count" th:text="${'· ตรง ' + #lists.size(match.matched) + ' จาก ' + (#lists.size(match.matched) + #lists.size(match.missing)) + ' ทักษะ'}">· ตรง 0 จาก 0 ทักษะ</span><svg class="icon-sm chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="skill-cols">
+            <section><h4>ทักษะที่คุณมี</h4><div><span class="badge badge-ok" th:each="skill : ${match.matched}" th:text="${skill}">ทักษะ</span></div><p class="muted" th:if="${#lists.isEmpty(match.matched)}">ยังไม่มีทักษะที่ตรงกับตำแหน่งนี้</p></section>
+            <section><h4>ควรเตรียมเพิ่ม</h4><div><span class="badge badge-missing" th:each="skill : ${match.missing}" th:text="${skill}">ทักษะ</span><span class="badge badge-ok" th:if="${#lists.isEmpty(match.missing)}">คุณมีทักษะครบทุกข้อ</span></div></section>
+          </div>
+        </details>
+      </article>
+    </div>
+    </th:block>
+  </section>
 </div>
-</th:block>
-</th:block>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('สมัครสมาชิก')}"><title>สมัครสมาชิก | Workmatch</title></head>
-<body><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="container main">
-<div class="auth-shell">
-  <section th:replace="~{fragments/layout :: authPanel}"></section>
-  <section class="auth-form" aria-labelledby="register-title">
-    <h2 id="register-title">สมัครสมาชิก</h2>
-    <p class="lead">เลือกบทบาทและสร้างบัญชีเพื่อเริ่มใช้งาน</p>
+<!--/* หน้าจอลงทะเบียน ตามเอกสาร รูปที่ 34-35: การ์ดกลางจอ แท็บ นักศึกษา / สถานประกอบการ
+     หมายเหตุ: ช่อง ชื่อ-นามสกุลแยก และรหัสนิสิต ในรูปที่ 34 ยังไม่มีใน backend (ใช้ displayName ช่องเดียว) */-->
+<body>
+<main id="main" class="auth-page">
+  <section class="auth-card wide" aria-labelledby="register-title">
+    <a class="auth-logo" th:href="@{/}"><img src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch หน้าแรก" width="150" height="32" /></a>
+    <h1 id="register-title">สร้างบัญชีผู้ใช้งาน</h1>
+    <p class="lead">เริ่มต้นใช้งานแพลตฟอร์ม Workmatch</p>
     <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
     <form method="post" th:action="@{/register}">
-      <fieldset><legend>คุณต้องการใช้งานในบทบาทใด</legend>
-        <div class="roles">
-          <label class="role-choice"><input type="radio" name="role" value="STUDENT" required="required" checked="checked" th:checked="${param.role == null or param.role[0] != 'COMPANY'}" /><span class="role-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span><span>นักศึกษา<small>หาตำแหน่งสหกิจศึกษา</small></span></label>
-          <label class="role-choice"><input type="radio" name="role" value="COMPANY" th:checked="${param.role != null and param.role[0] == 'COMPANY'}" /><span class="role-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h.01M9 13h.01M9 17h.01"/></svg></span><span>บริษัท<small>ประกาศตำแหน่งและดูผู้สมัคร</small></span></label>
+      <fieldset><legend class="visually-hidden">ประเภทบัญชี</legend>
+        <div class="segmented">
+          <label><input type="radio" name="role" value="STUDENT" required="required" checked="checked" th:checked="${param.role == null or param.role[0] != 'COMPANY'}" />นักศึกษา</label>
+          <label><input type="radio" name="role" value="COMPANY" th:checked="${param.role != null and param.role[0] == 'COMPANY'}" />สถานประกอบการ</label>
         </div>
       </fieldset>
-      <div class="field"><label for="displayName">ชื่อที่แสดง / ชื่อบริษัท</label><input id="displayName" name="displayName" required="required" autocomplete="name" th:value="${param.displayName != null ? param.displayName[0] : ''}" /></div>
-      <div class="field"><label for="email">อีเมล</label><input id="email" name="email" type="email" autocomplete="username" required="required" th:value="${param.email != null ? param.email[0] : ''}" placeholder="yourname@example.com" /></div>
-      <div class="field"><label for="password">รหัสผ่าน</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required="required" aria-describedby="password-note" /></div><p id="password-note" class="field-note">ใช้รหัสผ่านอย่างน้อย 8 ตัวอักษร</p></div>
-      <button class="full" type="submit">สร้างบัญชี</button>
+      <div class="field"><label for="displayName" data-label-student="ชื่อ-นามสกุล" data-label-company="ชื่อสถานประกอบการ">ชื่อที่แสดง / ชื่อบริษัท</label><input id="displayName" name="displayName" required="required" autocomplete="name" data-ph-student="เช่น สมชาย ใจดี" data-ph-company="เช่น บริษัท ตัวอย่าง จำกัด" th:value="${param.displayName != null ? param.displayName[0] : ''}" /></div>
+      <div class="field"><label for="email">อีเมล</label><input id="email" name="email" type="email" autocomplete="username" required="required" th:value="${param.email != null ? param.email[0] : ''}" placeholder="example@up.ac.th" /></div>
+      <div class="field"><label for="password">รหัสผ่าน</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required="required" aria-describedby="password-note" placeholder="กำหนดรหัสผ่านอย่างน้อย 8 ตัวอักษร" /></div><p id="password-note" class="field-note">ใช้รหัสผ่านอย่างน้อย 8 ตัวอักษร</p></div>
+      <button class="full" type="submit">สมัครสมาชิก</button>
     </form>
     <p class="auth-switch">มีบัญชีอยู่แล้ว? <a th:href="@{/login}">เข้าสู่ระบบ</a></p>
   </section>
-</div>
 </main>
-<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>
