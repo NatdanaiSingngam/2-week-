@@ -227,4 +227,45 @@ class WebFlowTests {
                 .andExpect(view().name("company/job-form"))
                 .andExpect(model().attributeExists("error"));
     }
+
+    @Test
+    void companyEditsAndDeletesOwnJobButOtherCompanyGets404() throws Exception {
+        createUser("a@co.com", Role.COMPANY);
+        createUser("b@co.com", Role.COMPANY);
+        when(nlpClient.extractSkills("ต้องการ Python")).thenReturn(List.of(new ExtractedSkill("Python", "programming")));
+        when(nlpClient.extractSkills("ต้องการ Java และ Git")).thenReturn(List.of(
+                new ExtractedSkill("Java", "programming"), new ExtractedSkill("Git", "tool")));
+        String location = mvc.perform(post("/company/jobs").with(csrf()).with(user("a@co.com").roles("COMPANY"))
+                        .param("title", "Intern").param("description", "ต้องการ Python"))
+                .andReturn().getResponse().getRedirectedUrl();
+        Long id = jobs.findAll().get(0).getId();
+
+        mvc.perform(get(location + "/edit").with(user("a@co.com").roles("COMPANY")))
+                .andExpect(status().isOk()).andExpect(view().name("company/job-form"))
+                .andExpect(model().attributeExists("job", "editId"));
+        mvc.perform(get(location + "/edit").with(user("b@co.com").roles("COMPANY")))
+                .andExpect(status().isNotFound());
+        mvc.perform(post(location + "/edit").with(csrf()).with(user("b@co.com").roles("COMPANY"))
+                        .param("title", "x").param("description", "y"))
+                .andExpect(status().isNotFound());
+
+        mvc.perform(post(location + "/edit").with(csrf()).with(user("a@co.com").roles("COMPANY"))
+                        .param("title", "Intern 2").param("description", "ต้องการ Java และ Git"))
+                .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl(location));
+        assertThat(jobs.findById(id).orElseThrow().getTitle()).isEqualTo("Intern 2");
+        assertThat(jobSkills.findByJobId(id)).extracting("skillName").containsExactlyInAnyOrder("Java", "Git");
+
+        mvc.perform(post(location + "/edit").with(csrf()).with(user("a@co.com").roles("COMPANY"))
+                        .param("title", "").param("description", "Java"))
+                .andExpect(status().isOk()).andExpect(view().name("company/job-form"))
+                .andExpect(model().attributeExists("error"));
+
+        mvc.perform(post(location + "/delete").with(csrf()).with(user("b@co.com").roles("COMPANY")))
+                .andExpect(status().isNotFound());
+        assertThat(jobs.findById(id)).isPresent();
+        mvc.perform(post(location + "/delete").with(csrf()).with(user("a@co.com").roles("COMPANY")))
+                .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/company/jobs"));
+        assertThat(jobs.findById(id)).isEmpty();
+        assertThat(jobSkills.findByJobId(id)).isEmpty();
+    }
 }

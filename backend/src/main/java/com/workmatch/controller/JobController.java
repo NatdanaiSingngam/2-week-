@@ -83,4 +83,54 @@ public class JobController {
         model.addAttribute("applicants", matchService.applicantsFor(id));
         return "company/job-detail";
     }
+
+    @GetMapping("/company/jobs/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model, HttpServletResponse response) {
+        try {
+            model.addAttribute("job", jobService.getJobForm(currentUserService.getCurrentUser(), id));
+        } catch (JobNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            model.addAttribute("applicants", List.of());
+            return "company/job-detail";
+        }
+        model.addAttribute("editId", id);
+        return "company/job-form";
+    }
+
+    @PostMapping("/company/jobs/{id}/edit")
+    public String update(@PathVariable Long id,
+                         @RequestParam(required = false) String title,
+                         @RequestParam(required = false) String description,
+                         Model model, HttpServletResponse response) {
+        try {
+            jobService.updateJob(currentUserService.getCurrentUser(), id, title, description);
+        } catch (JobNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            model.addAttribute("applicants", List.of());
+            return "company/job-detail";
+        } catch (NlpUnavailableException | IllegalArgumentException e) {
+            model.addAttribute("job", new JobForm(title, description));
+            model.addAttribute("editId", id);
+            model.addAttribute("error", e.getMessage());
+            return "company/job-form";
+        }
+        try {
+            matchService.recalculateForJob(id);
+        } catch (RuntimeException e) {
+            log.warn("คำนวณคะแนนจับคู่ไม่สำเร็จ (job {})", id, e);
+        }
+        return "redirect:/company/jobs/" + id;
+    }
+
+    @PostMapping("/company/jobs/{id}/delete")
+    public String delete(@PathVariable Long id, Model model, HttpServletResponse response) {
+        try {
+            jobService.deleteJob(currentUserService.getCurrentUser(), id);
+        } catch (JobNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            model.addAttribute("applicants", List.of());
+            return "company/job-detail";
+        }
+        return "redirect:/company/jobs";
+    }
 }

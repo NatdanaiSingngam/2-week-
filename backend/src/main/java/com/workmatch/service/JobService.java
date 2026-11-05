@@ -1,6 +1,7 @@
 package com.workmatch.service;
 
 import com.workmatch.dto.JobDetail;
+import com.workmatch.dto.JobForm;
 import com.workmatch.dto.JobListItem;
 import com.workmatch.dto.SkillView;
 import com.workmatch.entity.Job;
@@ -38,15 +39,31 @@ public class JobService {
         this.matches = matches;
     }
 
+    private static String checkTitle(String title) {
+        String t = title == null ? "" : title.trim();
+        if (t.isEmpty()) throw new IllegalArgumentException("กรุณากรอกชื่อตำแหน่ง");
+        if (t.length() > MAX_TITLE) throw new IllegalArgumentException("ชื่อตำแหน่งยาวเกิน 200 ตัวอักษร");
+        return t;
+    }
+
+    private static String checkDescription(String description) {
+        String d = description == null ? "" : description.trim();
+        if (d.isEmpty()) throw new IllegalArgumentException("กรุณากรอกรายละเอียดงาน");
+        if (d.length() > MAX_DESCRIPTION) throw new IllegalArgumentException("รายละเอียดงานยาวเกิน 20,000 ตัวอักษร");
+        return d;
+    }
+
+    private Job ownedJob(User company, Long jobId) {
+        Job job = jobs.findById(jobId).orElseThrow(JobNotFoundException::new);
+        if (!job.getCompany().getId().equals(company.getId())) throw new JobNotFoundException();
+        return job;
+    }
+
     /** สร้างประกาศงาน เรียก NLP กับ description แล้วบันทึก jobs + job_skills คืน id ของประกาศ */
     @Transactional
     public Long createJob(User company, String title, String description) {
-        String t = title == null ? "" : title.trim();
-        String d = description == null ? "" : description.trim();
-        if (t.isEmpty()) throw new IllegalArgumentException("กรุณากรอกชื่อตำแหน่ง");
-        if (t.length() > MAX_TITLE) throw new IllegalArgumentException("ชื่อตำแหน่งยาวเกิน 200 ตัวอักษร");
-        if (d.isEmpty()) throw new IllegalArgumentException("กรุณากรอกรายละเอียดงาน");
-        if (d.length() > MAX_DESCRIPTION) throw new IllegalArgumentException("รายละเอียดงานยาวเกิน 20,000 ตัวอักษร");
+        String t = checkTitle(title);
+        String d = checkDescription(description);
 
         List<ExtractedSkill> extracted = nlpClient.extractSkills(d); // ล้มเหลวจะไม่บันทึกอะไรเลย
 
@@ -83,5 +100,41 @@ public class JobService {
                 .map(s -> new SkillView(s.getSkillName(), s.getCategory()))
                 .toList();
         return new JobDetail(job.getId(), job.getTitle(), job.getDescription(), skills);
+    }
+
+    /** แก้ไขประกาศงานของบริษัทตัวเอง: สกัดทักษะใหม่จาก description แล้วแทนที่ทักษะเดิม (NLP ล้มเหลวจะไม่แก้อะไรเลย) */
+    @Transactional
+    public void updateJob(User company, Long jobId, String title, String description) {
+        Job job = ownedJob(company, jobId);
+        String t = checkTitle(title);
+        String d = checkDescription(description);
+        List<ExtractedSkill> extracted = nlpClient.extractSkills(d);
+
+        job.setTitle(t);
+        job.setDescription(d);
+        jobs.save(job);
+
+        jobSkills.deleteByJobId(job.getId());
+        List<JobSkill> rows = new ArrayList<>();
+        for (ExtractedSkill s : ResumeService.dedupe(extracted)) {
+            rows.add(new JobSkill(job, s.name(), s.category()));
+        }
+        jobSkills.saveAll(rows);
+    }
+
+    /** ลบประกาศงานของบริษัทตัวเอง พร้อมทักษะและผลจับคู่ของประกาศนั้น */
+    @Transactional
+    public void deleteJob(User company, Long jobId) {
+        Job job = ownedJob(company, jobId);
+        matches.deleteByJobId(job.getId());
+        jobSkills.deleteByJobId(job.getId());
+        jobs.delete(job);
+    }
+
+    /** ข้อมูลเดิมสำหรับเติมฟอร์มแก้ไข */
+    @Transactional(readOnly = true)
+    public JobForm getJobForm(User company, Long jobId) {
+        Job job = ownedJob(company, jobId);
+        return new JobForm(job.getTitle(), job.getDescription());
     }
 }

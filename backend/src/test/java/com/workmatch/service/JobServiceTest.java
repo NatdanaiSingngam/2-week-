@@ -103,4 +103,65 @@ class JobServiceTest {
         assertThat(detail.getTitle()).isEqualTo("Data Intern");
         assertThat(detail.getSkills()).extracting("name").containsExactly("Python");
     }
+
+    private Job ownedJob(User owner) {
+        Job job = new Job();
+        job.setId(9L);
+        job.setCompany(owner);
+        job.setTitle("เดิม");
+        job.setDescription("Python");
+        return job;
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void updateJobReplacesTitleDescriptionAndSkills() {
+        User owner = company(2L);
+        Job job = ownedJob(owner);
+        when(jobs.findById(9L)).thenReturn(Optional.of(job));
+        when(nlpClient.extractSkills("ต้องการ Java")).thenReturn(List.of(new ExtractedSkill("Java", "programming")));
+
+        service.updateJob(owner, 9L, " ใหม่ ", "ต้องการ Java");
+
+        assertThat(job.getTitle()).isEqualTo("ใหม่");
+        assertThat(job.getDescription()).isEqualTo("ต้องการ Java");
+        verify(jobSkills).deleteByJobId(9L);
+        ArgumentCaptor<List<JobSkill>> rows = ArgumentCaptor.forClass(List.class);
+        verify(jobSkills).saveAll(rows.capture());
+        assertThat(rows.getValue()).extracting(JobSkill::getSkillName).containsExactly("Java");
+    }
+
+    @Test
+    void updateJobDoesNotChangeAnythingWhenNlpFails() {
+        User owner = company(2L);
+        when(jobs.findById(9L)).thenReturn(Optional.of(ownedJob(owner)));
+        when(nlpClient.extractSkills(anyString())).thenThrow(new NlpUnavailableException());
+
+        assertThatThrownBy(() -> service.updateJob(owner, 9L, "ใหม่", "Java")).isInstanceOf(NlpUnavailableException.class);
+        verify(jobs, never()).save(any());
+        verify(jobSkills, never()).deleteByJobId(any());
+    }
+
+    @Test
+    void companyCannotUpdateOrDeleteAnotherCompanysJob() {
+        when(jobs.findById(9L)).thenReturn(Optional.of(ownedJob(company(3L))));
+
+        assertThatThrownBy(() -> service.updateJob(company(2L), 9L, "x", "y")).isInstanceOf(JobNotFoundException.class);
+        assertThatThrownBy(() -> service.deleteJob(company(2L), 9L)).isInstanceOf(JobNotFoundException.class);
+        verify(jobs, never()).delete(any());
+        verify(matches, never()).deleteByJobId(any());
+    }
+
+    @Test
+    void deleteJobRemovesMatchesSkillsAndJob() {
+        User owner = company(2L);
+        Job job = ownedJob(owner);
+        when(jobs.findById(9L)).thenReturn(Optional.of(job));
+
+        service.deleteJob(owner, 9L);
+
+        verify(matches).deleteByJobId(9L);
+        verify(jobSkills).deleteByJobId(9L);
+        verify(jobs).delete(job);
+    }
 }
