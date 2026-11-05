@@ -329,3 +329,229 @@ details.job-info[open] summary{margin-bottom:12px}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important}
   .button:active,button:active{transform:none}
 }
+
+/* =====================================================================
+   หน้าเพิ่มเติมตามเอกสารบทที่ 3 (รูปที่ 36-52)
+   ===================================================================== */
+
+/* ---------- เมนูในวงกลมผู้ใช้ ---------- */
+.menu-links{display:grid;gap:2px;margin:0 0 10px;padding:8px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.menu-links a{display:flex;align-items:center;min-height:38px;padding:0 8px;border-radius:8px;color:var(--text);text-decoration:none;font-size:.9rem}
+.menu-links a:hover{background:var(--primary-soft);color:var(--primary-text)}
+
+/* ---------- สถานะ (ข้อความ + สี) ---------- */
+.status{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;font-size:.78rem;font-weight:500;white-space:nowrap}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.status.PENDING{background:var(--warn-soft);color:var(--warn-text)}
+.status.INTERVIEW{background:var(--primary-soft);color:var(--primary-text)}
+.status.HIRED{background:var(--success-soft);color:var(--success-text)}
+.status.REJECTED{background:#F3F4F6;color:#4B5563}
+.status.OPEN,.status.APPROVED{background:var(--success-soft);color:var(--success-text)}
+.status.DRAFT,.status.NONE{background:#F3F4F6;color:#4B5563}
+.status.CLOSED{background:var(--danger-soft);color:var(--danger-text)}
+.verified{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:999px;background:var(--success-soft);color:var(--success-text);font-size:.76rem;font-weight:500}
+.verified::before{content:"\2713";font-weight:700}
+
+/* ---------- แท็บ (รูปที่ 45) ---------- */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:6px 0 18px;overflow-x:auto}
+.tabs a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:.92rem}
+.tabs a:hover{color:var(--primary-text)}
+.tabs a[aria-current=page]{color:var(--primary-text);border-bottom-color:var(--primary);font-weight:600}
+.tabs .sep{width:1px;background:var(--border);margin:10px 6px}
+
+/* ---------- ค้นหางาน (รูปที่ 38) ---------- */
+.search-bar{display:grid;grid-template-columns:1fr 220px auto;gap:10px;padding:12px}
+.search-bar select,.select{min-height:44px;padding:0 12px;border:1px solid var(--input-border);border-radius:9px;background:var(--surface);color:var(--text)}
+.job-row{display:flex;gap:16px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow)}
+.job-row+.job-row{margin-top:12px}
+.job-row .grow{flex:1;min-width:0}
+.job-row h3{margin:0;font-size:1.02rem}
+.job-row h3 a{color:var(--heading);text-decoration:none}
+.job-row h3 a:hover{color:var(--primary-text)}
+.job-row .meta{color:var(--muted);font-size:.85rem;margin:2px 0 8px}
+.job-row .side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right;flex:none}
+.job-row .side small{color:var(--muted);font-size:.78rem}
+.score-pill{display:inline-flex;align-items:center;white-space:nowrap;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600}
+.score-pill.high{background:var(--success-soft);color:var(--success-text)}
+.score-pill.medium{background:var(--warn-soft);color:var(--warn-text)}
+.score-pill.low{background:#F3F4F6;color:#374151}
+
+/* ---------- รายละเอียดงาน (รูปที่ 39) ---------- */
+.job-hero{display:flex;gap:16px;align-items:flex-start}
+.mono.lg{width:52px;height:52px;font-size:1.1rem;background:var(--primary);color:#fff;border-radius:12px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.info{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.info dt{color:var(--muted);font-size:.8rem;margin-bottom:2px}
+.info dd{margin:0;color:var(--heading);font-size:.92rem;overflow-wrap:anywhere}
+.info dd.accent{color:var(--primary-text);font-weight:600}
+.apply-box{border-top:1px solid var(--border);margin-top:18px;padding-top:18px}
+.match-summary{display:flex;gap:14px;align-items:center;padding:14px;border-radius:12px;background:#F8FAFC;border:1px solid var(--border);margin-bottom:14px}
+
+/* ---------- หน้าบัญชีนักศึกษา (รูปที่ 36, 41, 42) ---------- */
+.account-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;align-items:start;max-width:960px;margin:0 auto}
+.account-nav{display:grid;gap:4px;position:sticky;top:88px}
+.account-nav-title{font-size:.78rem;color:var(--muted);padding:0 12px 6px}
+.account-nav a,.account-logout{display:flex;align-items:center;min-height:42px;padding:0 12px;border-radius:10px;color:var(--text);text-decoration:none;font-size:.92rem;background:transparent;border:0;font-weight:400;justify-content:flex-start;width:100%}
+.account-nav a:hover,.account-logout:hover{background:var(--primary-soft);color:var(--primary-text)}
+.account-nav a.active{background:var(--primary-soft);color:var(--primary-text);font-weight:600}
+.account-nav form{margin:12px 0 0}
+.account-logout{color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.form-grid .span-2{grid-column:1/-1}
+.form-section-title{font-size:1rem;margin:20px 0 12px}
+input[readonly]{background:#F3F4F6;color:var(--muted)}
+.list-item{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
+.list-item+.list-item{margin-top:12px}
+.list-item .grow{flex:1;min-width:0}
+.list-item h3{margin:0;font-size:1rem}
+.list-item .meta{color:var(--muted);font-size:.84rem}
+.star{color:#EAB308}
+
+/* ---------- เรซูเม่: อัปโหลดและแก้ไขทักษะ (รูปที่ 37) ---------- */
+.dropzone{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:28px 18px;border:2px dashed #CBD5E1;border-radius:14px;background:#F8FAFC;transition:border-color .15s var(--ease),background-color .15s var(--ease)}
+.dropzone:hover,.dropzone:focus-within{border-color:var(--primary);background:var(--primary-soft)}
+.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dropzone .up{width:48px;height:48px;border-radius:50%;background:var(--primary-soft);color:var(--primary-text);display:inline-flex;align-items:center;justify-content:center}
+.dropzone strong{color:var(--heading)}
+.dropzone strong span{color:var(--primary-text)}
+.dropzone small{color:var(--muted)}
+.file-row{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#F8FAFC;margin-top:14px}
+.file-row .pdf{color:#DC2626;flex:none}
+.file-row .grow{flex:1;min-width:0}
+.file-row strong{display:block;font-size:.9rem;overflow-wrap:anywhere}
+.file-row small{color:var(--success-text);font-size:.78rem}
+.icon-button{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;padding:0;border-radius:8px;background:transparent;color:var(--muted);border:1px solid transparent}
+.icon-button:hover{background:#FEE2E2;color:var(--danger-text)}
+.chip-x{display:inline-flex;align-items:center;gap:2px;padding:2px 4px 2px 11px;border-radius:999px;background:var(--primary-soft);border:1px solid var(--primary-100);color:var(--primary-text);font-size:.82rem;font-weight:500}
+.chip-x form{display:inline;margin:0}
+.chip-x button{min-height:24px;width:24px;padding:0;border-radius:50%;background:transparent;color:var(--primary-text);font-size:1rem;line-height:1}
+.chip-x button:hover{background:var(--primary-100);color:var(--danger-text)}
+.add-skill{display:flex;gap:8px;margin-top:12px}
+.add-skill input{flex:1}
+details.text-entry{margin-top:16px}
+details.text-entry summary{cursor:pointer;color:var(--primary-text);font-weight:500;min-height:40px;display:inline-flex;align-items:center}
+
+/* ---------- ตัวเลือกทักษะในฟอร์มประกาศ (รูปที่ 44) ---------- */
+.skill-toggles{display:flex;flex-wrap:wrap;gap:8px;max-height:220px;overflow:auto;padding:4px}
+.skill-toggle{position:relative;margin:0;display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border:1px solid var(--border);border-radius:999px;font-weight:400;font-size:.85rem;color:var(--text);cursor:pointer;background:var(--surface)}
+.skill-toggle input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.skill-toggle:has(input:checked){background:var(--primary-soft);border-color:var(--primary);color:var(--primary-text);font-weight:500}
+.skill-toggle:has(input:checked)::before{content:"\2713";margin-right:6px;font-weight:700}
+.skill-toggle:has(input:focus-visible){outline:3px solid #93C5FD;outline-offset:1px}
+
+/* ---------- รายละเอียดผู้สมัคร (รูปที่ 46) ---------- */
+.candidate-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.candidate-head .avatar{width:60px;height:60px;font-size:1.15rem}
+.candidate-head .grow{flex:1;min-width:0}
+.candidate-head h1{font-size:1.35rem;margin:0}
+.candidate-head .meta{color:var(--muted);font-size:.86rem}
+.candidate-head .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.match-score{display:inline-flex;padding:5px 14px;border-radius:999px;font-weight:600;font-size:.88rem;color:#fff;background:#6B7280}
+.match-score.high{background:var(--success)}.match-score.medium{background:var(--warn)}
+.quote{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);white-space:pre-line;overflow-wrap:anywhere;margin:0}
+.decision{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--primary-soft);border:1px solid var(--primary-100)}
+.decision p{margin:0;color:var(--muted);font-size:.85rem}
+.decision .actions form{margin:0}
+.button.red,button.red{background:#DC2626}
+.button.red:hover,button.red:hover{background:#B91C1C}
+.button.amber,button.amber{background:#B45309}
+.button.amber:hover,button.amber:hover{background:#92400E}
+.button.green,button.green{background:#15803D}
+.button.green:hover,button.green:hover{background:#166534}
+.button[aria-pressed=true]{box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(17,24,39,.45)}
+
+/* ---------- ผู้ดูแลระบบ (รูปที่ 48-52) ---------- */
+.admin-body{flex-direction:row;background:#F1F5F9}
+.admin-side{width:250px;flex:none;background:#0F172A;color:#CBD5E1;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:18px 14px}
+.admin-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:600;font-size:1.05rem;padding:4px 6px 18px}
+.admin-brand:hover{color:#fff}
+.admin-logo{width:30px;height:30px;border-radius:8px;background:#14B8A6;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.admin-nav{display:grid;gap:2px;flex:1;align-content:start}
+.admin-nav a{display:flex;align-items:center;min-height:42px;padding:0 12px;border-radius:10px;color:#CBD5E1;text-decoration:none;font-size:.9rem;border-left:3px solid transparent}
+.admin-nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.admin-nav a.active{background:rgba(20,184,166,.14);color:#5EEAD4;border-left-color:#14B8A6;font-weight:500}
+.admin-nav-group{font-size:.72rem;color:#94A3B8;padding:14px 12px 4px}
+.admin-user{display:flex;align-items:center;gap:10px;border-top:1px solid #1E293B;padding-top:14px}
+.admin-user .avatar{background:#334155;color:#fff}
+.admin-user div{flex:1;min-width:0;line-height:1.3}
+.admin-user strong{display:block;color:#fff;font-size:.88rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-user span{display:block;color:#94A3B8;font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-logout{width:36px;height:36px;min-height:36px;padding:0;background:transparent;color:#94A3B8;border-radius:8px}
+.admin-logout:hover{background:rgba(255,255,255,.08);color:#fff}
+.admin-main{flex:1;min-width:0;padding:28px 32px 48px}
+.admin-main .page-title{margin-bottom:20px}
+.admin-body .card{box-shadow:none}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.admin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;border-top:3px solid var(--c,#3B82F6)}
+.admin-stat .stat-value{font-size:1.8rem}
+.admin-stat .unit{color:var(--muted);font-size:.82rem;margin-left:4px}
+.admin-body{--primary:#0F766E;--primary-hover:#115E59;--primary-soft:#F0FDFA;--primary-100:#CCFBF1;--primary-text:#0F766E}
+.admin-body .button.dark{background:#0F172A}
+.admin-body .button.dark:hover{background:#1E293B}
+.link-button{background:transparent;border:0;min-height:32px;padding:0 6px;font-size:.85rem;font-weight:500;color:#0F766E}
+.link-button:hover{background:#F0FDFA;color:#115E59}
+.link-button.danger{color:var(--danger-text)}
+.link-button.danger:hover{background:var(--danger-soft);color:var(--danger-text)}
+.bar-chart{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;align-items:end;height:200px;padding:10px 6px 0}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bar-col .bar-v{width:100%;max-width:56px;background:#14B8A6;border-radius:8px 8px 0 0;min-height:4px}
+.bar-col span{font-size:.78rem;color:var(--muted)}
+.bar-col strong{font-size:.82rem;color:var(--heading)}
+.health{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0}
+.health div{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.health dt{color:var(--muted);font-size:.8rem}
+.health dd{margin:2px 0 0;font-weight:600;color:var(--heading)}
+.map-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#F8FAFC;border-radius:10px}
+.map-row+.map-row{margin-top:8px}
+.map-row .from{flex:1;color:var(--text);overflow-wrap:anywhere}
+.map-row .to{color:#0F766E;font-weight:600}
+.map-row form{margin:0}
+.inline-form{display:inline;margin:0}
+.log-msg{max-width:420px;overflow-wrap:anywhere;font-size:.84rem;color:var(--muted)}
+.admin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+
+@media (max-width:960px){
+  .admin-body{flex-direction:column}
+  .admin-side{width:auto;height:auto;position:static}
+  .admin-nav{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto}
+  .admin-nav-group{display:none}
+  .admin-user{display:none}
+  .admin-main{padding:20px 16px 40px}
+  .admin-stats{grid-template-columns:1fr 1fr}
+  .admin-grid{grid-template-columns:1fr}
+  .account-layout{grid-template-columns:1fr}
+  .account-nav{position:static;grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto}
+  .account-nav-title{display:none}
+  .account-nav form{margin:0}
+}
+@media (max-width:760px){
+  .search-bar{grid-template-columns:1fr}
+  .info-grid,.form-grid,.health{grid-template-columns:1fr}
+  .job-row{flex-wrap:wrap}
+  .job-row .side{flex-direction:row;flex-wrap:wrap;align-items:center;width:100%;justify-content:flex-start;gap:8px 12px;text-align:left;padding-left:60px}
+  .job-row .side small{white-space:nowrap}
+  .job-row .side .actions{margin-left:auto;flex-wrap:nowrap}
+  .candidate-head .right{align-items:flex-start}
+  .bar-chart{gap:6px}
+}
+
+/* ลิงก์หัวข้อในการ์ดที่ไม่ต้องขีดเส้นใต้ */
+.plain-link{color:var(--heading);text-decoration:none}
+.plain-link:hover{color:var(--primary-text);text-decoration:underline}
+
+/* ผู้สมัคร: วันที่และปุ่มด้านขวา (รูปที่ 45) บนมือถือย้ายลงบรรทัดใหม่ */
+.applicant-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+@media (max-width:760px){
+  .applicant{flex-wrap:wrap}
+  .applicant-info{flex:1 1 calc(100% - 80px)}
+  .applicant-side{width:100%;align-items:flex-start}
+}
+
+/* หัวรายละเอียดผู้สมัครบนมือถือ: คะแนนและสถานะลงบรรทัดใหม่ */
+@media (max-width:760px){
+  .candidate-head .grow{flex:1 1 calc(100% - 80px)}
+  .candidate-head .right{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center}
+  .decision .actions{width:100%}
+  .decision .actions form{flex:1}
+  .decision .actions button{width:100%}
+}

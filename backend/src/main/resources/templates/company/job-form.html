@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('สร้างประกาศงาน')}"><title>สร้างประกาศงาน | Workmatch</title></head>
-<!--/* สร้างประกาศรับสมัครงานใหม่ ตามเอกสาร รูปที่ 44 (ฟอร์ม)
-     ช่องค่าตอบแทน วันเวลาทำงาน สวัสดิการ และการเลือกทักษะจากพจนานุกรมในรูปยังไม่มีใน backend: ตอนนี้ระบบดึงทักษะจากรายละเอียดงานด้วย NLP */-->
+<head th:replace="~{fragments/layout :: head(${editingId == null ? 'สร้างประกาศงาน' : 'แก้ไขประกาศงาน'})}"><title>สร้างประกาศงาน | Workmatch</title></head>
+<!--/* สร้าง/แก้ไขประกาศรับสมัครงาน ตามเอกสาร รูปที่ 44 (ฟอร์ม)
+     ทักษะ = ที่ NLP สกัดจากรายละเอียดงาน + ที่เลือกจากพจนานุกรมด้านล่าง ปุ่ม "บันทึกแบบร่าง" ยังไม่จับคู่และไม่แสดงให้นักศึกษา */-->
 <body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="narrow main">
-<a class="back-link" th:href="@{/company/jobs}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>กลับไปรายการตำแหน่ง</a>
+<main id="main" class="narrow main" th:with="f=${form}">
+<a class="back-link" th:href="@{/company/postings}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>กลับไปรายการตำแหน่ง</a>
 <section class="card" aria-labelledby="form-title">
-  <h1 id="form-title">สร้างประกาศรับสมัครงานใหม่</h1>
+  <h1 id="form-title" th:text="${editingId == null} ? 'สร้างประกาศรับสมัครงานใหม่' : 'แก้ไขประกาศรับสมัครงาน'">สร้างประกาศรับสมัครงานใหม่</h1>
   <p class="muted">ระบุรายละเอียดตำแหน่งงานและทักษะที่ต้องการ เพื่อให้ระบบคำนวณและจับคู่กับนิสิตที่ตรงสเปกที่สุด</p>
   <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
-  <form method="post" th:action="@{/company/jobs}" data-busy="กำลังบันทึก...">
-    <div class="field"><label for="title">ชื่อตำแหน่งงาน <span class="req" aria-hidden="true">*</span></label><input id="title" name="title" maxlength="200" required="required" th:value="${job?.title}" placeholder="เช่น Software Engineer (Intern)" /></div>
-    <div class="field"><label for="description">รายละเอียดงาน (Job Description) <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="10" required="required" th:text="${job?.description}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ เช่น Java, Spring Boot, SQL"></textarea><p id="description-help" class="field-note">ใส่ชื่อทักษะในข้อความได้เลย ระบบจะสกัดทักษะด้วย NLP และนำไปคำนวณ Cosine Similarity หลังบันทึก</p></div>
-    <div class="form-actions"><a class="button secondary" th:href="@{/company/jobs}">ยกเลิก</a><button type="submit">เผยแพร่ประกาศงาน</button></div>
+  <form method="post" th:action="${editingId == null} ? @{/company/jobs} : @{/company/jobs/{id}(id=${editingId})}" data-busy="กำลังบันทึก...">
+    <div class="field"><label for="title">ชื่อตำแหน่งงาน <span class="req" aria-hidden="true">*</span></label><input id="title" name="title" maxlength="200" required="required" th:value="${f?.title()}" placeholder="เช่น Software Engineer (Intern)" /></div>
+    <div class="field"><label for="description">รายละเอียดงาน (Job Description) <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบจะสกัดทักษะจากข้อความนี้ด้วย NLP อัตโนมัติ และรวมกับทักษะที่เลือกด้านล่าง</p></div>
+    <div class="form-grid">
+      <div class="field"><label for="compensation">ค่าตอบแทน / เบี้ยเลี้ยง (บาท/วัน หรือ บาท/เดือน)</label><input id="compensation" name="compensation" maxlength="255" th:value="${f?.compensation()}" placeholder="เช่น WFH 300 บาท/วัน, Onsite 400 บาท/วัน" /></div>
+      <div class="field"><label for="workSchedule">วันและเวลาทำงาน</label><input id="workSchedule" name="workSchedule" maxlength="255" th:value="${f?.workSchedule()}" placeholder="เช่น 5 วัน / สัปดาห์ (จันทร์ - ศุกร์)" /></div>
+      <div class="field"><label for="accommodation">สวัสดิการที่พัก</label><input id="accommodation" name="accommodation" maxlength="255" th:value="${f?.accommodation()}" placeholder="เช่น ไม่มีสวัสดิการที่พัก" /></div>
+      <div class="field"><label for="transport">สวัสดิการรถรับส่ง</label><input id="transport" name="transport" maxlength="255" th:value="${f?.transport()}" placeholder="เช่น ไม่มีรถรับส่งพนักงาน" /></div>
+    </div>
+    <fieldset style="border-top:1px solid var(--border);padding-top:14px">
+      <legend>ทักษะวิชาชีพที่ต้องการ (ดึงเข้าสู่การคำนวณ Cosine Similarity)</legend>
+      <p class="field-note" style="margin:0 0 8px">เลือกจากพจนานุกรมทักษะของระบบ (ไม่บังคับ ถ้าระบุในรายละเอียดงานแล้ว)</p>
+      <div class="skill-toggles">
+        <label class="skill-toggle" th:each="s : ${dictionarySkills}"><input type="checkbox" name="skills" th:value="${s.name}" th:checked="${f != null and f.selectedSkills() != null and f.selectedSkills().contains(s.name)}" /><span th:text="${s.name}">Java</span></label>
+      </div>
+      <p class="field-note" th:if="${#lists.isEmpty(dictionarySkills)}">ยังไม่มีพจนานุกรมทักษะในระบบ (ผู้ดูแลระบบนำเข้าเมื่อเปิด NLP)</p>
+    </fieldset>
+    <div class="form-actions"><a class="button secondary" th:href="@{/company/postings}">ยกเลิก</a><button type="submit" name="action" value="draft" class="secondary">บันทึกแบบร่าง</button><button type="submit" name="action" value="publish">เผยแพร่ประกาศงาน</button></div>
   </form>
 </section>
 </main>

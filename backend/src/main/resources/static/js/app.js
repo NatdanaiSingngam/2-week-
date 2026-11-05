@@ -2,11 +2,12 @@
 (() => {
   function resetForms() {
     document.querySelectorAll('form[data-busy]').forEach(form => {
-      const button = form.querySelector('[type="submit"]');
-      if (button && button.dataset.originalLabel) {
+      form.querySelectorAll('[data-original-label]').forEach(button => {
         button.textContent = button.dataset.originalLabel;
         button.disabled = false;
-      }
+        delete button.dataset.originalLabel;
+      });
+      form.querySelectorAll('input[data-submitter-copy]').forEach(input => input.remove());
       form.removeAttribute('aria-busy');
     });
   }
@@ -19,8 +20,17 @@
   document.querySelectorAll('form[data-busy]').forEach(form => {
     form.addEventListener('submit', event => {
       if (event.defaultPrevented || !form.checkValidity()) return;
-      const button = form.querySelector('[type="submit"]');
-      if (!button || button.disabled) { event.preventDefault(); return; }
+      // ปุ่มที่ถูกกด (เช่น "บันทึกแบบร่าง" name=action value=draft): disabled แล้วค่าจะไม่ถูกส่ง จึงคัดลอกเป็น hidden input ก่อน
+      const button = event.submitter || form.querySelector('[type="submit"]');
+      if (!button || button.disabled || form.getAttribute('aria-busy') === 'true') { event.preventDefault(); return; }
+      if (button.name) {
+        const copy = document.createElement('input');
+        copy.type = 'hidden';
+        copy.name = button.name;
+        copy.value = button.value;
+        copy.dataset.submitterCopy = 'true';
+        form.appendChild(copy);
+      }
       button.dataset.originalLabel = button.textContent;
       button.textContent = form.dataset.busy;
       button.disabled = true;
@@ -64,9 +74,39 @@
     document.querySelectorAll('input[name=role]').forEach(radio => radio.addEventListener('change', syncRole));
     syncRole();
   }
+  // Register (รูปที่ 34-35): show the field group for the chosen role; hidden groups are disabled so they are not submitted
+  const roleSections = document.querySelectorAll('[data-role-section]');
+  if (roleSections.length) {
+    const syncSections = () => {
+      const checked = document.querySelector('input[name=role]:checked');
+      const role = checked ? checked.value : 'STUDENT';
+      roleSections.forEach(section => {
+        const show = section.dataset.roleSection === role;
+        section.hidden = !show;
+        section.querySelectorAll('input, select, textarea').forEach(el => { el.disabled = !show; });
+      });
+      document.querySelectorAll('[data-role-text]').forEach(el => {
+        el.textContent = role === 'COMPANY' ? el.dataset.textCompany : el.dataset.textStudent;
+      });
+      document.body.classList.toggle('theme-company', role === 'COMPANY' && document.body.dataset.roleTheme === 'true');
+    };
+    document.querySelectorAll('input[name=role]').forEach(radio => radio.addEventListener('change', syncSections));
+    syncSections();
+  }
+  // Forms that change or delete data ask for confirmation (data-confirm="ข้อความ")
+  document.querySelectorAll('form[data-confirm]').forEach(form => {
+    form.addEventListener('submit', event => { if (!window.confirm(form.dataset.confirm)) event.preventDefault(); });
+  });
+  // File inputs inside a drop zone show the chosen file name
+  document.querySelectorAll('.dropzone input[type=file]').forEach(input => {
+    const label = input.closest('.dropzone').querySelector('[data-file-name]');
+    input.addEventListener('change', () => { if (label && input.files.length) label.textContent = input.files[0].name; });
+  });
   window.addEventListener('pageshow', resetForms);
   const current = location.pathname.replace(/\/$/, '');
   document.querySelectorAll('.nav-links a').forEach(link => {
-    if (new URL(link.href).pathname.replace(/\/$/, '') === current) link.setAttribute('aria-current', 'page');
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const prefix = link.dataset.prefix;
+    if (path === current || (prefix && current.startsWith(prefix))) link.setAttribute('aria-current', 'page');
   });
 })();

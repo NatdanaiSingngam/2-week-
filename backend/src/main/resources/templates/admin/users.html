@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('จัดการบัญชีผู้ใช้')}"><title>จัดการบัญชีผู้ใช้ | Workmatch</title></head>
+<!--/* จัดการบัญชีผู้ใช้ (เอกสาร 1.4.3.1.3 ระงับ/เปิดใช้งานบัญชี) บัญชีที่ถูกระงับเข้าสู่ระบบไม่ได้ */-->
+<body class="admin-body">
+<aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
+<main id="main" class="admin-main">
+<div class="page-title"><h1>จัดการบัญชีผู้ใช้</h1><p>ระงับหรือเปิดใช้งานบัญชีนักศึกษาและสถานประกอบการ</p></div>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<section class="card table-card" aria-label="บัญชีผู้ใช้ทั้งหมด">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">ชื่อ</th><th scope="col">อีเมล</th><th scope="col">บทบาท</th><th scope="col">สมัครเมื่อ</th><th scope="col">สถานะ</th><th scope="col" style="text-align:right">การจัดการ</th></tr></thead>
+      <tbody>
+        <tr th:each="u : ${users}">
+          <td><strong th:text="${u.name()}">ชื่อ</strong></td>
+          <td th:text="${u.email()}">email</td>
+          <td th:text="${u.role() == 'STUDENT' ? 'นักศึกษา' : (u.role() == 'COMPANY' ? 'สถานประกอบการ' : 'ผู้ดูแลระบบ')}">นักศึกษา</td>
+          <td th:text="${@fmt.date(u.createdAt())}">31 ส.ค. 2569</td>
+          <td><span class="status" th:classappend="${u.enabled()} ? 'OPEN' : 'CLOSED'" th:text="${u.enabled()} ? 'ใช้งานได้' : 'ถูกระงับ'">ใช้งานได้</span></td>
+          <td style="text-align:right">
+            <form method="post" class="inline-form" th:if="${u.role() != 'ADMIN'}" th:action="@{/admin/users/{id}/toggle(id=${u.id()})}" th:attr="data-confirm=${(u.enabled() ? 'ระงับบัญชี ' : 'เปิดใช้งานบัญชี ') + u.email() + '?'}"><button type="submit" class="link-button" th:classappend="${u.enabled()} ? 'danger'" th:aria-label="${(u.enabled() ? 'ระงับบัญชี ' : 'เปิดใช้งานบัญชี ') + u.name()}" th:text="${u.enabled()} ? 'ระงับบัญชี' : 'เปิดใช้งาน'">ระงับบัญชี</button></form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>

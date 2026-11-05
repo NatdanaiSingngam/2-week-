@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ประวัติการสมัครงาน')}"><title>ประวัติการสมัครงาน | Workmatch</title></head>
+<!--/* หน้าจอติดตามสถานะการสมัครงาน ตามเอกสาร รูปที่ 42 */-->
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main">
+<div class="account-layout">
+  <aside th:replace="~{fragments/layout :: accountNav(${section})}"></aside>
+  <section>
+    <div class="page-title"><h1>ประวัติการสมัครงาน</h1><p>ติดตามสถานะการยื่นเรซูเม่ของคุณได้ที่นี่</p></div>
+    <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+    <div class="card empty" th:if="${#lists.isEmpty(applications)}">
+      <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+      <h2>ยังไม่ได้สมัครงาน</h2><p>เลือกตำแหน่งที่สนใจแล้วกด "สมัครงาน" ในหน้ารายละเอียดงาน</p>
+      <div class="actions"><a class="button" th:href="@{/student/jobs}">ค้นหางาน</a></div>
+    </div>
+    <section class="card table-card" th:if="${not #lists.isEmpty(applications)}" aria-label="รายการใบสมัคร">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">ตำแหน่งงาน / บริษัท</th><th scope="col">วันที่สมัคร</th><th scope="col">สถานะ</th><th scope="col"><span class="visually-hidden">จัดการ</span></th></tr></thead>
+          <tbody>
+            <tr th:each="a : ${applications}">
+              <td><strong th:text="${a.jobTitle()}">Software Engineer (Intern)</strong><div class="muted" style="font-size:.84rem" th:text="${a.companyName()}">บริษัท</div></td>
+              <td th:text="${@fmt.date(a.appliedAt())}">31 ส.ค. 2569</td>
+              <td><span class="status" th:classappend="${a.status().name()}" th:text="${a.status().name() == 'INTERVIEW' ? 'กำลังพิจารณา / นัดสัมภาษณ์' : (a.status().name() == 'REJECTED' ? 'ปิดรับสมัคร / ไม่ผ่าน' : a.status().label)}">รอพิจารณา</span></td>
+              <td style="text-align:right"><a class="table-link" th:href="@{/student/jobs/{id}(id=${a.jobId()})}">ดูรายละเอียด</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

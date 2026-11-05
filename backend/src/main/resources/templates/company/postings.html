@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('จัดการประกาศงาน')}"><title>จัดการประกาศงาน | Workmatch</title></head>
+<!--/* หน้าจอจัดการประกาศรับสมัครงาน ตามเอกสาร รูปที่ 44 / ขอบเขต 1.4.2.1: ดู แก้ไข ปิด/เปิดรับ และลบประกาศ */-->
+<body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main">
+<div class="welcome" style="margin-bottom:18px"><div><h1>จัดการประกาศงาน</h1><p>ดูสถานะ แก้ไข ปิดรับสมัคร หรือลบประกาศของบริษัท</p></div><a class="button" th:href="@{/company/jobs/new}">+ สร้างประกาศงาน</a></div>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<section class="card empty" th:if="${#lists.isEmpty(rows)}">
+  <h2>ยังไม่มีประกาศงาน</h2><p>สร้างประกาศแรกเพื่อเริ่มรับสมัครนักศึกษา</p>
+  <div class="actions"><a class="button" th:href="@{/company/jobs/new}">สร้างประกาศงาน</a></div>
+</section>
+<section class="card table-card" th:if="${not #lists.isEmpty(rows)}" aria-label="ประกาศงานทั้งหมด">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">ชื่อตำแหน่ง</th><th scope="col">วันที่สร้าง</th><th scope="col">ทักษะ</th><th scope="col">ผู้สมัคร</th><th scope="col">สถานะ</th><th scope="col">การจัดการ</th></tr></thead>
+      <tbody>
+        <tr th:each="r : ${rows}">
+          <td><a class="table-link" style="color:var(--heading)" th:href="@{/company/jobs/{id}(id=${r.id()})}" th:text="${r.title()}">ตำแหน่ง</a></td>
+          <td th:text="${@fmt.date(r.createdAt())}">15 ส.ค. 2569</td>
+          <td th:text="${r.skillCount()}">5</td>
+          <td class="num" th:text="${r.applicationCount() + ' คน'}">0 คน</td>
+          <td><span class="status" th:classappend="${r.status().name()}" th:text="${r.status().label}">เปิดรับสมัคร</span></td>
+          <td>
+            <div class="actions" style="gap:2px;flex-wrap:nowrap">
+              <a class="link-button" th:href="@{/company/jobs/{id}/edit(id=${r.id()})}" th:aria-label="${'แก้ไข ' + r.title()}">แก้ไข</a>
+              <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/status(id=${r.id()})}" th:if="${r.status().name() == 'OPEN'}"><input type="hidden" name="status" value="CLOSED" /><button type="submit" class="link-button" th:aria-label="${'ปิดรับสมัคร ' + r.title()}">ปิดรับ</button></form>
+              <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/status(id=${r.id()})}" th:unless="${r.status().name() == 'OPEN'}"><input type="hidden" name="status" value="OPEN" /><button type="submit" class="link-button" th:aria-label="${'เปิดรับสมัคร ' + r.title()}" th:text="${r.status().name() == 'DRAFT'} ? 'เผยแพร่' : 'เปิดรับ'">เปิดรับ</button></form>
+              <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/delete(id=${r.id()})}" th:attr="data-confirm=${'ลบประกาศ ' + r.title() + '? ใบสมัครทั้งหมดของตำแหน่งนี้จะถูกลบด้วย'}"><button type="submit" class="link-button danger" th:aria-label="${'ลบ ' + r.title()}">ลบ</button></form>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

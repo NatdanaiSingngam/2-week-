@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ภาพรวมระบบ')}"><title>ภาพรวมระบบ | Workmatch</title></head>
+<!--/* หน้าจอกระดานสรุปผลภาพรวมระบบ ตามเอกสาร รูปที่ 48 (+ สถานะการทำงานของระบบ 1.4.3.4.2) */-->
+<body class="admin-body">
+<aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
+<main id="main" class="admin-main">
+<div class="page-title"><h1>ภาพรวมการทำงานของระบบ (System Overview)</h1><p>สถิติและข้อมูลการใช้งานแพลตฟอร์ม Workmatch แบบเรียลไทม์</p></div>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<div class="admin-stats">
+  <div class="admin-stat" style="--c:#3B82F6"><span class="stat-label">นักศึกษาทั้งหมด</span><span class="stat-value" th:text="${o.students()}">0</span><span class="unit">บัญชี</span></div>
+  <div class="admin-stat" style="--c:#8B5CF6"><span class="stat-label">บริษัทที่อนุมัติแล้ว</span><span class="stat-value" th:text="${o.approvedCompanies()}">0</span><span class="unit" th:text="${'แห่ง (จาก ' + o.companies() + ')'}">แห่ง</span></div>
+  <div class="admin-stat" style="--c:#14B8A6"><span class="stat-label">ประกาศงานที่เปิดรับ</span><span class="stat-value" th:text="${o.openJobs()}">0</span><span class="unit">ตำแหน่ง</span></div>
+  <div class="admin-stat" style="--c:#22C55E"><span class="stat-label">การจับคู่สำเร็จ (รับเข้าทำงาน)</span><span class="stat-value" th:text="${o.hired()}">0</span><span class="unit">คู่</span></div>
+</div>
+<div class="admin-grid">
+  <section class="card" aria-labelledby="chart-title">
+    <div class="card-head"><h2 id="chart-title">จำนวนใบสมัครงานรายเดือน</h2><span class="count" th:text="${'รวม ' + o.applications() + ' ใบ'}">รวม</span></div>
+    <div class="bar-chart" role="img" th:aria-label="${'กราฟจำนวนใบสมัคร 6 เดือนล่าสุด: ' + #strings.listJoin(o.applicationsByMonth().![label() + ' ' + count() + ' ใบ'], ', ')}">
+      <div class="bar-col" th:each="m : ${o.applicationsByMonth()}"><strong th:text="${m.count()}">0</strong><div class="bar-v" th:style="${'height:' + (m.percent() * 0.8) + '%'}"></div><span th:text="${m.label()}">ส.ค. 69</span></div>
+    </div>
+  </section>
+  <section class="card" aria-labelledby="health-title">
+    <div class="card-head"><h2 id="health-title">สถานะการทำงานของระบบ</h2></div>
+    <dl class="health">
+      <div><dt>ระบบ NLP (FastAPI)</dt><dd th:class="${o.nlpHealthy()} ? 'text-ok' : 'text-bad'" th:text="${o.nlpHealthy()} ? 'ทำงานปกติ' : 'เชื่อมต่อไม่ได้'">ทำงานปกติ</dd></div>
+      <div><dt>ฐานข้อมูล</dt><dd class="text-ok">ทำงานปกติ</dd></div>
+      <div><dt>ข้อผิดพลาด 7 วันล่าสุด</dt><dd><a th:href="@{/admin/logs}" th:text="${o.errorsLast7Days() + ' รายการ'}">0 รายการ</a></dd></div>
+    </dl>
+    <h3 style="margin:18px 0 8px;font-size:.95rem">สรุปผลการจับคู่ในภาพรวม</h3>
+    <dl class="health">
+      <div><dt>คู่ที่คำนวณแล้ว</dt><dd th:text="${o.matches()}">0</dd></div>
+      <div><dt>คะแนนเฉลี่ย</dt><dd th:text="${o.averageScore() == null ? '-' : #numbers.formatDecimal(o.averageScore(), 1, 1) + '%'}">0%</dd></div>
+      <div><dt>บริษัทรออนุมัติ</dt><dd><a th:href="@{/admin/companies}" th:text="${o.pendingCompanies() + ' แห่ง'}">0 แห่ง</a></dd></div>
+    </dl>
+  </section>
+</div>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>

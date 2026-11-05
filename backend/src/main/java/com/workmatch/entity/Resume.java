@@ -22,6 +22,13 @@ public class Resume {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // ไฟล์ PDF ที่อัปโหลด (ตาราง stored_files) null = กรอกเป็นข้อความอย่างเดียว
+    @Column(name = "resume_file_id")
+    private Long resumeFileId;
+
+    public Long getResumeFileId() { return resumeFileId; }
+    public void setResumeFileId(Long resumeFileId) { this.resumeFileId = resumeFileId; }
+
     // ตั้งเวลาอัตโนมัติทั้งตอนสร้างและตอนแก้ไข (เรียกเองได้ เผื่อข้อความเหมือนเดิมแต่อยากอัปเดตเวลา)
     @PrePersist
     @PreUpdate

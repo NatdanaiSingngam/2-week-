@@ -2,23 +2,26 @@
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('หน้าหลัก')}"><title>หน้าหลัก | Workmatch</title></head>
 <!--/* กระดานสรุปผลนักศึกษา ตามเอกสาร รูปที่ 40: การ์ดโปรไฟล์ + ทักษะที่สกัดได้ (ซ้าย), ตำแหน่งงานที่เหมาะกับคุณพร้อมป้าย Match % (ขวา)
-     ปุ่ม "บันทึก" และ "ดูรายละเอียดงาน" ในรูปเป็นฟีเจอร์ช่วงถัดไป (Bookmark / Job Detail) จึงยังไม่แสดง */-->
+     ปุ่ม "ดูรายละเอียดงาน" ไปหน้ารูปที่ 39 และ "บันทึก" เก็บไว้ในรายการที่บันทึก (รูปที่ 41) */-->
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="container main">
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
 <div class="dash">
   <aside class="dash-side" aria-label="ข้อมูลของฉัน">
     <section class="card">
-      <div class="profile"><span class="avatar" aria-hidden="true" th:text="${#strings.isEmpty(displayName) ? '?' : #strings.substring(displayName, 0, 1)}">ณ</span><div><strong th:text="${displayName}">ชื่อนักศึกษา</strong><span>นักศึกษาสหกิจศึกษา</span></div></div>
-      <dl class="profile-facts" th:if="${hasResume == true}">
-        <div><dt>ตำแหน่งที่จับคู่ได้</dt><dd th:text="${#lists.size(matches) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
-        <div><dt>คะแนนสูงสุด</dt><dd th:text="${#lists.isEmpty(matches) ? '–' : #numbers.formatDecimal(matches[0].score == null ? 0 : matches[0].score, 1, 1) + '%'}">–</dd></div>
-        <div><dt>เหมาะมาก (70%+)</dt><dd th:text="${#lists.size(matches.?[score != null and score >= 70]) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
+      <div class="profile"><span class="avatar" aria-hidden="true" th:text="${userInitials}">ณด</span><div><strong th:text="${displayName}">ชื่อนักศึกษา</strong><span th:text="${profile.studentId != null ? 'รหัสนิสิต: ' + profile.studentId : 'นักศึกษาสหกิจศึกษา'}">รหัสนิสิต</span></div></div>
+      <dl class="profile-facts">
+        <div th:if="${profile.faculty != null}"><dt>คณะ</dt><dd th:text="${profile.faculty}">คณะ</dd></div>
+        <div th:if="${profile.major != null}"><dt>สาขาวิชา</dt><dd th:text="${profile.major}">สาขา</dd></div>
+        <div th:if="${hasResume == true}"><dt>ตำแหน่งที่จับคู่ได้</dt><dd th:text="${#lists.size(matches) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
+        <div th:if="${hasResume == true}"><dt>เหมาะมาก (70%+)</dt><dd th:text="${#lists.size(matches.?[score != null and score >= 70]) + ' ตำแหน่ง'}">0</dd></div>
       </dl>
+      <a class="button secondary sm full" style="margin-top:14px" th:href="@{/student/profile}" th:if="${profile.faculty == null}">เพิ่มคณะและสาขาวิชา</a>
     </section>
     <section class="card" aria-labelledby="skills-title">
       <h2 id="skills-title" class="side-title">ทักษะที่สกัดได้จากเรซูเม่ (NLP)</h2>
       <div class="tags" th:if="${skills != null and not #lists.isEmpty(skills)}"><span class="chip" th:each="skill : ${skills}" th:text="${skill.name}">Java</span></div>
-      <p class="muted" style="margin:0" th:if="${skills == null or #lists.isEmpty(skills)}">ยังไม่มีทักษะ <a th:href="@{/student/resume}">กรอกเรซูเม่</a> เพื่อให้ระบบสกัดทักษะ</p>
+      <p class="muted" style="margin:0" th:if="${skills == null or #lists.isEmpty(skills)}">ยังไม่มีทักษะ <a th:href="@{/student/resume}">จัดการเรซูเม่</a> เพื่อให้ระบบสกัดทักษะ</p>
     </section>
   </aside>
 
@@ -31,8 +34,8 @@
     <div class="card empty" th:if="${hasResume != true}">
       <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg></div>
       <h2>คุณยังไม่ได้กรอก resume</h2>
-      <p>เพิ่มประสบการณ์และทักษะของคุณ ระบบจะวิเคราะห์และจับคู่กับตำแหน่งสหกิจศึกษาให้ทันที</p>
-      <div class="actions"><a class="button" th:href="@{/student/resume}">เริ่มกรอก resume</a></div>
+      <p>อัปโหลดไฟล์ PDF หรือกรอกประสบการณ์และทักษะของคุณ ระบบจะวิเคราะห์และจับคู่กับตำแหน่งสหกิจศึกษาให้ทันที</p>
+      <div class="actions"><a class="button" th:href="@{/student/resume}">เริ่มจัดการเรซูเม่</a><a class="button secondary" th:href="@{/student/jobs}">ดูตำแหน่งงานทั้งหมด</a></div>
     </div>
 
     <th:block th:if="${hasResume == true}">
@@ -46,17 +49,21 @@
     <div class="match-list" th:if="${not #lists.isEmpty(matches)}">
       <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะมาก 70%+</span><span class="level medium">ปานกลาง 40–69%</span><span class="level low">ควรพัฒนาเพิ่ม &lt;40%</span></div>
       <article class="match-card" th:each="match, it : ${matches}"
-               th:with="s=${match.score == null ? 0 : match.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+               th:with="s=${match.score == null ? 0 : match.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}, saved=${bookmarkedIds.contains(match.jobId)}">
         <span class="match-ribbon" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(s, 1, 1) + '%'}">Match 0.0%</span>
         <div class="match-body">
           <span class="mono" th:text="${it.count}" th:aria-label="${'อันดับ ' + it.count}">1</span>
           <div class="match-info">
-            <h3 th:text="${match.jobTitle}">ชื่อตำแหน่ง</h3>
+            <h3><a class="plain-link" th:href="@{/student/jobs/{id}(id=${match.jobId})}" th:text="${match.jobTitle}">ชื่อตำแหน่ง</a></h3>
             <span class="match-company" th:text="${match.companyName}">บริษัท</span>
             <div class="tags" th:if="${not #lists.isEmpty(match.matched)}"><span class="tag" th:each="skill : ${match.matched}" th:text="${skill}">Java</span></div>
             <div class="match-meta">
               <span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span>
               <span title="ค่า Cosine similarity ระหว่างทักษะใน resume กับทักษะของตำแหน่ง" th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(match.cosine == null ? 0 : match.cosine, 1, 1) + '%'}">ความคล้ายของทักษะ 0.0%</span>
+            </div>
+            <div class="actions" style="margin-top:12px">
+              <a class="button sm" th:href="@{/student/jobs/{id}(id=${match.jobId})}">ดูรายละเอียดงาน</a>
+              <form method="post" class="inline-form" th:action="@{/student/jobs/{id}/bookmark(id=${match.jobId})}"><input type="hidden" name="back" value="/student/dashboard" /><button type="submit" class="secondary sm" th:attr="aria-pressed=${saved}" th:text="${saved} ? '★ บันทึกแล้ว' : 'บันทึก'">บันทึก</button></form>
             </div>
           </div>
         </div>

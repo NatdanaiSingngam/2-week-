@@ -62,6 +62,7 @@ public class MatchService {
         List<String> resumeSkillNames = resumeSkillNames(resume.getId());
         int count = 0;
         for (Job job : jobs.findAll()) {
+            if (!job.isOpen()) continue; // แบบร่าง / ปิดรับสมัคร ไม่นำมาจับคู่
             List<String> jobSkillNames = jobSkillNames(job.getId());
             if (jobSkillNames.isEmpty()) continue; // ประกาศที่ไม่มีทักษะ ข้ามและไม่สร้างแถว
             upsert(resume, job, nlpClient.match(resumeSkillNames, jobSkillNames));
@@ -74,6 +75,7 @@ public class MatchService {
     @Transactional
     public int recalculateForJob(Long jobId) {
         Job job = jobs.findById(jobId).orElseThrow();
+        if (!job.isOpen()) return 0;
         List<String> jobSkillNames = jobSkillNames(job.getId());
         if (jobSkillNames.isEmpty()) return 0;
         int count = 0;
@@ -89,6 +91,7 @@ public class MatchService {
     public List<MatchView> dashboardFor(User student) {
         return resumes.findByUserId(student.getId())
                 .map(resume -> matches.findByResumeId(resume.getId()).stream()
+                        .filter(m -> m.getJob().isOpen())
                         .map(m -> new MatchView(
                                 m.getJob().getId(),
                                 m.getJob().getTitle(),
@@ -116,6 +119,16 @@ public class MatchService {
                         fromJson(m.getMissingSkills())))
                 .sorted(Comparator.comparing(ApplicantView::getScore).reversed())
                 .toList();
+    }
+
+    /** ผลจับคู่ของนักศึกษาคนนี้กับประกาศนี้ (ยังไม่มีเรซูเม่หรือยังไม่ได้คำนวณ = empty) */
+    @Transactional(readOnly = true)
+    public java.util.Optional<MatchView> matchFor(Long studentUserId, Long jobId) {
+        return resumes.findByUserId(studentUserId)
+                .flatMap(r -> matches.findByResumeIdAndJobId(r.getId(), jobId))
+                .map(m -> new MatchView(m.getJob().getId(), m.getJob().getTitle(),
+                        m.getJob().getCompany().getDisplayName(), m.getScore().doubleValue(),
+                        m.getCosine().doubleValue(), fromJson(m.getMatchedSkills()), fromJson(m.getMissingSkills())));
     }
 
     @Transactional(readOnly = true)

@@ -61,6 +61,46 @@ public class NlpClient {
         }
     }
 
+    /** GET /dictionary -> พจนานุกรมทักษะทั้งหมดของ NLP (ใช้นำเข้าครั้งแรกตอนตารางในฐานข้อมูลยังว่าง) */
+    public List<DictionaryItem> fetchDictionary() {
+        try {
+            DictionaryBody body = restClient.get().uri("/dictionary").retrieve().body(DictionaryBody.class);
+            return body == null || body.skills() == null ? List.of() : body.skills();
+        } catch (RestClientException e) {
+            throw new NlpUnavailableException(e);
+        }
+    }
+
+    /** PUT /dictionary {"skills":[...]} แทนพจนานุกรมของ NLP ทั้งชุด (ผู้ดูแลระบบแก้ไขจากหน้าเว็บ) */
+    public void replaceDictionary(List<DictionaryItem> skills) {
+        try {
+            restClient.put().uri("/dictionary")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new DictionaryBody(skills))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientException e) {
+            throw new NlpUnavailableException(e);
+        }
+    }
+
+    /** GET /health ใช้แสดงสถานะระบบในหน้าผู้ดูแล ไม่โยน exception */
+    public boolean isHealthy() {
+        try {
+            Map<?, ?> body = restClient.get().uri("/health").retrieve().body(Map.class);
+            return body != null && "ok".equals(body.get("status"));
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    /** หนึ่งทักษะในพจนานุกรม: ชื่อมาตรฐาน หมวด และคำพ้องความหมาย */
+    public record DictionaryItem(String name, String category, List<String> aliases) {
+    }
+
+    record DictionaryBody(List<DictionaryItem> skills) {
+    }
+
     record ExtractResponse(List<ExtractedSkill> skills) {
     }
 }

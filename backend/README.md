@@ -134,10 +134,30 @@ $env:MAVEN_OPTS="-Duser.language=en -Duser.country=US"   # Windows ภาษา�
 | นักศึกษา | `student2@demo.workmatch.test` | เรซูเม่สาย Frontend (HTML, CSS, JavaScript, React, Figma) |
 | นักศึกษา | `student3@demo.workmatch.test` | เรซูเม่สาย Data (Python, SQL, Machine Learning, Excel) |
 | บริษัท | `company1@demo.workmatch.test` | Backend / Frontend / Data Analyst |
-| บริษัท | `company2@demo.workmatch.test` | Mobile App / DevOps-QA / UX-UI Designer |
+| บริษัท | `company2@demo.workmatch.test` | Mobile App / DevOps-QA / UX-UI Designer (ส่งเอกสารแล้ว รออนุมัติ) |
+| ผู้ดูแลระบบ | `admin@demo.workmatch.test` | หน้าผู้ดูแลระบบ `/admin` |
 
-ลำดับสาธิตที่แนะนำ: login `student1` → เห็น Dashboard มีคะแนนทันที → แก้ resume เพิ่มทักษะ → คะแนนเปลี่ยน →
-logout → login `company1` → เปิดตำแหน่ง Backend Developer → เห็นนักศึกษาเรียงตามคะแนน
+ข้อมูลตัวอย่างเพิ่มเติม (สร้างให้ทั้งฐานข้อมูลใหม่และฐานข้อมูลเดิมที่มีบัญชีตัวอย่างแล้ว): รหัสนิสิต/คณะ/สาขา, ข้อมูลบริษัท,
+ใบสมัคร 6 ใบหลายสถานะ, งานที่ student1 บันทึกไว้ และคำขอยืนยันตัวตนของ company2 (ไฟล์ PDF ตัวอย่าง ไม่ใช่เอกสารจริง)
+
+ลำดับสาธิตที่แนะนำ: login `student1` → เห็น Dashboard มีคะแนนทันที → ค้นหางาน → เปิดรายละเอียดงาน → บันทึก/สมัครงาน →
+ดูประวัติการสมัคร → logout → login `company1` → เปิดตำแหน่ง Backend Developer → ดูผู้สมัคร → อัปเดตสถานะ →
+logout → login `admin` → อนุมัติ company2 → แก้พจนานุกรมทักษะ/คำพ้อง
+
+### ฟีเจอร์ตามเอกสารบทที่ 3 (User Interface รูปที่ 32-52)
+
+| บทบาท | หน้า | URL |
+|---|---|---|
+| ทุกคน | หน้าแรก, เข้าสู่ระบบ, ลงทะเบียนนักศึกษา (รหัสนิสิต 8 หลัก) / สถานประกอบการ (เลขผู้เสียภาษี 13 หลัก) | `/`, `/login`, `/register` |
+| นักศึกษา | กระดานสรุปผล, จัดการเรซูเม่ (อัปโหลด PDF / ลบ-เพิ่มทักษะ), ค้นหางาน, รายละเอียดงาน + บันทึก/สมัคร, งานที่บันทึก, ประวัติการสมัคร, ข้อมูลส่วนตัว | `/student/dashboard`, `/student/resume`, `/student/jobs`, `/student/jobs/{id}`, `/student/bookmarks`, `/student/applications`, `/student/profile` |
+| สถานประกอบการ | ภาพรวม, จัดการประกาศ (แก้ไข/ปิดรับ/ลบ/แบบร่าง), ผู้สมัครแยกตามสถานะ + CSV, รายละเอียดผู้สมัคร + อัปเดตสถานะ, ผู้สมัครทั้งหมด, โปรไฟล์ + ยืนยันตัวตน (ภ.พ.20) | `/company/jobs`, `/company/postings`, `/company/jobs/{id}`, `/company/applications/{id}`, `/company/applications`, `/company/profile` |
+| ผู้ดูแลระบบ | ภาพรวมระบบ, อนุมัติสถานประกอบการ, พจนานุกรมทักษะ, คำพ้องความหมาย, บันทึกข้อผิดพลาด, จัดการบัญชีผู้ใช้ (ระงับ/เปิดใช้งาน) | `/admin`, `/admin/companies`, `/admin/skills`, `/admin/synonyms`, `/admin/logs`, `/admin/users` |
+
+- **พจนานุกรมทักษะ:** ตาราง `skill_dictionary` / `skill_synonyms` ในฐานข้อมูลเป็นต้นฉบับ เปิดระบบครั้งแรกนำเข้าจาก NLP (`GET /dictionary`)
+  ผู้ดูแลแก้ไขแล้วระบบส่งชุดใหม่ให้ NLP (`PUT /dictionary`) ซึ่งเขียน `skill_dictionary.csv` และใช้ชุดใหม่ทันที
+- **ไฟล์ PDF** (เรซูเม่ / ภ.พ.20) เก็บในตาราง `stored_files` ขนาดไม่เกิน 5MB เปิดดูได้เฉพาะเจ้าของ บริษัทที่ได้รับใบสมัคร และผู้ดูแลระบบ
+- **บัญชีผู้ดูแลระบบนอก profile demo:** ตั้ง `WORKMATCH_ADMIN_EMAIL` และ `WORKMATCH_ADMIN_PASSWORD` (เฉพาะเซสชัน) แล้วเปิดระบบ จะสร้างให้ถ้ายังไม่มี ADMIN
+- **ยังไม่ทำ:** ลืมรหัสผ่าน (ต้องมีระบบส่งอีเมล), อัปโหลดรูปโปรไฟล์, การลบบัญชีผู้ใช้โดยผู้ดูแล (ใช้ระงับบัญชีแทน)
 
 ข้อความเรซูเม่ตัวอย่างอยู่ใน `src/main/resources/demo/` (คัดลอกจาก `nlp-service/tests/`) ประกาศงานอยู่ใน `DemoDataLoader.java`
 
@@ -165,6 +185,9 @@ cd backend
 ```
 ใช้ฐานข้อมูล H2 ในหน่วยความจำ และ NLP จำลอง จึงไม่ต้องเปิด MySQL หรือ NLP
 มีเทสต์เส้นทางหลัก `MainFlowIntegrationTest` (สมัคร → login → วาง resume → บริษัทสร้างตำแหน่ง → นักศึกษาเห็นคะแนน)
+และ `DocumentFeaturesTest` (ฟีเจอร์ตามเอกสารบทที่ 3: ลงทะเบียนแบบเต็ม, ค้นหา/บันทึก/สมัครงาน, ผู้สมัคร + CSV, อัปโหลด PDF, ยืนยันตัวตน, หน้าผู้ดูแลระบบ)
+
+ชุดทดสอบของ NLP (รวม `GET/PUT /dictionary`): `cd nlp-service` แล้ว `venv\Scripts\python -m pytest tests`
 
 ## การจับคู่ (A4)
 
