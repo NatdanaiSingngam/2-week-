@@ -2,8 +2,37 @@
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('ตำแหน่งงานของฉัน')}"><title>ตำแหน่งงานของฉัน | Workmatch</title></head>
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="container main"><div class="page-heading"><div><p class="eyebrow">COMPANY WORKSPACE</p><h1>ตำแหน่งงานของฉัน</h1><p>จัดการโอกาสสหกิจศึกษา และค้นหานักศึกษาที่มีทักษะตรงกับทีมของคุณ</p></div><a class="button" th:href="@{/company/jobs/new}">+ สร้างตำแหน่งใหม่</a></div>
-<section class="card"><div class="card-title"><h2>ตำแหน่งงานทั้งหมด</h2><span class="badge" th:text="${(jobs == null ? 0 : #lists.size(jobs)) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div>
-<div class="empty" th:if="${#lists.isEmpty(jobs)}"><div class="symbol" aria-hidden="true">＋</div><h2>ยังไม่มีตำแหน่งงาน</h2><p>เริ่มสร้างตำแหน่งแรก เพื่อค้นหานักศึกษาที่เหมาะกับบริษัท</p><a class="button" th:href="@{/company/jobs/new}">สร้างตำแหน่งแรก</a></div>
-<div class="table-wrap" th:if="${not #lists.isEmpty(jobs)}"><table><thead><tr><th scope="col">ชื่อตำแหน่ง</th><th scope="col">จำนวนทักษะ</th><th scope="col">ผู้สมัครที่จับคู่ได้</th></tr></thead><tbody><tr th:each="item : ${jobs}"><td><a th:href="@{/company/jobs/{id}(id=${item.id})}" th:text="${item.title}">ชื่อตำแหน่ง</a></td><td th:text="${item.skillCount}">0</td><td th:text="${item.applicantCount}">0</td></tr></tbody></table></div></section></main>
+<main id="main" class="container main">
+
+<div class="page-head">
+  <div><p class="eyebrow">พื้นที่ทำงานของบริษัท</p><h1>ตำแหน่งงานของฉัน</h1><p>จัดการโอกาสสหกิจศึกษา และค้นหานักศึกษาที่มีทักษะตรงกับทีมของคุณ</p></div>
+  <div class="actions"><a class="button" th:href="@{/company/jobs/new}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>สร้างตำแหน่งใหม่</a></div>
+</div>
+
+<section class="card empty" th:if="${#lists.isEmpty(jobs)}">
+  <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M12 11v6M9 14h6"/></svg></div>
+  <h2>ยังไม่มีตำแหน่งงาน</h2>
+  <p>เริ่มสร้างตำแหน่งแรก ระบบจะดึงทักษะจากรายละเอียดงานและจับคู่กับนักศึกษาให้ทันที</p>
+  <div class="actions"><a class="button" th:href="@{/company/jobs/new}">สร้างตำแหน่งแรก</a></div>
+</section>
+
+<th:block th:if="${not #lists.isEmpty(jobs)}">
+<div class="stats">
+  <div class="stat"><span class="stat-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span><div><span class="stat-label">ตำแหน่งที่เปิดรับ</span><span class="stat-value" th:text="${#lists.size(jobs) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div></div>
+  <div class="stat"><span class="stat-icon green" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><span class="stat-label">ผู้สมัครที่จับคู่ได้ (รวม)</span><span class="stat-value" th:text="${#aggregates.sum(jobs.![applicantCount]) + ' คน'}">0 คน</span></div></div>
+</div>
+
+<div class="section-title"><h2>ตำแหน่งงานทั้งหมด</h2><span class="count" th:text="${#lists.size(jobs) + ' ตำแหน่ง'}">0 ตำแหน่ง</span></div>
+<div class="job-grid">
+  <article class="job-card" th:each="item : ${jobs}">
+    <div><p class="eyebrow">สหกิจศึกษา</p><h3><a th:href="@{/company/jobs/{id}(id=${item.id})}" th:text="${item.title}">ชื่อตำแหน่ง</a></h3></div>
+    <div class="job-facts">
+      <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>ทักษะที่ต้องการ <strong th:text="${item.skillCount}">0</strong></span></span>
+      <span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>ผู้สมัครที่จับคู่ได้ <strong th:text="${item.applicantCount}">0</strong></span></span>
+    </div>
+    <span class="job-link" aria-hidden="true">ดูผู้สมัคร<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </article>
+</div>
+</th:block>
+</main>
 <footer th:replace="~{fragments/layout :: footer}"></footer></body></html>
