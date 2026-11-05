@@ -27,6 +27,26 @@
       form.setAttribute('aria-busy', 'true');
     });
   });
+  // Show/hide password: lets users check what they typed (fewer login errors), still works with password managers
+  document.querySelectorAll('.password-field').forEach(wrap => {
+    const input = wrap.querySelector('input');
+    if (!input) return;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'password-toggle';
+    toggle.setAttribute('aria-controls', input.id);
+    const sync = () => {
+      const shown = input.type === 'text';
+      toggle.textContent = shown ? 'ซ่อน' : 'แสดง';
+      toggle.setAttribute('aria-pressed', String(shown));
+      toggle.setAttribute('aria-label', shown ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน');
+    };
+    toggle.addEventListener('click', () => { input.type = input.type === 'password' ? 'text' : 'password'; sync(); input.focus(); });
+    // never submit the password while it is visible as plain text in the field type
+    input.form && input.form.addEventListener('submit', () => { input.type = 'password'; sync(); });
+    sync();
+    wrap.appendChild(toggle);
+  });
   window.addEventListener('pageshow', resetForms);
   const current = location.pathname.replace(/\/$/, '');
   document.querySelectorAll('.nav-links a').forEach(link => {

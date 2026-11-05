@@ -1,11 +1,30 @@
-<!DOCTYPE html><html lang="th" xmlns:th="http://www.thymeleaf.org"><head th:fragment="head(title)"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title th:text="${title + ' | Workmatch'}">Workmatch</title><link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}" /></head><body>
+<!DOCTYPE html><html lang="th" xmlns:th="http://www.thymeleaf.org"><head th:fragment="head(title)"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#0369A1" /><title th:text="${title + ' | Workmatch'}">Workmatch</title><link rel="icon" type="image/svg+xml" href="/images/workmatch.svg" th:href="@{/images/workmatch.svg}" /><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;600;700&amp;family=Noto+Sans+Thai:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}" /></head><body>
+<!--/* แถบบนสุด: โลโก้, เมนูตามบทบาท, ข้อมูลผู้ใช้ + ออกจากระบบ (ออกแบบใหม่ธีม Professional Blue) */-->
 <header class="site-header" th:fragment="navbar"><a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a><div class="container nav-wrap">
-  <a class="brand" href="/login" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})"><img src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch" width="178" height="36" /></a>
+  <a class="brand" href="/login" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})"><img src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch หน้าหลัก" width="160" height="32" /></a>
   <nav class="nav-links" aria-label="เมนูหลัก">
-    <th:block th:if="${role == 'STUDENT'}"><a th:href="@{/student/resume}">แบบฟอร์ม resume</a><a th:href="@{/student/dashboard}">ผลจับคู่</a></th:block>
-    <a th:if="${role == 'COMPANY'}" th:href="@{/company/jobs}">ตำแหน่งงานของฉัน</a>
+    <th:block th:if="${role == 'STUDENT'}">
+      <a th:href="@{/student/dashboard}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>ผลจับคู่</a>
+      <a th:href="@{/student/resume}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>Resume ของฉัน</a>
+    </th:block>
+    <th:block th:if="${role == 'COMPANY'}">
+      <a th:href="@{/company/jobs}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>ตำแหน่งงานของฉัน</a>
+      <a th:href="@{/company/jobs/new}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>สร้างตำแหน่งใหม่</a>
+    </th:block>
     <th:block th:if="${role == null}"><a th:href="@{/login}">เข้าสู่ระบบ</a><a th:href="@{/register}">สมัครสมาชิก</a></th:block>
   </nav>
-  <div class="account" th:if="${role != null}"><span th:text="${displayName}">ชื่อผู้ใช้</span><form method="post" th:action="@{/logout}"><button class="quiet" type="submit">ออกจากระบบ</button></form></div>
+  <div class="account" th:if="${role != null}">
+    <div class="user-chip"><span class="avatar" aria-hidden="true" th:text="${#strings.isEmpty(displayName) ? '?' : #strings.substring(displayName, 0, 1)}">ส</span><span class="user-meta"><strong th:text="${displayName}">ชื่อผู้ใช้</strong><span th:text="${role == 'COMPANY' ? 'บัญชีบริษัท' : 'บัญชีนักศึกษา'}">บัญชีนักศึกษา</span></span></div>
+    <form method="post" th:action="@{/logout}"><button class="ghost" type="submit">ออกจากระบบ</button></form>
+  </div>
 </div></header>
+<!--/* แผงซ้ายของหน้า login / สมัครสมาชิก: อธิบาย 3 ขั้นตอนการใช้งาน (funnel pattern) */-->
+<section class="auth-panel" th:fragment="authPanel" aria-labelledby="auth-panel-title">
+  <div><p class="eyebrow">Workmatch · สหกิจศึกษา</p><h1 id="auth-panel-title">ก้าวต่อไปที่ใช่<br />เริ่มจากทักษะของคุณ</h1><p>ระบบจับคู่นักศึกษากับตำแหน่งสหกิจศึกษาจากทักษะจริง พร้อมบอกว่าควรพัฒนาอะไรเพิ่ม</p></div>
+  <ol class="steps">
+    <li><span class="step-num" aria-hidden="true">1</span><div><strong>กรอก resume</strong><span>เล่าประสบการณ์และทักษะเป็นภาษาไทยหรืออังกฤษได้เลย</span></div></li>
+    <li><span class="step-num" aria-hidden="true">2</span><div><strong>ระบบวิเคราะห์ทักษะ</strong><span>ดึงทักษะจากข้อความอัตโนมัติ แล้วเทียบกับทุกตำแหน่งงาน</span></div></li>
+    <li><span class="step-num" aria-hidden="true">3</span><div><strong>ดูตำแหน่งที่เหมาะ</strong><span>เห็นคะแนนความเหมาะสม ทักษะที่ตรง และทักษะที่ควรเตรียมเพิ่ม</span></div></li>
+  </ol>
+</section>
 <footer class="footer" th:fragment="footer"><div class="container"><span>Workmatch · เชื่อมทักษะ สู่โอกาสสหกิจศึกษา</span><span>โครงงานมหาวิทยาลัยพะเยา</span></div><script src="/js/app.js" th:src="@{/js/app.js}" defer="defer"></script></footer></body></html>
