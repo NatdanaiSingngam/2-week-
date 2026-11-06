@@ -2,7 +2,7 @@
 <!--/* งาน A5 (ธนวัฒน์): ไม่พบหน้า / ไม่พบตำแหน่งงาน (รวมกรณีบริษัทเปิดประกาศของบริษัทอื่น) */-->
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('ไม่พบหน้าที่ต้องการ')}"><title>ไม่พบหน้าที่ต้องการ | Workmatch</title></head>
-<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<body th:classappend="${role == 'COMPANY'} ? 'theme-company'"><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="container main"><section class="card empty error-page">
 <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3M8.5 8.5l5 5M13.5 8.5l-5 5"/></svg></div>
 <p class="error-code">ERROR 404</p>

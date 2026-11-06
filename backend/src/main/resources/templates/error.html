@@ -4,7 +4,7 @@
      ไม่แสดง stack trace หรือรายละเอียดภายในของระบบ */-->
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('เกิดข้อผิดพลาด')}"><title>เกิดข้อผิดพลาด | Workmatch</title></head>
-<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<body th:classappend="${role == 'COMPANY'} ? 'theme-company'"><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="container main"><section class="card empty error-page">
 <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
 <p class="error-code" th:text="${status != null ? 'ERROR ' + status : 'ERROR'}">ERROR</p>

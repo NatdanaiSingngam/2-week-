@@ -29,10 +29,18 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // ผู้ดูแลระบบระงับ/เปิดใช้งานบัญชีได้ (เอกสาร 1.4.3.1.3) null = ใช้งานได้ (ข้อมูลเดิมก่อนมีคอลัมน์นี้)
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @PrePersist
     void onCreate() {
         createdAt = LocalDateTime.now();
+        if (enabled == null) enabled = Boolean.TRUE;
     }
+
+    public boolean isEnabled() { return enabled == null || enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

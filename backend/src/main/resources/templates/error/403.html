@@ -2,7 +2,7 @@
 <!--/* งาน A5 (ธนวัฒน์): ไม่มีสิทธิ์เข้าหน้า เช่น นักศึกษาเปิดหน้าของบริษัท หรือฟอร์มไม่มี CSRF token */-->
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('ไม่มีสิทธิ์เข้าถึง')}"><title>ไม่มีสิทธิ์เข้าถึง | Workmatch</title></head>
-<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<body th:classappend="${role == 'COMPANY'} ? 'theme-company'"><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="container main"><section class="card empty error-page">
 <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
 <p class="error-code">ERROR 403</p>

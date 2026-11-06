@@ -21,6 +21,7 @@ public class RoleRedirectSuccessHandler implements AuthenticationSuccessHandler 
         for (GrantedAuthority a : authentication.getAuthorities()) {
             if ("ROLE_STUDENT".equals(a.getAuthority())) return "/student/dashboard";
             if ("ROLE_COMPANY".equals(a.getAuthority())) return "/company/jobs";
+            if ("ROLE_ADMIN".equals(a.getAuthority())) return "/admin";
         }
         return "/login";
     }

@@ -63,6 +63,25 @@ class WebFlowTests {
         return users.save(u);
     }
 
+    // ---------- หน้าแรก (Landing Page ตามเอกสาร รูปที่ 32) ----------
+
+    @Test
+    void anonymousRootShowsLandingPageWithLoginAndRegisterLinks() throws Exception {
+        String html = mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("landing"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(html).contains("หาที่ฝึกงานที่ใช่").contains("href=\"/login\"").contains("/register?role=STUDENT");
+    }
+
+    @Test
+    void loggedInRootRedirectsToRoleHome() throws Exception {
+        mvc.perform(get("/").with(user("s@test.com").roles("STUDENT")))
+                .andExpect(redirectedUrl("/student/dashboard"));
+        mvc.perform(get("/").with(user("c@test.com").roles("COMPANY")))
+                .andExpect(redirectedUrl("/company/jobs"));
+    }
+
     // ---------- A2 ----------
 
     @Test

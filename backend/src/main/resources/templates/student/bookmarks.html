@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('งานที่บันทึกไว้')}"><title>งานที่บันทึกไว้ | Workmatch</title></head>
+<!--/* หน้าจอประกาศงานที่บันทึกไว้ ตามเอกสาร รูปที่ 41 */-->
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main">
+<div class="account-layout">
+  <aside th:replace="~{fragments/layout :: accountNav(${section})}"></aside>
+  <section>
+    <div class="page-title"><h1>งานที่บันทึกไว้</h1><p th:text="${'คุณมีประกาศงานที่บันทึกไว้จำนวน ' + #lists.size(bookmarks) + ' รายการ'}">คุณมีประกาศงานที่บันทึกไว้</p></div>
+    <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+    <div class="card empty" th:if="${#lists.isEmpty(bookmarks)}">
+      <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+      <h2>ยังไม่มีงานที่บันทึกไว้</h2><p>กดปุ่ม "บันทึก" ในหน้าค้นหางานหรือหน้ารายละเอียดงาน เพื่อเก็บไว้สมัครภายหลัง</p>
+      <div class="actions"><a class="button" th:href="@{/student/jobs}">ค้นหางาน</a></div>
+    </div>
+    <article class="list-item" th:each="b : ${bookmarks}">
+      <span class="mono" aria-hidden="true" th:text="${@fmt.initial(b.companyName())}">ส</span>
+      <div class="grow">
+        <h3 th:text="${b.title()}">Software Engineer (Intern)</h3>
+        <div class="meta" th:text="${b.companyName()}">บริษัท</div>
+        <div class="meta"><span th:text="${'บันทึกเมื่อ ' + @fmt.date(b.savedAt())}">บันทึกเมื่อ 31 ส.ค. 2569</span> <span class="status CLOSED" th:if="${!b.open()}">ปิดรับสมัครแล้ว</span> <span class="status HIRED" th:if="${b.applied()}">สมัครแล้ว</span></div>
+      </div>
+      <span class="star" aria-hidden="true">★</span>
+      <div class="actions">
+        <form method="post" class="inline-form" th:action="@{/student/bookmarks/{id}/remove(id=${b.jobId()})}"><button type="submit" class="secondary sm" th:aria-label="${'ลบออก: ' + b.title()}">ลบออก</button></form>
+        <a class="button sm" th:href="@{/student/jobs/{id}(id=${b.jobId()})}">ดูรายละเอียดและสมัคร</a>
+      </div>
+    </article>
+  </section>
+</div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

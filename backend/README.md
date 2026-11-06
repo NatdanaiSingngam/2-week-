@@ -13,7 +13,6 @@ Backend ของระบบ Workmatch: Java 17 + Spring Boot 3.3 + Thymeleaf +
 2-week-/
 ├── start-demo.bat / start-demo.sh  # เปิด NLP + Spring Boot (พร้อมข้อมูลตัวอย่าง) ในคำสั่งเดียว
 ├── nlp-service/                    # Python FastAPI ของณัฐดนัย (/extract, /match, /health)
-├── frontend-draft/                 # หน้า preview ของชญาณัตถพล (ข้อมูลสมมติ) ตัวที่ใช้จริงอยู่ใน backend/
 └── backend/
     ├── pom.xml, mvnw, mvnw.cmd, .mvn/   # Maven Wrapper (ไม่ต้องติดตั้ง Maven เอง)
     ├── db/create_database.sql           # สร้างฐานข้อมูลและผู้ใช้ MySQL
@@ -135,10 +134,30 @@ $env:MAVEN_OPTS="-Duser.language=en -Duser.country=US"   # Windows ภาษา�
 | นักศึกษา | `student2@demo.workmatch.test` | เรซูเม่สาย Frontend (HTML, CSS, JavaScript, React, Figma) |
 | นักศึกษา | `student3@demo.workmatch.test` | เรซูเม่สาย Data (Python, SQL, Machine Learning, Excel) |
 | บริษัท | `company1@demo.workmatch.test` | Backend / Frontend / Data Analyst |
-| บริษัท | `company2@demo.workmatch.test` | Mobile App / DevOps-QA / UX-UI Designer |
+| บริษัท | `company2@demo.workmatch.test` | Mobile App / DevOps-QA / UX-UI Designer (ส่งเอกสารแล้ว รออนุมัติ) |
+| ผู้ดูแลระบบ | `admin@demo.workmatch.test` | หน้าผู้ดูแลระบบ `/admin` |
 
-ลำดับสาธิตที่แนะนำ: login `student1` → เห็น Dashboard มีคะแนนทันที → แก้ resume เพิ่มทักษะ → คะแนนเปลี่ยน →
-logout → login `company1` → เปิดตำแหน่ง Backend Developer → เห็นนักศึกษาเรียงตามคะแนน
+ข้อมูลตัวอย่างเพิ่มเติม (สร้างให้ทั้งฐานข้อมูลใหม่และฐานข้อมูลเดิมที่มีบัญชีตัวอย่างแล้ว): รหัสนิสิต/คณะ/สาขา, ข้อมูลบริษัท,
+ใบสมัคร 6 ใบหลายสถานะ, งานที่ student1 บันทึกไว้ และคำขอยืนยันตัวตนของ company2 (ไฟล์ PDF ตัวอย่าง ไม่ใช่เอกสารจริง)
+
+ลำดับสาธิตที่แนะนำ: login `student1` → เห็น Dashboard มีคะแนนทันที → ค้นหางาน → เปิดรายละเอียดงาน → บันทึก/สมัครงาน →
+ดูประวัติการสมัคร → logout → login `company1` → เปิดตำแหน่ง Backend Developer → ดูผู้สมัคร → อัปเดตสถานะ →
+logout → login `admin` → อนุมัติ company2 → แก้พจนานุกรมทักษะ/คำพ้อง
+
+### ฟีเจอร์ตามเอกสารบทที่ 3 (User Interface รูปที่ 32-52)
+
+| บทบาท | หน้า | URL |
+|---|---|---|
+| ทุกคน | หน้าแรก, เข้าสู่ระบบ, ลงทะเบียนนักศึกษา (รหัสนิสิต 8 หลัก) / สถานประกอบการ (เลขผู้เสียภาษี 13 หลัก) | `/`, `/login`, `/register` |
+| นักศึกษา | กระดานสรุปผล, จัดการเรซูเม่ (อัปโหลด PDF / ลบ-เพิ่มทักษะ), ค้นหางาน, รายละเอียดงาน + บันทึก/สมัคร, งานที่บันทึก, ประวัติการสมัคร, ข้อมูลส่วนตัว | `/student/dashboard`, `/student/resume`, `/student/jobs`, `/student/jobs/{id}`, `/student/bookmarks`, `/student/applications`, `/student/profile` |
+| สถานประกอบการ | ภาพรวม, จัดการประกาศ (แก้ไข/ปิดรับ/ลบ/แบบร่าง), ผู้สมัครแยกตามสถานะ + CSV, รายละเอียดผู้สมัคร + อัปเดตสถานะ, ผู้สมัครทั้งหมด, โปรไฟล์ + ยืนยันตัวตน (ภ.พ.20) | `/company/jobs`, `/company/postings`, `/company/jobs/{id}`, `/company/applications/{id}`, `/company/applications`, `/company/profile` |
+| ผู้ดูแลระบบ | ภาพรวมระบบ, อนุมัติสถานประกอบการ, พจนานุกรมทักษะ, คำพ้องความหมาย, บันทึกข้อผิดพลาด, จัดการบัญชีผู้ใช้ (ระงับ/เปิดใช้งาน) | `/admin`, `/admin/companies`, `/admin/skills`, `/admin/synonyms`, `/admin/logs`, `/admin/users` |
+
+- **พจนานุกรมทักษะ:** ตาราง `skill_dictionary` / `skill_synonyms` ในฐานข้อมูลเป็นต้นฉบับ เปิดระบบครั้งแรกนำเข้าจาก NLP (`GET /dictionary`)
+  ผู้ดูแลแก้ไขแล้วระบบส่งชุดใหม่ให้ NLP (`PUT /dictionary`) ซึ่งเขียน `skill_dictionary.csv` และใช้ชุดใหม่ทันที
+- **ไฟล์ PDF** (เรซูเม่ / ภ.พ.20) เก็บในตาราง `stored_files` ขนาดไม่เกิน 5MB เปิดดูได้เฉพาะเจ้าของ บริษัทที่ได้รับใบสมัคร และผู้ดูแลระบบ
+- **บัญชีผู้ดูแลระบบนอก profile demo:** ตั้ง `WORKMATCH_ADMIN_EMAIL` และ `WORKMATCH_ADMIN_PASSWORD` (เฉพาะเซสชัน) แล้วเปิดระบบ จะสร้างให้ถ้ายังไม่มี ADMIN
+- **ยังไม่ทำ:** ลืมรหัสผ่าน (ต้องมีระบบส่งอีเมล), อัปโหลดรูปโปรไฟล์, การลบบัญชีผู้ใช้โดยผู้ดูแล (ใช้ระงับบัญชีแทน)
 
 ข้อความเรซูเม่ตัวอย่างอยู่ใน `src/main/resources/demo/` (คัดลอกจาก `nlp-service/tests/`) ประกาศงานอยู่ใน `DemoDataLoader.java`
 
@@ -166,6 +185,9 @@ cd backend
 ```
 ใช้ฐานข้อมูล H2 ในหน่วยความจำ และ NLP จำลอง จึงไม่ต้องเปิด MySQL หรือ NLP
 มีเทสต์เส้นทางหลัก `MainFlowIntegrationTest` (สมัคร → login → วาง resume → บริษัทสร้างตำแหน่ง → นักศึกษาเห็นคะแนน)
+และ `DocumentFeaturesTest` (ฟีเจอร์ตามเอกสารบทที่ 3: ลงทะเบียนแบบเต็ม, ค้นหา/บันทึก/สมัครงาน, ผู้สมัคร + CSV, อัปโหลด PDF, ยืนยันตัวตน, หน้าผู้ดูแลระบบ)
+
+ชุดทดสอบของ NLP (รวม `GET/PUT /dictionary`): `cd nlp-service` แล้ว `venv\Scripts\python -m pytest tests`
 
 ## การจับคู่ (A4)
 
@@ -189,14 +211,49 @@ cd backend
 | 1 | หน้า 403/404/500 เป็น Whitelabel ภาษาอังกฤษ / JSON error มี stack trace | เรา | **แก้แล้ว** (stack trace 22 ต.ค., หน้า error ภาษาไทย 24 ต.ค. งาน A5) |
 | 2 | หัวข้อหมวดทักษะในหน้า resume แสดงคีย์อังกฤษ (programming, database, soft ...) | เพื่อน | **แก้แล้ว** 27 ต.ค. (แสดงชื่อไทย) — `templates/student/resume.html` |
 | 3 | ส่วน "ไม่พบตำแหน่งงาน" (job == null) ใน job-detail ไม่เคยถูกใช้ | ตกลงร่วมกัน | **แก้แล้ว** 27 ต.ค. (แบบที่ 2: ตอบ 404 แต่แสดงส่วน "ไม่พบตำแหน่งงาน" + ปุ่มกลับรายการตำแหน่ง) — `JobController.java` |
-| 4 | templates/static มี 2 ชุด (`frontend-draft/` กับ `backend/`) เสี่ยงแก้ไม่ตรงกัน | เพื่อน | **แก้แล้ว** 27 ต.ค. (เหลือชุดเดียวใน `backend/`, preview ใน `frontend-draft/` ดึง static จาก backend) |
+| 4 | templates/static มี 2 ชุด (`frontend-draft/` กับ `backend/`) เสี่ยงแก้ไม่ตรงกัน | เพื่อน | **แก้แล้ว** 27 ต.ค. (เหลือชุดเดียวใน `backend/`) และ 5 พ.ย. ลบหน้า preview ข้อมูลสมมติใน `frontend-draft/` ออก เหลือเฉพาะหน้าเว็บจริง |
 | 5 | `job.skills` เป็น `{name, category}` แต่เอกสารสั่งงานเขียนว่า list ข้อความ | แก้เอกสาร | ยังไม่แก้ — `dto/JobDetail.java` |
 | 6 | `static/images/workmatch.svg` มี metadata เกินมาตอนคัดลอก | เรา | **แก้แล้ว** 22 ต.ค. |
 
 ## หมายเหตุหน้าเว็บ
 
-ไฟล์ใน `src/main/resources/templates` และ `static` เป็นงานของชญาณัตถพล (ย้ายมาจาก `frontend-draft/` และเป็นชุดเดียวที่ใช้จริง)
+ไฟล์ใน `src/main/resources/templates` และ `static` เป็นงานของชญาณัตถพล (ย้ายมาจาก `frontend-draft/` เดิม และเป็นชุดเดียวที่ใช้จริง)
 ยกเว้น `error.html`, `error/403.html`, `error/404.html` ที่ธนวัฒน์เพิ่มในงาน A5 (ใช้ layout และ CSS ของชญาณัตถพล)
+
+5 พ.ย.: ออกแบบหน้าเว็บใหม่ทั้งหมดเป็นธีม "Professional Blue" (ระบบดีไซน์จาก skill ui-ux-pro-max) รายละเอียดสี ฟอนต์ และกฎอยู่ที่หัวไฟล์ `static/css/style.css`
+หน้า preview ข้อมูลสมมติใน `frontend-draft/` ถูกลบออกแล้ว ดูหน้าเว็บได้ที่ http://localhost:8080 เท่านั้น (ต้องรัน backend)
+
+### URL, template และข้อมูลที่ส่งให้หน้าเว็บ
+
+(ย้ายมาจาก `frontend-draft/README.md` เดิม)
+
+| Method / URL | Template | Model / Fields |
+| --- | --- | --- |
+| GET /login, POST /login | login | param.error/logout/registered; username, password |
+| GET/POST /register | register | error; displayName, email, password, role |
+| POST /logout | Spring Security | CSRF token |
+| GET/POST /student/resume | student/resume | resumeText, skills[{name,category}], message, error; text |
+| GET /student/dashboard | student/dashboard | hasResume, matches[{jobId,jobTitle,companyName,score,cosine,matched,missing}] |
+| GET /company/jobs | company/jobs | jobs[{id,title,skillCount,applicantCount}] |
+| GET /company/jobs/new | company/job-form | job{title,description}, error |
+| POST /company/jobs | redirect /company/jobs/{id} | title, description |
+| GET /company/jobs/{id} | company/job-detail | job{id,title,description,skills}, applicants[{studentName,score,cosine,matched,missing}] |
+
+- ทุกหน้าหลังเข้าสู่ระบบรับ `displayName`, `role` (STUDENT/COMPANY) เพิ่มเติม หน้าเว็บไม่เรียก FastAPI โดยตรง
+- ทุกหน้าใช้ `fragments/layout :: head(title)`, `navbar`, `footer` (หน้า login/สมัครสมาชิกใช้ `authPanel` เพิ่ม) CSS มีไฟล์เดียวคือ `static/css/style.css` ฟอร์มใช้ `th:action` เพื่อให้ Spring Security แนบ CSRF token
+- `matched`/`missing` เป็นรายการข้อความ คะแนน `score` และ `cosine` เป็นเลข 0–100 แสดงหนึ่งตำแหน่งทศนิยม ระดับ: เหมาะมาก ≥70, ปานกลาง ≥40, ต่ำกว่านั้นควรพัฒนาเพิ่ม
+- Dashboard และรายชื่อผู้สมัครคงลำดับตามที่ backend ส่งมา (เรียงคะแนนมากไปน้อย)
+- สมัครสมาชิกเมื่อ validation ไม่ผ่าน ให้ return `register` ใน POST request เดิม เพื่อให้ param คงค่าชื่อ/อีเมล/บทบาท (รหัสผ่านไม่เติมกลับ)
+- Login สำเร็จ: STUDENT → /student/dashboard, COMPANY → /company/jobs
+- ต้องอนุญาต `/css/**`, `/js/**`, `/images/**`, `/login`, `/register` ก่อน login
+
+### รายการตรวจหน้าเว็บ
+
+- Login: error/logout/registered; register role 2 แบบและ password อย่างน้อย 8 ตัว
+- Resume: ว่าง/มีทักษะ/ข้อความ error, ตัวนับ 20,000 ตัว, ป้องกันกดซ้ำและคืนสถานะเมื่อ Back
+- Dashboard: ไม่มี resume / ไม่มี matches / หลาย matches, ระดับ 70/40, ขยายการ์ด, ไม่มี missing
+- Company: jobs ว่าง, error ฟอร์ม, job ว่าง, applicants ว่าง, อันดับ 1–3, ไม่แสดงอีเมล
+- ตรวจที่ 375px, 768px และ desktop, keyboard focus, ภาษาไทย และข้อความผู้ใช้ที่มี HTML (ต้องแสดงเป็นข้อความ)
 
 ## สถานะงาน
 

@@ -27,9 +27,11 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // /error ต้องเปิดไว้ เพื่อให้หน้า error ภาษาไทย (templates/error/403.html, 404.html, error.html) แสดงได้
-                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()
+                // "/" = หน้าแรก (Landing Page) เปิดให้ทุกคนดูได้ ถ้า login แล้ว HomeController จะส่งไปหน้าของบทบาทตัวเอง
+                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**", "/error").permitAll()
                 .requestMatchers("/student/**").hasRole("STUDENT")
                 .requestMatchers("/company/**").hasRole("COMPANY")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginPage("/login")

@@ -26,9 +26,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         String normalized = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
         User user = users.findByEmail(normalized)
                 .orElseThrow(() -> new UsernameNotFoundException("ไม่พบผู้ใช้"));
+        // บัญชีที่ผู้ดูแลระบบระงับ (enabled = false) เข้าสู่ระบบไม่ได้
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPasswordHash(),
+                user.isEnabled(), true, true, true,
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
     }
 }

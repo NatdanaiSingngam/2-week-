@@ -1,6 +1,7 @@
 package com.workmatch;
 
 import com.workmatch.demo.DemoDataLoader;
+import com.workmatch.entity.Role;
 import com.workmatch.entity.User;
 import com.workmatch.nlp.ExtractedSkill;
 import com.workmatch.nlp.MatchResult;
@@ -33,6 +34,9 @@ class DemoDataLoaderTest {
     @Autowired JobSkillRepository jobSkills;
     @Autowired MatchRepository matches;
     @Autowired PasswordEncoder encoder;
+    @Autowired StudentProfileRepository studentProfiles;
+    @Autowired CompanyProfileRepository companyProfiles;
+    @Autowired JobApplicationRepository applications;
     @MockBean NlpClient nlpClient;
 
     @Test
@@ -49,17 +53,24 @@ class DemoDataLoaderTest {
 
         loader.run();
 
-        assertThat(users.count()).isEqualTo(5);
+        // 3 นักศึกษา + 2 บริษัท + 1 ผู้ดูแลระบบ (ส่วนเสริมตามเอกสารบทที่ 3)
+        assertThat(users.count()).isEqualTo(6);
         assertThat(resumes.count()).isEqualTo(3);
         assertThat(jobs.count()).isEqualTo(6);
         assertThat(matches.count()).isEqualTo(18); // 3 เรซูเม่ x 6 ตำแหน่ง
         User s1 = users.findByEmail(DemoDataLoader.MARKER_EMAIL).orElseThrow();
         assertThat(s1.getPasswordHash()).startsWith("$2");
         assertThat(encoder.matches(DemoDataLoader.DEMO_PASSWORD, s1.getPasswordHash())).isTrue();
+        assertThat(users.findByEmail(DemoDataLoader.ADMIN_EMAIL).orElseThrow().getRole()).isEqualTo(Role.ADMIN);
+        assertThat(studentProfiles.count()).isEqualTo(3);
+        assertThat(companyProfiles.count()).isEqualTo(2);
+        long applicationsAfterFirstRun = applications.count();
+        assertThat(applicationsAfterFirstRun).isEqualTo(6);
 
         loader.run(); // รันซ้ำต้องไม่สร้างซ้ำ
-        assertThat(users.count()).isEqualTo(5);
+        assertThat(users.count()).isEqualTo(6);
         assertThat(jobs.count()).isEqualTo(6);
         assertThat(matches.count()).isEqualTo(18);
+        assertThat(applications.count()).isEqualTo(applicationsAfterFirstRun);
     }
 }
