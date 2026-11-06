@@ -59,6 +59,13 @@ button,input,textarea,select{font:inherit;color:inherit}
 .nav-links a[aria-current=page]{color:var(--header-active);font-weight:600}
 .nav-links a[aria-current=page]::after{content:"";position:absolute;left:12px;right:12px;bottom:8px;height:2px;border-radius:2px;background:currentColor}
 .nav-cta{margin-left:6px}
+/* ปุ่ม "สมัครสมาชิก" ในเมนู: ตัวอักษรขาวบนพื้นน้ำเงิน (ไม่ใช้สีลิงก์เมนูที่เป็นเทาเข้ม) */
+.nav-links a.nav-cta{background:var(--primary);color:#fff;font-weight:600;min-height:40px;padding:0 18px}
+.nav-links a.nav-cta:hover{background:var(--primary-hover);color:#fff}
+.nav-links a.nav-cta[aria-current=page]::after{display:none}
+/* ลิงก์ "เข้าสู่ระบบ" ตอนยังไม่ login ให้เข้มและหนาขึ้น */
+.nav-links a.nav-login{color:var(--heading);font-weight:500}
+.nav-links a.nav-login:hover{color:var(--primary-text)}
 .user-menu{position:relative;margin-left:8px}
 .user-menu summary{list-style:none;cursor:pointer;border-radius:50%}
 .user-menu summary::-webkit-details-marker{display:none}
@@ -309,7 +316,7 @@ details.job-info[open] summary{margin-bottom:12px}
   .user-menu{margin-left:auto}
   .nav-links{order:3;width:100%;margin-left:0;overflow-x:auto;border-top:1px solid rgba(127,127,127,.18);padding-top:4px}
   .nav-links a{flex:none}
-  .nav-cta{display:none}
+  .nav-links a.nav-cta{margin-left:auto}
   .main{padding:22px 0 44px}
   .card{padding:18px}
   .match-card{padding:16px}

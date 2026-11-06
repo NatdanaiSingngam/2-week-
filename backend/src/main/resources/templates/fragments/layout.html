@@ -13,7 +13,7 @@
     <th:block th:if="${role == 'STUDENT'}"><a th:href="@{/student/dashboard}">หน้าหลัก</a><a th:href="@{/student/resume}">จัดการเรซูเม่</a><a th:href="@{/student/jobs}" data-prefix="/student/jobs">ค้นหางาน</a><a th:href="@{/student/bookmarks}">รายการที่บันทึก</a></th:block>
     <th:block th:if="${role == 'COMPANY'}"><a th:href="@{/company/jobs}">หน้าหลัก</a><a th:href="@{/company/postings}" data-prefix="/company/postings">จัดการประกาศงาน</a><a th:href="@{/company/applications}" data-prefix="/company/applications">ผู้สมัครทั้งหมด</a><a th:href="@{/company/profile}">โปรไฟล์บริษัท</a></th:block>
     <th:block th:if="${role == 'ADMIN'}"><a th:href="@{/admin}">แผงผู้ดูแลระบบ</a></th:block>
-    <th:block th:if="${role == null}"><a th:href="@{/login}">เข้าสู่ระบบ</a><a class="button sm nav-cta" th:href="@{/register}">สมัครสมาชิก</a></th:block>
+    <th:block th:if="${role == null}"><a class="nav-login" th:href="@{/login}">เข้าสู่ระบบ</a><a class="nav-cta" th:href="@{/register}">สมัครสมาชิก</a></th:block>
   </nav>
   <details class="user-menu" th:if="${role != null}">
     <summary aria-label="เมนูบัญชีผู้ใช้"><span class="avatar" aria-hidden="true" th:text="${userInitials != null ? userInitials : '?'}">ณด</span></summary>
