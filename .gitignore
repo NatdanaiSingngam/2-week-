@@ -2,3 +2,6 @@ __pycache__/
 .pytest_cache/
 venv/
 *.pyc
+
+# เอกสารแผนงานที่มีชื่อและรหัสนิสิต (repo เป็นสาธารณะ) เก็บไว้ในเครื่องเท่านั้น
+docs/presentation/plans/

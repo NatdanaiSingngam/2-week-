@@ -48,17 +48,20 @@ public class DictionaryService {
     @EventListener(ApplicationReadyEvent.class)
     public void syncOnStartup() {
         try {
-            if (skills.count() == 0) {
-                int n = importFromNlp();
-                if (n > 0) log.info("[dictionary] นำเข้าพจนานุกรมทักษะจาก NLP {} คำ", n);
-            } else {
-                pushToNlp();
-            }
+            // เติมเฉพาะทักษะ/คำพ้องที่ฐานข้อมูลยังไม่มี (เช่น ทีม NLP เพิ่มคำใน skill_dictionary.csv ผ่าน git)
+            // แล้วค่อยส่งชุดในฐานข้อมูลกลับให้ NLP ไม่อย่างนั้นชุดเก่าในฐานข้อมูลจะเขียนทับคำใหม่ในไฟล์
+            int n = importFromNlp();
+            if (n > 0) log.info("[dictionary] เติมทักษะ/คำพ้องใหม่จาก NLP {} รายการ", n);
+            if (skills.count() > 0) pushToNlp();
         } catch (RuntimeException e) {
             log.warn("[dictionary] ซิงก์พจนานุกรมกับ NLP ไม่สำเร็จ (เปิด NLP แล้วรีสตาร์ต หรือแก้ไขพจนานุกรมอีกครั้ง): {}", e.getMessage());
         }
     }
 
+    /**
+     * นำเข้าแบบเติม: ทักษะที่ยังไม่มี และคำพ้องที่ยังไม่มี (รวมคำพ้องใหม่ของทักษะเดิม) คืนจำนวนรายการที่เพิ่ม
+     * ไม่แก้หรือลบสิ่งที่ผู้ดูแลตั้งไว้แล้ว (ชื่อ หมวด สถานะเปิด/ปิด)
+     */
     @Transactional
     public int importFromNlp() {
         List<DictionaryItem> items = nlpClient.fetchDictionary();
@@ -66,15 +69,19 @@ public class DictionaryService {
         int count = 0;
         for (DictionaryItem item : items) {
             if (item == null || item.name() == null || item.name().isBlank()) continue;
-            if (skills.findByNameIgnoreCase(item.name().trim()).isPresent()) continue;
-            SkillEntry e = new SkillEntry();
-            e.setName(item.name().trim());
-            e.setCategory(item.category() == null || item.category().isBlank() ? "other" : item.category().trim());
-            e = skills.save(e);
-            count++;
+            SkillEntry e = skills.findByNameIgnoreCase(item.name().trim()).orElse(null);
+            if (e == null) {
+                e = new SkillEntry();
+                e.setName(item.name().trim());
+                e.setCategory(item.category() == null || item.category().isBlank() ? "other" : item.category().trim());
+                e = skills.save(e);
+                count++;
+            }
             if (item.aliases() != null) {
                 for (String alias : item.aliases()) {
-                    if (alias == null || alias.isBlank() || synonyms.findByAliasIgnoreCase(alias.trim()).isPresent()) continue;
+                    if (alias == null || alias.isBlank() || synonyms.findByAliasIgnoreCase(alias.trim()).isPresent()
+                            || skills.findByNameIgnoreCase(alias.trim()).isPresent()) continue;
+                    count++;
                     SkillSynonym s = new SkillSynonym();
                     s.setAlias(alias.trim());
                     s.setSkill(e);

@@ -1,0 +1,21 @@
+type,id,expected_skills
+resume,1,Spring Boot|MySQL|REST API|Git|GitHub|Postman|Docker|Java|SQL|การทำงานเป็นทีม|ความรับผิดชอบ
+resume,2,Python|Django|Flask|PostgreSQL|Linux|Docker|AWS|การแก้ปัญหา
+resume,3,HTML|CSS|JavaScript|React|Bootstrap|Figma|การทำงานเป็นทีม
+resume,4,Vue|TypeScript|Tailwind CSS|Node.js|Git|Cypress|ภาษาอังกฤษ
+resume,5,Python|pandas|NumPy|Power BI|Excel|SQL|MySQL|scikit-learn|Machine Learning|Data Analysis|การนำเสนอ
+resume,6,Machine Learning|NLP|TensorFlow|PyTorch|Python|Jupyter Notebook|Git|Linux|การคิดวิเคราะห์|การสื่อสาร|ภาษาอังกฤษ
+resume,7,Software Testing|Selenium|Postman|Jira|SQL|Git|ความรับผิดชอบ|การบริหารเวลา
+resume,8,Networking|Cisco|Linux|Shell Script|Cybersecurity|Docker|Git|ภาษาอังกฤษ|การแก้ปัญหา
+resume,9,UI/UX|Figma|Photoshop|Illustrator|ความคิดสร้างสรรค์|การนำเสนอ|การทำงานเป็นทีม|Microsoft Office
+resume,10,Flutter|Dart|Firebase|Android|Kotlin|GitHub|ภาวะผู้นำ|การสื่อสาร
+job,1,Java|Spring Boot|REST API|MySQL|Git|Docker
+job,2,Python|Django|PostgreSQL|Linux|Docker|Git|การทำงานเป็นทีม
+job,3,HTML|CSS|JavaScript|React|Git|Figma
+job,4,Vue|TypeScript|Tailwind CSS|Git|ภาษาอังกฤษ
+job,5,Python|pandas|SQL|Power BI|Excel|Data Analysis|การนำเสนอ
+job,6,Machine Learning|Python|TensorFlow|PyTorch|NLP|Linux|Git
+job,7,Software Testing|Selenium|Postman|Jira|SQL|Git|ความรับผิดชอบ
+job,8,Networking|Linux|Docker|Shell Script|Cybersecurity|ภาษาอังกฤษ|การแก้ปัญหา
+job,9,UI/UX|Figma|Photoshop|Illustrator|ความคิดสร้างสรรค์|การนำเสนอ
+job,10,Flutter|Dart|Firebase|Android|Kotlin|GitHub|การทำงานเป็นทีม

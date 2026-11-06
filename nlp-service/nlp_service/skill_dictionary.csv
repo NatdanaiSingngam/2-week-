@@ -1,6 +1,6 @@
 skill,aliases,category
 Java,,programming
-Python,,programming
+Python,ไพธอน|ไพทอน,programming
 JavaScript,js,programming
 TypeScript,ts,programming
 C#,,programming
@@ -48,22 +48,28 @@ pandas,,data
 NumPy,,data
 scikit-learn,sklearn,data
 Machine Learning,ml,data
-Data Analysis,การวิเคราะห์ข้อมูล,data
+Data Analysis,การวิเคราะห์ข้อมูล|วิเคราะห์ข้อมูล,data
 TensorFlow,,data
 PyTorch,,data
 NLP,,data
 Selenium,,testing
-Software Testing,การทดสอบซอฟต์แวร์,testing
-Networking,เครือข่าย,infrastructure
+Software Testing,การทดสอบซอฟต์แวร์|ทดสอบซอฟต์แวร์,testing
+Networking,เครือข่าย|ระบบเครือข่าย,infrastructure
 Cybersecurity,ความปลอดภัยไซเบอร์,infrastructure
 การสื่อสาร,สื่อสาร,soft
 การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น,soft
 การแก้ปัญหา,แก้ปัญหา,soft
-ความรับผิดชอบ,,soft
-การบริหารเวลา,จัดการเวลา,soft
+ความรับผิดชอบ,รับผิดชอบ,soft
+การบริหารเวลา,จัดการเวลา|บริหารเวลา,soft
 ความคิดสร้างสรรค์,,soft
 ภาวะผู้นำ,ผู้นำ,soft
 การคิดวิเคราะห์,,soft
 ภาษาอังกฤษ,english,language
 ภาษาจีน,chinese,language
-การนำเสนอ,,soft
+การนำเสนอ,นำเสนอ,soft
+AWS,amazon web services,infrastructure
+Cisco,,infrastructure
+Shell Script,shell scripting|bash script,infrastructure
+Cypress,,testing
+Jira,,tools
+Jupyter Notebook,jupyter,data

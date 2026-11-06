@@ -39,6 +39,14 @@ Python service (FastAPI) ที่ Spring Boot เรียกใช้ มี 2
 
     python -m pytest -q
 
+วัดความถูกต้องของการดึงทักษะและคะแนนจับคู่ด้วยข้อมูลจำลองใน `../sample-data`:
+
+    python evaluation/run_eval.py              (พิมพ์ผล)
+    python evaluation/run_eval.py ผล.md         (บันทึกเป็นไฟล์ markdown)
+
+ผลที่วัดไว้อยู่ใน `evaluation/results_baseline.md` (ก่อนปรับพจนานุกรม) และ `evaluation/results_after_dictionary_update.md` (หลังปรับ)
+ข้อมูลทดสอบและเฉลยเขียนขึ้นเองโดยผู้พัฒนา ผลหลังปรับจึงเอนเอียงเข้าข้างชุดข้อมูลนี้ ควรทดสอบซ้ำกับ resume จริง
+
 ## หมายเหตุ
 - `skill_dictionary.csv` เป็นร่างแรก ควรให้ผู้รับผิดชอบข้อมูลช่วยตรวจและเพิ่มทักษะตามตำแหน่งที่ใช้เดโมจริง
 - เรซูเม่ใน `tests/` เป็นข้อมูลตัวอย่างที่เขียนขึ้นเพื่อทดสอบ ไม่ใช่ข้อมูลจริง

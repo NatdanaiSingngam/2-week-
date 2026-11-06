@@ -306,6 +306,25 @@ class DocumentFeaturesTest {
                 .andExpect(flash().attributeExists("error"));
     }
 
+    @Test
+    void startupSyncAddsNewDictionaryEntriesFromNlpWithoutOverwritingAdminChanges() {
+        // ผู้ดูแลปิดใช้งาน SQL ไว้ ส่วนทีม NLP เพิ่ม Kotlin และคำพ้อง "J2SE" ของ Java ในไฟล์ CSV
+        Long sqlId = skillEntries.findByNameIgnoreCase("SQL").orElseThrow().getId();
+        dictionary.toggleSkill(sqlId);
+        when(nlpClient.fetchDictionary()).thenReturn(List.of(
+                new NlpClient.DictionaryItem("Java", "programming", List.of("J2SE")),
+                new NlpClient.DictionaryItem("SQL", "database", List.of()),
+                new NlpClient.DictionaryItem("Kotlin", "programming", List.of("kt"))));
+
+        dictionary.syncOnStartup();
+
+        assertThat(skillEntries.findByNameIgnoreCase("Kotlin")).isPresent();
+        assertThat(dictionary.resolve("kt").map(s -> s.getName())).contains("Kotlin");
+        assertThat(dictionary.resolve("J2SE").map(s -> s.getName())).contains("Java");
+        assertThat(skillEntries.findById(sqlId).orElseThrow().isActive()).isFalse(); // ไม่ทับการตั้งค่าของผู้ดูแล
+        org.mockito.Mockito.verify(nlpClient, org.mockito.Mockito.atLeastOnce()).replaceDictionary(anyList());
+    }
+
     private static byte[] pdf(String text) throws Exception {
         try (PDDocument doc = new PDDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PDPage page = new PDPage();
