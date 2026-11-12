@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/CurrentUserService.java
+ * หน้าที่: หาว่าผู้ใช้คนไหนกำลังล็อกอินอยู่
+ * เรียกใช้: UserRepository
+ * ถูกเรียกโดย: AdminController, CompanyController, GlobalExceptionHandler, GlobalModelAdvice, JobController,
+ *     ResumeController, StudentController, StudentDashboardController
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.User;

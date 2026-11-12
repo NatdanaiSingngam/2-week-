@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ความปลอดภัย / ล็อกอิน ====
+ * ไฟล์: backend/src/main/java/com/workmatch/security/RoleRedirectSuccessHandler.java
+ * หน้าที่: หลังล็อกอินสำเร็จ พาไปหน้าหลักตามบทบาท
+ * ถูกเรียกโดย: HomeController, SecurityConfig
+ */
 package com.workmatch.security;
 
 import jakarta.servlet.http.HttpServletRequest;

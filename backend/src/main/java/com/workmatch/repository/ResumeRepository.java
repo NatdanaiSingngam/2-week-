@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · เข้าถึงฐานข้อมูล (Repository) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/repository/ResumeRepository.java
+ * หน้าที่: ค้นหา / บันทึก / ลบข้อมูลในตาราง resumes (Spring Data สร้างคำสั่ง SQL จากชื่อเมธอดให้เอง)
+ * อ่าน/เขียนตาราง: resumes (entity Resume) ผ่าน Spring Data JPA
+ * ถูกเรียกโดย: ApplicationService, JobPostingService, MatchService, ResumeExtrasService, ResumeService
+ */
 package com.workmatch.repository;
 
 import com.workmatch.entity.Resume;

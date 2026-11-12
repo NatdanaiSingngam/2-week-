@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/JobListItem.java
+ * หน้าที่: ประกาศงาน 1 แถวในหน้าภาพรวมบริษัท (จำนวนทักษะ จำนวนผู้สมัคร)
+ * ถูกเรียกโดย: JobService
+ */
 package com.workmatch.dto;
 
 /** หนึ่งแถวในหน้า company/jobs: {id, title, skillCount, applicantCount} */

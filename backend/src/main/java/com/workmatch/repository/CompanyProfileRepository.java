@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · เข้าถึงฐานข้อมูล (Repository) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/repository/CompanyProfileRepository.java
+ * หน้าที่: ค้นหา / บันทึก / ลบข้อมูลในตาราง company_profiles (Spring Data สร้างคำสั่ง SQL จากชื่อเมธอดให้เอง)
+ * อ่าน/เขียนตาราง: company_profiles (entity CompanyProfile) ผ่าน Spring Data JPA
+ * ถูกเรียกโดย: AdminService, DemoDataLoader, GlobalModelAdvice, JobPostingService, ProfileService,
+ *     RegistrationService
+ */
 package com.workmatch.repository;
 
 import com.workmatch.entity.CompanyProfile;

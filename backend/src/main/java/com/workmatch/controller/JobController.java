@@ -1,3 +1,16 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/JobController.java
+ * หน้าที่: หน้าบริษัทฝั่งประกาศงาน: ภาพรวม, จัดการประกาศ, สร้าง/แก้ไข/ลบ, เปลี่ยนสถานะ, ดูผู้สมัครที่จับคู่ได้, ดาวน์โหลด CSV
+ * URL ที่รับ: GET /company/jobs, GET /company/postings, GET /company/jobs/new, POST /company/jobs,
+ *     GET /company/jobs/{id}/edit, POST /company/jobs/{id}, POST /company/jobs/{id}/status,
+ *     POST /company/jobs/{id}/delete, GET /company/jobs/{id}, GET /company/jobs/{id}/applicants.csv
+ * แสดงผลที่หน้า: frontend/templates/company/job-detail.html, frontend/templates/company/job-form.html,
+ *     frontend/templates/company/jobs.html, frontend/templates/company/postings.html
+ * เรียกใช้: JobService, MatchService, CurrentUserService, JobPostingService, ApplicationService,
+ *     DictionaryService
+ * ถูกเรียกโดย: JobNotFoundException
+ */
 package com.workmatch.controller;
 
 import com.workmatch.dto.Views.ApplicantItem;

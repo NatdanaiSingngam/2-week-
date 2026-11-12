@@ -29,7 +29,7 @@ Backend ของระบบ Workmatch: Java 17 + Spring Boot 3.3 + Thymeleaf +
         ├── main/resources/
         │   ├── application.properties
         │   ├── demo/                           # ข้อความเรซูเม่ตัวอย่าง
-        │   ├── templates/  static/             # หน้าเว็บของชญาณัตถพล + error.html, error/403, error/404
+        │   (หน้าเว็บ templates/ และ static/ ย้ายไปอยู่ที่ ../frontend/ แล้ว Maven คัดลอกเข้ามาให้ตอน build ดู pom.xml)
         └── test/                               # mvn test ใช้ H2 ในหน่วยความจำ ไม่ต้องเปิด MySQL
 ```
 
@@ -217,7 +217,7 @@ cd backend
 
 ## หมายเหตุหน้าเว็บ
 
-ไฟล์ใน `src/main/resources/templates` และ `static` เป็นงานของชญาณัตถพล (ย้ายมาจาก `frontend-draft/` เดิม และเป็นชุดเดียวที่ใช้จริง)
+ไฟล์ใน `../frontend/templates` และ `../frontend/static` (เดิมอยู่ที่ `src/main/resources/`) เป็นงานของชญาณัตถพล (ย้ายมาจาก `frontend-draft/` เดิม และเป็นชุดเดียวที่ใช้จริง)
 ยกเว้น `error.html`, `error/403.html`, `error/404.html` ที่ธนวัฒน์เพิ่มในงาน A5 (ใช้ layout และ CSS ของชญาณัตถพล)
 
 5 พ.ย.: ออกแบบหน้าเว็บใหม่ทั้งหมดเป็นธีม "Professional Blue" (ระบบดีไซน์จาก skill ui-ux-pro-max) รายละเอียดสี ฟอนต์ และกฎอยู่ที่หัวไฟล์ `static/css/style.css`

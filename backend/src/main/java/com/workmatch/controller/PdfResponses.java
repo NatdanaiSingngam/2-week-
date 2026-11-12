@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/PdfResponses.java
+ * หน้าที่: ตัวช่วยส่งไฟล์ PDF จากฐานข้อมูลกลับไปให้เบราว์เซอร์เปิดดู
+ * ถูกเรียกโดย: AdminController, CompanyController, ResumeController
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.StoredFile;

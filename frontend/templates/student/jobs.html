@@ -1,0 +1,54 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า student/jobs.html ====
+  หน้าที่: ค้นหางาน
+  แสดงโดย: StudentController (GET /student/jobs)
+  ข้อมูลที่ได้รับจาก Controller: q, businessTypes, jobs
+  ส่งฟอร์มไปที่: GET /student/jobs, POST /student/jobs/{id}/bookmark
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ค้นหางาน')}"><title>ค้นหางาน | Workmatch</title></head>
+<!--/* หน้าจอค้นหาประกาศงาน ตามเอกสาร รูปที่ 38: ช่องค้นหา + ประเภทกิจการ แล้วรายการตำแหน่งที่เปิดรับ */-->
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="narrow main" style="width:min(860px,calc(100% - 32px))">
+<h1 class="visually-hidden">ค้นหางาน</h1>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<form class="card search-bar" method="get" th:action="@{/student/jobs}" role="search">
+  <label for="q" class="visually-hidden">ค้นหาตำแหน่งงาน ชื่อบริษัท หรือทักษะ</label>
+  <input id="q" name="q" type="search" th:value="${q}" placeholder="ค้นหาตำแหน่งงาน ชื่อบริษัท หรือทักษะ..." />
+  <label for="type" class="visually-hidden">ประเภทกิจการ</label>
+  <select id="type" name="type">
+    <option value="">ทุกประเภทกิจการ</option>
+    <option th:each="t : ${businessTypes}" th:value="${t}" th:text="${t}" th:selected="${t == type}">ไอที</option>
+  </select>
+  <button type="submit">ค้นหา</button>
+</form>
+
+<div class="section-head"><h2 th:text="${(#strings.isEmpty(q) and #strings.isEmpty(type) ? 'ตำแหน่งงานล่าสุด' : 'ผลการค้นหา') + ' (' + #lists.size(jobs) + ' ประกาศ)'}">ตำแหน่งงานล่าสุด</h2></div>
+
+<div class="card empty" th:if="${#lists.isEmpty(jobs)}">
+  <div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+  <h2>ไม่พบตำแหน่งงาน</h2>
+  <p>ลองใช้คำค้นอื่น หรือเลือก "ทุกประเภทกิจการ"</p>
+  <div class="actions"><a class="button secondary" th:href="@{/student/jobs}">ล้างการค้นหา</a></div>
+</div>
+
+<article class="job-row" th:each="j : ${jobs}" th:with="lv=${j.score() == null ? '' : (j.score() >= 70 ? 'high' : (j.score() >= 40 ? 'medium' : 'low'))}">
+  <span class="mono" aria-hidden="true" th:text="${@fmt.initial(j.companyName())}">B</span>
+  <div class="grow">
+    <h3><a th:href="@{/student/jobs/{id}(id=${j.jobId()})}" th:text="${j.title()}">Software Engineer (Intern)</a></h3>
+    <div class="meta"><span th:text="${j.companyName()}">บริษัท</span><th:block th:if="${j.location() != null}"> · <span th:text="${j.location()}">กรุงเทพมหานคร</span></th:block> <span class="verified" th:if="${j.companyVerified()}">ยืนยันแล้ว</span></div>
+    <div class="tags"><span class="tag" th:each="s : ${j.skills()}" th:text="${s}">Java</span></div>
+  </div>
+  <div class="side">
+    <small th:text="${'ประกาศเมื่อ ' + @fmt.ago(j.createdAt())}">ประกาศเมื่อ 2 วันที่แล้ว</small>
+    <span class="score-pill" th:if="${j.score() != null}" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(j.score(), 1, 1) + '%'}">Match 95%</span>
+    <div class="actions">
+      <form method="post" class="inline-form" th:action="@{/student/jobs/{id}/bookmark(id=${j.jobId()})}"><input type="hidden" name="back" th:value="${'/student/jobs' + (#strings.isEmpty(q) ? '' : '?q=' + #uris.escapeQueryParam(q))}" /><button type="submit" class="secondary sm" th:attr="aria-pressed=${j.bookmarked()}" th:aria-label="${(j.bookmarked() ? 'นำออกจากรายการที่บันทึก: ' : 'บันทึกงาน: ') + j.title()}" th:text="${j.bookmarked()} ? '★' : '☆'">☆</button></form>
+      <a class="button secondary sm" th:href="@{/student/jobs/{id}(id=${j.jobId()})}">ดูรายละเอียด</a>
+    </div>
+  </div>
+</article>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

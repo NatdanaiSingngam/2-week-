@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/ErrorLog.java
+ * หน้าที่: ข้อผิดพลาดของระบบให้ผู้ดูแลตรวจสอบ
+ * ตารางในฐานข้อมูล: error_logs
+ * ถูกเรียกโดย: ErrorLogRepository, ErrorLogService
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

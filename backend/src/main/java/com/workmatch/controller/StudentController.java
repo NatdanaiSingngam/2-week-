@@ -1,3 +1,15 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/StudentController.java
+ * หน้าที่: หน้านักศึกษา: ค้นหางาน, รายละเอียดงาน, บันทึกงาน, สมัครงาน, ประวัติการสมัคร, ข้อมูลส่วนตัว
+ * URL ที่รับ: GET /student/jobs, GET /student/jobs/{id}, POST /student/jobs/{id}/bookmark,
+ *     POST /student/jobs/{id}/apply, GET /student/bookmarks, POST /student/bookmarks/{jobId}/remove,
+ *     GET /student/applications, GET /student/profile, POST /student/profile
+ * แสดงผลที่หน้า: frontend/templates/student/applications.html, frontend/templates/student/bookmarks.html,
+ *     frontend/templates/student/job.html, frontend/templates/student/jobs.html,
+ *     frontend/templates/student/profile.html
+ * เรียกใช้: CurrentUserService, JobPostingService, BookmarkService, ApplicationService, ProfileService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.User;

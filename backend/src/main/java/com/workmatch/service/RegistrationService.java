@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/RegistrationService.java
+ * หน้าที่: สมัครสมาชิก: ตรวจข้อมูล เข้ารหัสรหัสผ่านด้วย BCrypt แล้วบันทึก
+ * เรียกใช้: UserRepository, StudentProfileRepository, CompanyProfileRepository
+ * ถูกเรียกโดย: AdminAccountInitializer, AuthController, DemoDataLoader
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.CompanyProfile;

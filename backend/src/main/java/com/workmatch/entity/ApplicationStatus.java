@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/ApplicationStatus.java
+ * หน้าที่: สถานะใบสมัคร: รอพิจารณา / นัดสัมภาษณ์ / ผ่าน / ไม่ผ่าน พร้อมชื่อภาษาไทย
+ * ถูกเรียกโดย: AdminService, ApplicationService, CompanyController, DemoDataLoader, JobApplication,
+ *     JobApplicationRepository, JobController, JobPostingService, Views
+ */
 package com.workmatch.entity;
 
 /** สถานะการสมัครงาน (เอกสาร รูปที่ 42, 45, 46): รอพิจารณา -> นัดสัมภาษณ์ -> รับเข้าทำงาน / ปฏิเสธ */

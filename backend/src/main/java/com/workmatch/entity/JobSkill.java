@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/JobSkill.java
+ * หน้าที่: ทักษะที่ประกาศงานต้องการ (NLP สกัดจากรายละเอียดงาน)
+ * ตารางในฐานข้อมูล: job_skills
+ * ถูกเรียกโดย: ApplicationService, JobPostingService, JobService, JobSkillRepository, MatchService
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

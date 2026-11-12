@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/AuthController.java
+ * หน้าที่: หน้าเข้าสู่ระบบและสมัครสมาชิก (การตรวจรหัสผ่านจริงทำโดย Spring Security ตาม SecurityConfig)
+ * URL ที่รับ: GET /login, GET /register, POST /register
+ * แสดงผลที่หน้า: frontend/templates/login.html, frontend/templates/register.html
+ * เรียกใช้: RegistrationService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.service.RegistrationService;

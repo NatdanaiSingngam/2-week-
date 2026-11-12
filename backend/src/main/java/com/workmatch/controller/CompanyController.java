@@ -1,3 +1,14 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/CompanyController.java
+ * หน้าที่: หน้าบริษัท: ผู้สมัครทั้งหมด, รายละเอียดผู้สมัคร + เปลี่ยนสถานะ, โปรไฟล์องค์กร + เอกสาร ภ.พ.20
+ * URL ที่รับ: GET /company/applications, GET /company/applications/{id},
+ *     POST /company/applications/{id}/status, GET /company/applications/{id}/resume, GET /company/profile,
+ *     POST /company/profile, GET /company/profile/document
+ * แสดงผลที่หน้า: frontend/templates/company/applications.html, frontend/templates/company/candidate.html,
+ *     frontend/templates/company/profile.html
+ * เรียกใช้: CurrentUserService, ApplicationService, ProfileService, FileStorageService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.ApplicationStatus;

@@ -1,3 +1,14 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/ResumeController.java
+ * หน้าที่: หน้าจัดการเรซูเม่ของนักศึกษา: กรอกข้อความ / อัปโหลด PDF / เพิ่ม-ลบทักษะ แล้วคำนวณการจับคู่ใหม่
+ * URL ที่รับ: GET /student/resume, POST /student/resume, POST /student/resume/upload,
+ *     POST /student/resume/file/delete, GET /student/resume/file, POST /student/resume/skills/add,
+ *     POST /student/resume/skills/remove
+ * แสดงผลที่หน้า: frontend/templates/student/resume.html
+ * เรียกใช้: ResumeService, MatchService, CurrentUserService, ResumeExtrasService, FileStorageService,
+ *     DictionaryService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.Resume;

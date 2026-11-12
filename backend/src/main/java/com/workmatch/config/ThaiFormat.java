@@ -1,3 +1,12 @@
+/*
+ * ==== Workmatch · Backend · ตั้งค่าระบบ ====
+ * ไฟล์: backend/src/main/java/com/workmatch/config/ThaiFormat.java
+ * หน้าที่: ตัวช่วยจัดรูปแบบในหน้าเว็บ เรียกใน template ด้วย ${@fmt...} เช่น วันที่ พ.ศ. ขนาดไฟล์ ชื่อหมวดทักษะภาษาไทย
+ * ใช้ในหน้า: admin/companies.html, admin/logs.html, admin/skills.html, admin/users.html,
+ *     company/applications.html, company/candidate.html, company/job-detail.html, company/jobs.html,
+ *     company/postings.html, student/applications.html, student/bookmarks.html, student/job.html,
+ *     student/jobs.html, student/resume.html
+ */
 package com.workmatch.config;
 
 import org.springframework.stereotype.Component;
@@ -37,6 +46,16 @@ public class ThaiFormat {
     /** ตัวอักษรย่อของบริษัทในกล่องสี่เหลี่ยม (รูปที่ 38-41) เช่น "บริษัท สตรีม ไอที" -> "ส" */
     public String initial(String companyName) {
         return com.workmatch.service.JobPostingService.initial(companyName);
+    }
+
+    /** ชื่อไทยของหมวดทักษะ เช่น programming -> ภาษาโปรแกรม เรียกด้วย ${@fmt.category(code)} */
+    public String category(String code) {
+        return com.workmatch.service.SkillCategories.label(code);
+    }
+
+    /** หมวดทักษะที่มีอยู่ เรียงตามลำดับมาตรฐาน เรียกด้วย ${@fmt.categoryOrder(skills.![category])} */
+    public java.util.List<String> categoryOrder(java.util.Collection<String> codes) {
+        return com.workmatch.service.SkillCategories.ordered(codes);
     }
 
     /** ขนาดไฟล์ เช่น 1.2 MB */

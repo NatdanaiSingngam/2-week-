@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/AdminService.java
+ * หน้าที่: งานของผู้ดูแลระบบ: สถิติภาพรวม, อนุมัติบริษัท, ระงับ/เปิดบัญชี
+ * เรียกใช้: UserRepository, CompanyProfileRepository, JobRepository, JobApplicationRepository,
+ *     MatchRepository, NlpClient, ErrorLogService
+ * ถูกเรียกโดย: AdminController
+ */
 package com.workmatch.service;
 
 import com.workmatch.dto.Views.AdminOverview;

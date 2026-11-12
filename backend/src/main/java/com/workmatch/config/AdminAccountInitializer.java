@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตั้งค่าระบบ ====
+ * ไฟล์: backend/src/main/java/com/workmatch/config/AdminAccountInitializer.java
+ * หน้าที่: สร้างบัญชีผู้ดูแลระบบตอนเปิดระบบ จากตัวแปรสภาพแวดล้อม WORKMATCH_ADMIN_EMAIL / WORKMATCH_ADMIN_PASSWORD
+ * เรียกใช้: UserRepository, RegistrationService
+ * ถูกเรียกโดย: RegistrationService
+ */
 package com.workmatch.config;
 
 import com.workmatch.entity.Role;

@@ -1,0 +1,22 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า error.html ====
+  หน้าที่: หน้าข้อผิดพลาดทั่วไปภาษาไทย (500 ฯลฯ)
+  แสดงโดย: Spring Boot แสดงเองเมื่อเกิดข้อผิดพลาด (GlobalExceptionHandler)
+  ข้อมูลที่ได้รับจาก Controller: role, status, errorTitle, errorMessage
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<!--/* งาน A5 (ธนวัฒน์): หน้า error ทั่วไปภาษาไทย ใช้ layout เดียวกับหน้าอื่น
+     ข้อมูลที่ได้: errorTitle, errorMessage (จาก GlobalExceptionHandler) หรือ status (จาก Spring Boot)
+     ไม่แสดง stack trace หรือรายละเอียดภายในของระบบ */-->
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('เกิดข้อผิดพลาด')}"><title>เกิดข้อผิดพลาด | Workmatch</title></head>
+<body th:classappend="${role == 'COMPANY'} ? 'theme-company'"><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="container main"><section class="card empty error-page">
+<div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+<p class="error-code" th:text="${status != null ? 'ERROR ' + status : 'ERROR'}">ERROR</p>
+<h1 th:text="${errorTitle != null ? errorTitle : (status == 503 ? 'ระบบยังไม่พร้อมใช้งาน' : 'เกิดข้อผิดพลาดในระบบ')}">เกิดข้อผิดพลาดในระบบ</h1>
+<p th:text="${errorMessage != null ? errorMessage : 'ขออภัย ระบบทำงานผิดพลาด ลองใหม่อีกครั้ง หรือกลับไปหน้าหลัก'}">ขออภัย ระบบทำงานผิดพลาด</p>
+<div class="actions"><a class="button" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : @{/login})">กลับหน้าหลัก</a><a class="button secondary" href="javascript:history.back()">ย้อนกลับ</a></div>
+</section></main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

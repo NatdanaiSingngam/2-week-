@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/VerificationStatus.java
+ * หน้าที่: สถานะยืนยันตัวตนบริษัท: รอตรวจสอบ / อนุมัติ / ไม่อนุมัติ
+ * ถูกเรียกโดย: AdminService, CompanyProfile, CompanyProfileRepository, DemoDataLoader, ProfileService,
+ *     RegistrationService, Views
+ */
 package com.workmatch.entity;
 
 /** สถานะยืนยันตัวตนสถานประกอบการ (เอกสาร 1.4.2.2, 1.4.3.5) */

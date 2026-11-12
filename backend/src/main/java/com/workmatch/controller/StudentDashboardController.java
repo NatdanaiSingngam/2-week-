@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/StudentDashboardController.java
+ * หน้าที่: หน้าหลักนักศึกษา: แสดงงานที่จับคู่ได้ เรียงคะแนนจากมากไปน้อย
+ * URL ที่รับ: GET /student/dashboard
+ * แสดงผลที่หน้า: frontend/templates/student/dashboard.html
+ * เรียกใช้: ResumeService, MatchService, CurrentUserService, ProfileService, BookmarkRepository
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.User;

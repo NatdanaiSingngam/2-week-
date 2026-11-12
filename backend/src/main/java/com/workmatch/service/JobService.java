@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/JobService.java
+ * หน้าที่: ประกาศงานแบบเดิม: สร้างประกาศ (ส่งรายละเอียดให้ NLP สกัดทักษะ) และข้อมูลหน้าภาพรวมบริษัท
+ * เรียกใช้: JobRepository, JobSkillRepository, NlpClient, MatchRepository
+ * ถูกเรียกโดย: DemoDataLoader, JobController, JobPostingService
+ */
 package com.workmatch.service;
 
 import com.workmatch.dto.JobDetail;

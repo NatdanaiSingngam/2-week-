@@ -1,0 +1,71 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า fragments/layout.html ====
+  หน้าที่: ชิ้นส่วนที่ทุกหน้าใช้ร่วมกัน: <head>, แถบเมนูบน, แถบด้านซ้ายของ admin, footer, สคริปต์
+  แสดงโดย: ทุกหน้าดึงไปใช้ด้วย th:replace="~{fragments/layout :: ...}"
+  ข้อมูลที่ได้รับจาก Controller: role, userInitials, displayName, message, error, userEmail
+  ส่งฟอร์มไปที่: POST /logout
+*/-->
+<!DOCTYPE html><html lang="th" xmlns:th="http://www.thymeleaf.org"><head th:fragment="head(title)"><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content="#2563EB" /><title th:text="${title + ' | Workmatch'}">Workmatch</title><link rel="icon" type="image/svg+xml" href="/images/workmatch.svg" th:href="@{/images/workmatch.svg}" /><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&amp;display=swap" /><link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}" /></head><body>
+<!--/* แถบบนสุดตามเอกสารบทที่ 3 หัวข้อ 5
+     นักศึกษา (รูปที่ 38-42): หน้าหลัก / จัดการเรซูเม่ / ค้นหางาน / รายการที่บันทึก
+     สถานประกอบการ (รูปที่ 43-47): พื้นคราม + "สำหรับสถานประกอบการ" หน้าหลัก / จัดการประกาศงาน / ผู้สมัครทั้งหมด / โปรไฟล์บริษัท
+     ผู้ดูแลระบบใช้แถบด้านซ้าย (adminSidebar) แทน */-->
+<header class="site-header" th:fragment="navbar"><a class="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a><div class="nav-wrap">
+  <a class="brand" href="/" th:href="${role == 'STUDENT'} ? @{/student/dashboard} : (${role == 'COMPANY'} ? @{/company/jobs} : (${role == 'ADMIN'} ? @{/admin} : @{/}))">
+    <img th:if="${role != 'COMPANY'}" src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch หน้าหลัก" width="140" height="30" />
+    <img th:if="${role == 'COMPANY'}" src="/images/workmatch-light.svg" th:src="@{/images/workmatch-light.svg}" alt="Workmatch หน้าหลัก" width="140" height="30" />
+    <span class="brand-sub" th:if="${role == 'COMPANY'}">สำหรับสถานประกอบการ</span>
+  </a>
+  <nav class="nav-links" aria-label="เมนูหลัก">
+    <th:block th:if="${role == 'STUDENT'}"><a th:href="@{/student/dashboard}">หน้าหลัก</a><a th:href="@{/student/resume}">จัดการเรซูเม่</a><a th:href="@{/student/jobs}" data-prefix="/student/jobs">ค้นหางาน</a><a th:href="@{/student/bookmarks}">รายการที่บันทึก</a></th:block>
+    <th:block th:if="${role == 'COMPANY'}"><a th:href="@{/company/jobs}">หน้าหลัก</a><a th:href="@{/company/postings}" data-prefix="/company/postings">จัดการประกาศงาน</a><a th:href="@{/company/applications}" data-prefix="/company/applications">ผู้สมัครทั้งหมด</a><a th:href="@{/company/profile}">โปรไฟล์บริษัท</a></th:block>
+    <th:block th:if="${role == 'ADMIN'}"><a th:href="@{/admin}">แผงผู้ดูแลระบบ</a></th:block>
+    <th:block th:if="${role == null}"><a class="nav-login" th:href="@{/login}">เข้าสู่ระบบ</a><a class="nav-cta" th:href="@{/register}">สมัครสมาชิก</a></th:block>
+  </nav>
+  <details class="user-menu" th:if="${role != null}">
+    <summary aria-label="เมนูบัญชีผู้ใช้"><span class="avatar" aria-hidden="true" th:text="${userInitials != null ? userInitials : '?'}">ณด</span></summary>
+    <div class="menu-panel">
+      <strong th:text="${displayName}">ชื่อผู้ใช้</strong>
+      <span th:text="${role == 'COMPANY' ? 'บัญชีสถานประกอบการ' : (role == 'ADMIN' ? 'ผู้ดูแลระบบ' : 'บัญชีนักศึกษา')}">บัญชีนักศึกษา</span>
+      <nav class="menu-links" aria-label="บัญชีของฉัน" th:if="${role == 'STUDENT'}"><a th:href="@{/student/profile}">ข้อมูลส่วนตัว</a><a th:href="@{/student/bookmarks}">งานที่บันทึกไว้</a><a th:href="@{/student/applications}">ประวัติการสมัครงาน</a></nav>
+      <nav class="menu-links" aria-label="บัญชีของฉัน" th:if="${role == 'COMPANY'}"><a th:href="@{/company/profile}">โปรไฟล์และยืนยันตัวตน</a><a th:href="@{/company/jobs/new}">สร้างประกาศงานใหม่</a></nav>
+      <form method="post" th:action="@{/logout}"><button class="danger-ghost" type="submit">ออกจากระบบ</button></form>
+    </div>
+  </details>
+</div></header>
+
+<!--/* ข้อความแจ้งผลหลังกดปุ่ม (flash) ใช้ร่วมทุกหน้า */-->
+<th:block th:fragment="flash"><div class="alert success" role="status" th:if="${message != null}" th:text="${message}"></div><div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div></th:block>
+
+<!--/* เมนูบัญชีนักศึกษาด้านซ้าย (รูปที่ 36, 41, 42) */-->
+<aside class="account-nav" th:fragment="accountNav(section)" aria-label="การตั้งค่าบัญชี">
+  <span class="account-nav-title">การตั้งค่าบัญชี</span>
+  <a th:href="@{/student/profile}" th:classappend="${section == 'profile'} ? 'active'" th:attr="aria-current=${section == 'profile'} ? 'page'">ข้อมูลส่วนตัว</a>
+  <a th:href="@{/student/bookmarks}" th:classappend="${section == 'bookmarks'} ? 'active'" th:attr="aria-current=${section == 'bookmarks'} ? 'page'">งานที่บันทึกไว้</a>
+  <a th:href="@{/student/applications}" th:classappend="${section == 'applications'} ? 'active'" th:attr="aria-current=${section == 'applications'} ? 'page'">ประวัติการสมัครงาน</a>
+  <form method="post" th:action="@{/logout}"><button type="submit" class="account-logout">ออกจากระบบ</button></form>
+</aside>
+
+<!--/* แถบด้านซ้ายของผู้ดูแลระบบ (รูปที่ 48-52) */-->
+<aside class="admin-side" th:fragment="adminSidebar(section)" aria-label="เมนูผู้ดูแลระบบ">
+  <a class="admin-brand" th:href="@{/admin}"><span class="admin-logo" aria-hidden="true">W</span><span>AdminPanel</span></a>
+  <nav class="admin-nav">
+    <a th:href="@{/admin}" th:classappend="${section == 'overview'} ? 'active'" th:attr="aria-current=${section == 'overview'} ? 'page'">ภาพรวมระบบ</a>
+    <a th:href="@{/admin/companies}" th:classappend="${section == 'companies'} ? 'active'" th:attr="aria-current=${section == 'companies'} ? 'page'">อนุมัติสถานประกอบการ</a>
+    <span class="admin-nav-group">จัดการระบบ NLP</span>
+    <a th:href="@{/admin/skills}" th:classappend="${section == 'skills'} ? 'active'" th:attr="aria-current=${section == 'skills'} ? 'page'">พจนานุกรมทักษะ (Skill)</a>
+    <a th:href="@{/admin/synonyms}" th:classappend="${section == 'synonyms'} ? 'active'" th:attr="aria-current=${section == 'synonyms'} ? 'page'">คำพ้องความหมาย (Synonym)</a>
+    <span class="admin-nav-group">ระบบและข้อผิดพลาด</span>
+    <a th:href="@{/admin/logs}" th:classappend="${section == 'logs'} ? 'active'" th:attr="aria-current=${section == 'logs'} ? 'page'">บันทึกข้อผิดพลาด (Error Logs)</a>
+    <a th:href="@{/admin/users}" th:classappend="${section == 'users'} ? 'active'" th:attr="aria-current=${section == 'users'} ? 'page'">จัดการบัญชีผู้ใช้</a>
+  </nav>
+  <div class="admin-user">
+    <span class="avatar" aria-hidden="true" th:text="${userInitials}">A</span>
+    <div><strong th:text="${displayName}">Superadmin</strong><span th:text="${userEmail}">admin@workmatch.com</span></div>
+    <form method="post" th:action="@{/logout}"><button type="submit" class="admin-logout" aria-label="ออกจากระบบ" title="ออกจากระบบ"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></form>
+  </div>
+</aside>
+
+<!--/* หน้า login / สมัครสมาชิกไม่มี header ตามรูปที่ 33-35 จึงเรียกเฉพาะสคริปต์ */-->
+<th:block th:fragment="scripts"><script src="/js/app.js" th:src="@{/js/app.js}" defer="defer"></script></th:block>
+<footer class="footer" th:fragment="footer"><div class="container"><span>Workmatch · ระบบจับคู่และแนะนำการเตรียมความพร้อมสำหรับสหกิจศึกษา</span><span>โครงงานมหาวิทยาลัยพะเยา</span></div><script src="/js/app.js" th:src="@{/js/app.js}" defer="defer"></script></footer></body></html>

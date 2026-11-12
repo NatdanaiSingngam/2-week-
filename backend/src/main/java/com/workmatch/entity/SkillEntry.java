@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/SkillEntry.java
+ * หน้าที่: พจนานุกรมทักษะมาตรฐาน (ต้นฉบับของ nlp-service/nlp_service/skill_dictionary.csv)
+ * ตารางในฐานข้อมูล: skill_dictionary
+ * ถูกเรียกโดย: DictionaryService, JobPostingService, ResumeExtrasService, SkillEntryRepository, SkillSynonym
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

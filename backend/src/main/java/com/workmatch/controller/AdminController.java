@@ -1,3 +1,16 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/AdminController.java
+ * หน้าที่: หน้าผู้ดูแลระบบ: ภาพรวม, อนุมัติบริษัท, พจนานุกรมทักษะ, คำพ้อง, บันทึกข้อผิดพลาด, จัดการผู้ใช้
+ * URL ที่รับ: GET /admin, GET /admin/companies, POST /admin/companies/{userId}/review,
+ *     GET /admin/companies/{userId}/document, GET /admin/skills, POST /admin/skills,
+ *     POST /admin/skills/{id}, POST /admin/skills/{id}/toggle, GET /admin/synonyms, POST /admin/synonyms,
+ *     POST /admin/synonyms/{id}/delete, GET /admin/logs, GET /admin/users, POST /admin/users/{id}/toggle
+ * แสดงผลที่หน้า: frontend/templates/admin/companies.html, frontend/templates/admin/logs.html,
+ *     frontend/templates/admin/overview.html, frontend/templates/admin/skills.html,
+ *     frontend/templates/admin/synonyms.html, frontend/templates/admin/users.html
+ * เรียกใช้: AdminService, DictionaryService, ErrorLogService, FileStorageService, CurrentUserService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.service.AdminService;

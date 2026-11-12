@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
+ * ทดสอบ: เปิดประกาศงานที่ไม่มี / ของบริษัทอื่น ต้องได้หน้าไม่พบตำแหน่งงาน
+ * รัน: cd backend แล้ว mvnw test (ใช้ฐานข้อมูล H2 และจำลอง NLP ด้วย Mockito ไม่ต้องเปิด MySQL/NLP)
+ */
 package com.workmatch;
 
 import com.workmatch.entity.Role;

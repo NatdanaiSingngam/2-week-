@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลสาธิต ====
+ * ไฟล์: backend/src/main/java/com/workmatch/demo/DemoDataLoader.java
+ * หน้าที่: สร้างบัญชีและข้อมูลตัวอย่างสำหรับสาธิต ทำงานเฉพาะเมื่อเปิด profile demo (start-demo.bat)
+ * เรียกใช้: UserRepository, RegistrationService, ResumeService, JobService, MatchService,
+ *     StudentProfileRepository, CompanyProfileRepository, JobRepository, JobApplicationRepository,
+ *     BookmarkRepository, StoredFileRepository
+ */
 package com.workmatch.demo;
 
 import com.workmatch.entity.ApplicationStatus;

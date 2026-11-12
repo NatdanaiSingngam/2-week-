@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ความปลอดภัย / ล็อกอิน ====
+ * ไฟล์: backend/src/main/java/com/workmatch/security/CustomUserDetailsService.java
+ * หน้าที่: โหลดผู้ใช้จากอีเมลตอนล็อกอิน แล้วกำหนดสิทธิ์ตามบทบาท (ระงับบัญชีแล้วเข้าไม่ได้)
+ * เรียกใช้: UserRepository
+ */
 package com.workmatch.security;
 
 import com.workmatch.entity.User;

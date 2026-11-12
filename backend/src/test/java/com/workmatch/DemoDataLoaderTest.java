@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
+ * ทดสอบ: ข้อมูลสาธิต (profile demo) สร้างบัญชีและข้อมูลถูกต้อง และรันซ้ำไม่สร้างซ้ำ
+ * รัน: cd backend แล้ว mvnw test (ใช้ฐานข้อมูล H2 และจำลอง NLP ด้วย Mockito ไม่ต้องเปิด MySQL/NLP)
+ */
 package com.workmatch;
 
 import com.workmatch.demo.DemoDataLoader;

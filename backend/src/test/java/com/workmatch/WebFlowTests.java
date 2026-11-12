@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
+ * ทดสอบ: ล็อกอิน สิทธิ์ตามบทบาท ฟอร์ม และกรณี NLP ล่ม
+ * รัน: cd backend แล้ว mvnw test (ใช้ฐานข้อมูล H2 และจำลอง NLP ด้วย Mockito ไม่ต้องเปิด MySQL/NLP)
+ */
 package com.workmatch;
 
 import com.workmatch.entity.Job;

@@ -1,3 +1,14 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/User.java
+ * หน้าที่: ผู้ใช้ทุกบทบาท (อีเมล รหัสผ่านที่เข้ารหัสแล้ว ชื่อที่แสดง บทบาท)
+ * ตารางในฐานข้อมูล: users
+ * ถูกเรียกโดย: AdminService, ApplicationService, Bookmark, BookmarkService, CompanyController,
+ *     CompanyProfile, CurrentUserService, CustomUserDetailsService, DemoDataLoader, FileStorageService, Job,
+ *     JobApplication, JobController, JobPostingService, JobService, MatchService, ProfileService,
+ *     RegistrationService, Resume, ResumeController, ResumeExtrasService, ResumeService, StoredFile,
+ *     StudentController, StudentDashboardController, StudentProfile, UserRepository
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

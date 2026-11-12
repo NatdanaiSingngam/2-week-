@@ -1,3 +1,8 @@
+# ==== Workmatch · NLP · ตัวอย่างผลตัดคำ ====
+# หน้าที่: แสดงผลตัดคำและทักษะที่จับได้ของเรซูเม่ตัวอย่าง 3 ไฟล์ ไว้ใช้ในรายงาน
+# ดึงข้อมูลจาก: tests/sample_resume_*.txt
+# ส่งผลไปที่: evaluation/tokenize_samples/<ชื่อ>.md
+# ====
 """สร้างตัวอย่างผลตัดคำ 3 ไฟล์ (งาน 1 ของแผน) จาก tests/sample_resume_*.txt
 
 รัน:  cd nlp-service && python evaluation/tokenize_samples.py

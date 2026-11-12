@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/ResumeSkill.java
+ * หน้าที่: ทักษะที่ NLP สกัดได้จากเรซูเม่ (นักศึกษาเพิ่ม/ลบเองได้)
+ * ตารางในฐานข้อมูล: resume_skills
+ * ถูกเรียกโดย: ApplicationService, MatchService, ResumeExtrasService, ResumeService, ResumeSkillRepository
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

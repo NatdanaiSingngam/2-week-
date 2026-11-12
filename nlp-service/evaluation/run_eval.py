@@ -1,3 +1,9 @@
+# ==== Workmatch · NLP · วัดผล (ข้อมูลจำลอง) ====
+# หน้าที่: วัด Precision/Recall ของการสกัดทักษะ และความถูกต้องของคะแนนจับคู่
+# ดึงข้อมูลจาก: sample-data/resumes/*.txt, sample-data/jobs.csv, sample-data/expected.csv, sample-data/pairs.csv
+# เรียกใช้: nlp_service/skill_extractor.py, nlp_service/match_scorer.py
+# ส่งผลไปที่: หน้าจอ หรือไฟล์ .md ที่ระบุ (เช่น evaluation/results_after_dictionary_update.md)
+# ====
 """วัดผลการดึงทักษะและคะแนนจับคู่กับข้อมูลจำลองใน sample-data/
 
 รัน:  cd nlp-service && python evaluation/run_eval.py [ไฟล์ผลลัพธ์.md]

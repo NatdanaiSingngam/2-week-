@@ -1,0 +1,48 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า company/profile.html ====
+  หน้าที่: โปรไฟล์องค์กร + อัปโหลดเอกสาร ภ.พ.20
+  แสดงโดย: CompanyController (GET /company/profile)
+  ข้อมูลที่ได้รับจาก Controller: profile, displayName, documentName
+  ส่งฟอร์มไปที่: POST /company/profile
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ข้อมูลสถานประกอบการ')}"><title>ข้อมูลสถานประกอบการ | Workmatch</title></head>
+<!--/* หน้าจอโปรไฟล์องค์กรและยืนยันตัวตน ตามเอกสาร รูปที่ 43: ข้อมูลบริษัท + อัปโหลด ภ.พ.20 / หนังสือรับรอง DBD (PDF) -> รอผู้ดูแลอนุมัติ */-->
+<body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="narrow main" th:with="p=${profile}, vs=${profile.verificationStatus}">
+<section class="card">
+  <div class="card-head" style="align-items:flex-start">
+    <div><h1>ข้อมูลสถานประกอบการ</h1><p class="muted" style="margin:0">กรอกข้อมูลและแนบเอกสารเพื่อให้ผู้ประกอบการพิจารณาตรวจสอบความถูกต้อง</p></div>
+    <span class="status" th:classappend="${vs.name() == 'REJECTED' ? 'CLOSED' : vs.name()}" th:text="${vs.label}">ยังไม่ส่งเอกสาร</span>
+  </div>
+  <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+  <div class="alert error" role="status" th:if="${vs.name() == 'REJECTED'}">ผู้ดูแลระบบไม่อนุมัติเอกสาร กรุณาตรวจสอบข้อมูลและแนบเอกสารใหม่</div>
+  <form method="post" enctype="multipart/form-data" th:action="@{/company/profile}" data-busy="กำลังบันทึก...">
+    <div class="form-grid">
+      <div class="field"><label for="companyName">ชื่อสถานประกอบการ (ภาษาไทย)</label><input id="companyName" name="companyName" required="required" maxlength="150" autocomplete="organization" th:value="${displayName}" /></div>
+      <div class="field"><label for="taxId">เลขประจำตัวผู้เสียภาษี (13 หลัก)</label><input id="taxId" name="taxId" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" th:value="${p.taxId}" placeholder="0105XXXXXXXXX" /></div>
+      <div class="field span-2"><label for="address">ที่ตั้งสำนักงาน</label><textarea id="address" name="address" rows="2" maxlength="2000" style="min-height:80px" th:text="${p.address}" placeholder="เลขที่ อาคาร ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"></textarea></div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="field"><label for="businessType">ประเภทกิจการ</label><input id="businessType" name="businessType" maxlength="150" th:value="${p.businessType}" placeholder="เช่น ไอที / เทคโนโลยีสารสนเทศ" /></div>
+      <div class="field"><label for="employeeCount">จำนวนพนักงาน</label><input id="employeeCount" name="employeeCount" maxlength="50" th:value="${p.employeeCount}" placeholder="เช่น 300" /></div>
+      <div class="field"><label for="selectionMethod">รูปแบบการคัดเลือก</label><input id="selectionMethod" name="selectionMethod" maxlength="200" th:value="${p.selectionMethod}" placeholder="เช่น สัมภาษณ์ออนไลน์" /></div>
+    </div>
+    <fieldset style="margin-top:6px">
+      <legend>เอกสารยืนยันสถานะนิติบุคคล (ภ.พ.20 หรือ หนังสือรับรอง DBD)</legend>
+      <div class="dropzone">
+        <span class="up" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+        <strong data-file-name="">อัปโหลดเอกสาร PDF ขนาดไม่เกิน 5MB</strong>
+        <small th:if="${documentName != null}"><span class="verified" th:text="${'ไฟล์ปัจจุบัน: ' + documentName}">ไฟล์ปัจจุบัน</span></small>
+        <small th:if="${documentName == null}">แนบเอกสารเพื่อส่งคำขอยืนยันตัวตน</small>
+        <input type="file" name="document" accept="application/pdf,.pdf" aria-label="เลือกไฟล์เอกสาร PDF" />
+      </div>
+      <p class="field-note" th:if="${documentName != null}"><a th:href="@{/company/profile/document}" target="_blank" rel="noopener">เปิดดูเอกสารที่ส่งแล้ว</a> · แนบไฟล์ใหม่จะส่งคำขอตรวจสอบอีกครั้ง</p>
+    </fieldset>
+    <div class="form-actions"><a class="button secondary" th:href="@{/company/jobs}">ยกเลิก</a><button type="submit">บันทึกข้อมูล</button></div>
+  </form>
+</section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

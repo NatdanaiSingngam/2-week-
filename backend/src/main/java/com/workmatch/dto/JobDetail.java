@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/JobDetail.java
+ * หน้าที่: ข้อมูลประกาศงาน 1 รายการ (ชื่อ รายละเอียด ทักษะ) สำหรับหน้ารายละเอียดฝั่งบริษัท
+ * ถูกเรียกโดย: JobService
+ */
 package com.workmatch.dto;
 
 import java.util.List;

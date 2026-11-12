@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/MatchView.java
+ * หน้าที่: การ์ดงานที่จับคู่ได้ 1 ใบในหน้าหลักนักศึกษา (คะแนน ทักษะที่ตรง/ขาด)
+ * ถูกเรียกโดย: ApplicationService, JobPostingService, MatchService, Views
+ */
 package com.workmatch.dto;
 
 import java.util.List;

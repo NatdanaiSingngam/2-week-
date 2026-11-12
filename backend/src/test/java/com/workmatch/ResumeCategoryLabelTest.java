@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
+ * ทดสอบ: หัวข้อหมวดทักษะในหน้าเรซูเม่เป็นภาษาไทยและเรียงตามลำดับมาตรฐาน
+ * รัน: cd backend แล้ว mvnw test (ใช้ฐานข้อมูล H2 และจำลอง NLP ด้วย Mockito ไม่ต้องเปิด MySQL/NLP)
+ */
 package com.workmatch;
 
 import com.workmatch.entity.Role;
@@ -43,10 +48,12 @@ class ResumeCategoryLabelTest {
             u.setRole(Role.STUDENT);
             users.save(u);
         }
+        // ส่งมาแบบสลับลำดับ: หน้าเว็บต้องเรียงหมวดตามลำดับมาตรฐาน (ภาษาโปรแกรม -> ฐานข้อมูล -> ... -> soft -> หมวดใหม่)
         when(nlpClient.extractSkills(anyString())).thenReturn(List.of(
+                new ExtractedSkill("Something", "brand-new-category"),
+                new ExtractedSkill("MySQL", "database"),
                 new ExtractedSkill("Java", "programming"),
-                new ExtractedSkill("การทำงานเป็นทีม", "soft"),
-                new ExtractedSkill("Something", "brand-new-category")));
+                new ExtractedSkill("การทำงานเป็นทีม", "soft")));
         mvc.perform(post("/student/resume").with(csrf()).with(user("cat@test.com").roles("STUDENT")).param("text", "Java"));
 
         String html = mvc.perform(get("/student/resume").with(user("cat@test.com").roles("STUDENT")))
@@ -56,5 +63,12 @@ class ResumeCategoryLabelTest {
                 .contains("<h3>brand-new-category</h3>")   // หมวดใหม่ที่ยังไม่มีชื่อไทย แสดงคีย์เดิม
                 .doesNotContain("<h3>programming</h3>")
                 .doesNotContain("<h3>soft</h3>");
+        int programming = html.indexOf("<h3>ภาษาโปรแกรม</h3>");
+        int database = html.indexOf("<h3>ฐานข้อมูล</h3>");
+        int soft = html.indexOf("<h3>ทักษะทางสังคม (Soft skills)</h3>");
+        int unknown = html.indexOf("<h3>brand-new-category</h3>");
+        assertThat(programming).isLessThan(database);
+        assertThat(database).isLessThan(soft);
+        assertThat(soft).isLessThan(unknown);
     }
 }

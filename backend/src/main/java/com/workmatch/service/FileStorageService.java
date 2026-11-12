@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/FileStorageService.java
+ * หน้าที่: รับไฟล์ PDF (ตรวจว่าเป็น PDF จริง ≤ 5MB) เก็บลงฐานข้อมูล และดึงข้อความจาก PDF ด้วย PDFBox
+ * เรียกใช้: StoredFileRepository
+ * ถูกเรียกโดย: AdminController, CompanyController, ProfileService, ResumeController, ResumeExtrasService,
+ *     StoredFile
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.StoredFile;

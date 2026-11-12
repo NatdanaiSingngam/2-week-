@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/GlobalModelAdvice.java
+ * หน้าที่: ใส่ข้อมูลผู้ใช้ที่ล็อกอิน (ชื่อ บทบาท อักษรย่อ) ให้ทุกหน้า ใช้แสดงในแถบเมนูด้านบน
+ * เรียกใช้: CurrentUserService, CompanyProfileRepository
+ */
 package com.workmatch.controller;
 
 import com.workmatch.entity.Role;

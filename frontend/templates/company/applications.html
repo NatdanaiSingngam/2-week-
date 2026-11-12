@@ -1,0 +1,39 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า company/applications.html ====
+  หน้าที่: ผู้สมัครทั้งหมด แยกตามสถานะ
+  แสดงโดย: CompanyController (GET /company/applications)
+  ข้อมูลที่ได้รับจาก Controller: status, statuses, applications
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('ผู้สมัครทั้งหมด')}"><title>ผู้สมัครทั้งหมด | Workmatch</title></head>
+<!--/* เมนู "ผู้สมัครทั้งหมด" (รูปที่ 45-47): ผู้สมัครทุกตำแหน่งของบริษัท กรองตามสถานะ */-->
+<body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="narrow main" style="width:min(960px,calc(100% - 32px))">
+<div class="page-title"><h1>ผู้สมัครทั้งหมด</h1><p>ผู้สมัครทุกตำแหน่งของบริษัท เรียงตามวันที่สมัครล่าสุด</p></div>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<nav class="tabs" aria-label="สถานะผู้สมัคร">
+  <a th:href="@{/company/applications}" th:attr="aria-current=${status == ''} ? 'page'" th:text="${'ทั้งหมด (' + total + ')'}">ทั้งหมด</a>
+  <a th:each="s : ${statuses}" th:href="@{/company/applications(status=${s.name()})}" th:attr="aria-current=${status == s.name()} ? 'page'" th:text="${s.label + ' (' + counts.get(s) + ')'}">รอพิจารณา</a>
+</nav>
+<div class="card empty" th:if="${#lists.isEmpty(applications)}"><p>ยังไม่มีผู้สมัครในสถานะนี้</p></div>
+<section class="card table-card" th:if="${not #lists.isEmpty(applications)}" aria-label="รายชื่อผู้สมัคร">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">ผู้สมัคร</th><th scope="col">ตำแหน่ง</th><th scope="col">คะแนน</th><th scope="col">วันที่สมัคร</th><th scope="col">สถานะ</th><th scope="col"><span class="visually-hidden">การจัดการ</span></th></tr></thead>
+      <tbody>
+        <tr th:each="a : ${applications}" th:with="s=${a.score()}, lv=${s == null ? 'low' : (s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low'))}">
+          <td><strong th:text="${a.studentName()}">ชื่อ</strong><div class="muted" style="font-size:.82rem" th:text="${a.major() != null ? a.major() : ''}">สาขา</div></td>
+          <td><a class="table-link" style="color:var(--text)" th:href="@{/company/jobs/{id}(id=${a.jobId()})}" th:text="${a.jobTitle()}">ตำแหน่ง</a></td>
+          <td><span class="score-pill" th:classappend="${lv}" th:text="${s == null ? '-' : #numbers.formatDecimal(s, 1, 1) + '%'}">95%</span></td>
+          <td th:text="${@fmt.date(a.appliedAt())}">31 ส.ค. 2569</td>
+          <td><span class="status" th:classappend="${a.status().name()}" th:text="${a.status().label}">รอพิจารณา</span></td>
+          <td style="text-align:right"><a class="table-link" th:href="@{/company/applications/{id}(id=${a.applicationId()})}">ดูรายละเอียด</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

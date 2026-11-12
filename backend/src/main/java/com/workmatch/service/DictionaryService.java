@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/DictionaryService.java
+ * หน้าที่: จัดการพจนานุกรมทักษะและคำพ้อง แล้วซิงก์กับ NLP (GET/PUT /dictionary)
+ * เรียกใช้: SkillEntryRepository, SkillSynonymRepository, NlpClient
+ * ถูกเรียกโดย: AdminController, JobController, JobPostingService, ResumeController, ResumeExtrasService,
+ *     SkillEntry
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.SkillEntry;
@@ -31,8 +39,8 @@ public class DictionaryService {
 
     private static final Logger log = LoggerFactory.getLogger(DictionaryService.class);
     private static final Pattern NAME = Pattern.compile("^[^|,\\r\\n]{1,100}$");
-    public static final List<String> CATEGORIES = List.of("programming", "database", "frontend", "backend", "mobile",
-            "data", "tools", "design", "infrastructure", "testing", "language", "office", "soft");
+    /** หมวดที่ผู้ดูแลเลือกได้ (ลำดับและชื่อไทยอยู่ที่ SkillCategories ที่เดียว) */
+    public static final List<String> CATEGORIES = SkillCategories.CODES;
 
     private final SkillEntryRepository skills;
     private final SkillSynonymRepository synonyms;

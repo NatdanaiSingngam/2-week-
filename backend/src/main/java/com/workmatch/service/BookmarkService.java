@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/BookmarkService.java
+ * หน้าที่: บันทึก/ยกเลิกบันทึกงาน และรายการงานที่บันทึกไว้
+ * เรียกใช้: BookmarkRepository, JobRepository, JobApplicationRepository
+ * ถูกเรียกโดย: StudentController
+ */
 package com.workmatch.service;
 
 import com.workmatch.dto.Views.BookmarkItem;

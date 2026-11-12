@@ -1,3 +1,8 @@
+# ==== Workmatch · NLP · คิดคะแนนจับคู่ ====
+# หน้าที่: เทียบทักษะเรซูเม่กับทักษะงาน คืน score (ตรง ÷ งานต้องการ × 100), cosine, matched, missing
+# ถูกเรียกโดย: api_server.py (POST /match) <- backend MatchService
+# ผลถูกเก็บที่: ตาราง matches ในฐานข้อมูล (โดย backend) แล้วแสดงในหน้า dashboard / job-detail
+# ====
 """คำนวณคะแนนความเหมาะสมระหว่างทักษะของผู้สมัครกับทักษะที่ตำแหน่งงานต้องการ"""
 import math
 

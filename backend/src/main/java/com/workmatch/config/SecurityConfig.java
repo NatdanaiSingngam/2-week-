@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ตั้งค่าระบบ ====
+ * ไฟล์: backend/src/main/java/com/workmatch/config/SecurityConfig.java
+ * หน้าที่: กำหนดว่าหน้าไหนต้องล็อกอิน / บทบาทไหนเข้าได้ (STUDENT, COMPANY, ADMIN) และตั้งค่าหน้า login/logout
+ */
 package com.workmatch.config;
 
 import com.workmatch.security.RoleRedirectSuccessHandler;

@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/StudentProfile.java
+ * หน้าที่: ข้อมูลส่วนตัวนักศึกษา (รหัสนิสิต คณะ สาขา ฯลฯ)
+ * ตารางในฐานข้อมูล: student_profiles
+ * ถูกเรียกโดย: ApplicationService, DemoDataLoader, ProfileService, RegistrationService,
+ *     StudentProfileRepository
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

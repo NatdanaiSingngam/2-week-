@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/StoredFile.java
+ * หน้าที่: ไฟล์ PDF ที่อัปโหลด (เรซูเม่ / เอกสาร ภ.พ.20)
+ * ตารางในฐานข้อมูล: stored_files
+ * ถูกเรียกโดย: ApplicationService, DemoDataLoader, FileStorageService, PdfResponses, ProfileService,
+ *     ResumeExtrasService, StoredFileRepository
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

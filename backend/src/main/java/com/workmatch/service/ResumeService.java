@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/ResumeService.java
+ * หน้าที่: บันทึกเรซูเม่: ส่งข้อความให้ NLP สกัดทักษะก่อน แล้วค่อยบันทึกเรซูเม่ + ทักษะ (NLP ล่มจะไม่บันทึกอะไร)
+ * เรียกใช้: ResumeRepository, ResumeSkillRepository, NlpClient
+ * ถูกเรียกโดย: DemoDataLoader, JobPostingService, JobService, ResumeController, ResumeExtrasService,
+ *     StudentDashboardController
+ */
 package com.workmatch.service;
 
 import com.workmatch.dto.SkillView;

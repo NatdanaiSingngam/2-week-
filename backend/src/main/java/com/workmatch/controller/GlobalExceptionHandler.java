@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/GlobalExceptionHandler.java
+ * หน้าที่: จับข้อผิดพลาดที่หลุดจาก controller แล้วแสดงหน้า error ภาษาไทย พร้อมบันทึกลงตาราง error_logs
+ * เรียกใช้: ErrorLogService, CurrentUserService
+ */
 package com.workmatch.controller;
 
 import com.workmatch.nlp.NlpUnavailableException;

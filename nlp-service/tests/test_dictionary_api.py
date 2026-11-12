@@ -1,3 +1,6 @@
+# ==== Workmatch · NLP · ทดสอบ (pytest) ====
+# หน้าที่: ทดสอบ GET/PUT /dictionary โดยเขียนลงไฟล์ชั่วคราว ไม่แตะ skill_dictionary.csv จริง
+# ====
 """ทดสอบ GET/PUT /dictionary (หน้าผู้ดูแลระบบจัดการพจนานุกรมทักษะ) โดยเขียนลงไฟล์ชั่วคราว ไม่แตะ skill_dictionary.csv จริง"""
 import shutil
 
@@ -15,9 +18,11 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(skill_extractor, "SKILLS_FILE", temp_csv)
     skill_extractor.load_skills.cache_clear()
     skill_extractor._trie.cache_clear()
+    skill_extractor._latin_pattern.cache_clear()
     yield TestClient(app)
     skill_extractor.load_skills.cache_clear()
     skill_extractor._trie.cache_clear()
+    skill_extractor._latin_pattern.cache_clear()
 
 
 def test_get_dictionary_returns_skills_with_aliases(client):

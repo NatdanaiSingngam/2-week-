@@ -1,3 +1,8 @@
+/*
+ * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
+ * ทดสอบ: ฟีเจอร์ตามเอกสารบทที่ 3: ค้นหา/บันทึก/สมัครงาน, สถานะผู้สมัคร, admin, พจนานุกรม
+ * รัน: cd backend แล้ว mvnw test (ใช้ฐานข้อมูล H2 และจำลอง NLP ด้วย Mockito ไม่ต้องเปิด MySQL/NLP)
+ */
 package com.workmatch;
 
 import com.workmatch.entity.ApplicationStatus;

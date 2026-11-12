@@ -1,0 +1,37 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า landing.html ====
+  หน้าที่: หน้าแรกก่อนล็อกอิน แนะนำระบบ
+  แสดงโดย: HomeController (GET /)
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('หาที่ฝึกงานที่ใช่')}"><title>หาที่ฝึกงานที่ใช่ | Workmatch</title></head>
+<!--/* หน้าแรกของระบบ (Landing Page) ตามเอกสาร รูปที่ 32
+     แถวตัวเลขใต้ปุ่มใช้ข้อเท็จจริงของระบบแทนตัวเลขตัวอย่างในรูป (เช่น "100+ สถานประกอบการ") เพื่อไม่อ้างข้อมูลที่ไม่มีจริง */-->
+<body><header th:replace="~{fragments/layout :: navbar}"></header>
+<main id="main" class="landing">
+  <section class="hero container">
+    <span class="pill blue">แพลตฟอร์มจับคู่นักศึกษาสหกิจศึกษา</span>
+    <h1>หาที่ฝึกงานที่ใช่ ด้วยเทคโนโลยี <span class="accent">AI สกัดทักษะ</span></h1>
+    <p>เชื่อมโยงนักศึกษากับสถานประกอบการอย่างแม่นยำ เพียงกรอกเรซูเม่ ระบบ NLP จะวิเคราะห์ทักษะของคุณ และแนะนำตำแหน่งงานที่เหมาะสมที่สุดโดยอัตโนมัติ</p>
+    <div class="actions">
+      <a class="button" th:href="@{/register(role='STUDENT')}">เริ่มต้นหางานเลย<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="button secondary" th:href="@{/register(role='COMPANY')}">สำหรับสถานประกอบการ</a>
+    </div>
+    <div class="hero-facts">
+      <div><strong>PyThaiNLP</strong><span>ตัดคำและสกัดทักษะจากเรซูเม่ภาษาไทย</span></div>
+      <div><strong class="blue">TF-IDF + Cosine</strong><span>คำนวณค่าร้อยละความสอดคล้อง</span></div>
+      <div><strong>เรียงตามคะแนน</strong><span>แนะนำตำแหน่งที่ตรงกับคุณที่สุดก่อน</span></div>
+    </div>
+  </section>
+  <section class="how container" aria-labelledby="how-title">
+    <h2 id="how-title">ใช้งานง่ายใน 3 ขั้นตอน</h2>
+    <div class="how-grid">
+      <div class="how-step"><span class="how-num" aria-hidden="true">1</span><h3>กรอกเรซูเม่</h3><p>เล่าประสบการณ์และทักษะของคุณ เป็นภาษาไทยหรืออังกฤษก็ได้</p></div>
+      <div class="how-step"><span class="how-num" aria-hidden="true">2</span><h3>ระบบสกัดทักษะ</h3><p>NLP ดึงทักษะจากข้อความ แล้วแปลงคำพ้องความหมายเป็นคำมาตรฐาน</p></div>
+      <div class="how-step"><span class="how-num" aria-hidden="true">3</span><h3>ดูตำแหน่งที่เหมาะ</h3><p>เห็นค่าร้อยละความสอดคล้อง ทักษะที่ตรง และทักษะที่ควรเตรียมเพิ่ม</p></div>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

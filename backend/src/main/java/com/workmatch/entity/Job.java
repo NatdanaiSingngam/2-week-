@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/Job.java
+ * หน้าที่: ประกาศงานของบริษัท
+ * ตารางในฐานข้อมูล: jobs
+ * ถูกเรียกโดย: ApplicationService, Bookmark, BookmarkService, DemoDataLoader, JobApplication,
+ *     JobPostingService, JobRepository, JobService, JobSkill, Match, MatchService
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

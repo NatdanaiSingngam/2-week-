@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/Resume.java
+ * หน้าที่: เรซูเม่ของนักศึกษา (คนละ 1 ฉบับ)
+ * ตารางในฐานข้อมูล: resumes
+ * ถูกเรียกโดย: ApplicationService, DemoDataLoader, Match, MatchService, ResumeController,
+ *     ResumeExtrasService, ResumeRepository, ResumeService, ResumeSkill
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

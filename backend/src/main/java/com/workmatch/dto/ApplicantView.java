@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/ApplicantView.java
+ * หน้าที่: ข้อมูลผู้สมัคร 1 แถวในหน้ารายละเอียดประกาศงานของบริษัท
+ * ถูกเรียกโดย: MatchService
+ */
 package com.workmatch.dto;
 
 import java.util.List;

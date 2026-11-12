@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/SkillView.java
+ * หน้าที่: ทักษะ 1 ตัว (ชื่อ + หมวด) ที่ส่งให้หน้าเว็บ
+ * ถูกเรียกโดย: JobDetail, JobPostingService, JobService, ResumeService, Views
+ */
 package com.workmatch.dto;
 
 /** ทักษะที่ส่งให้หน้าเว็บ: {name, category} */

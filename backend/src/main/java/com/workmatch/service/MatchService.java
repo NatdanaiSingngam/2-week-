@@ -1,3 +1,12 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/MatchService.java
+ * หน้าที่: จับคู่เรซูเม่กับประกาศงาน: ส่งทักษะทั้งสองฝั่งให้ NLP คิดคะแนน แล้วเก็บผลลงตาราง matches
+ * เรียกใช้: MatchRepository, JobRepository, JobSkillRepository, ResumeRepository, ResumeSkillRepository,
+ *     NlpClient
+ * ถูกเรียกโดย: ApplicationService, DemoDataLoader, JobController, JobPostingService, ResumeController,
+ *     StudentDashboardController
+ */
 package com.workmatch.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

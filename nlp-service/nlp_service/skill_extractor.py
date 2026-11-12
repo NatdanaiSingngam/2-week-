@@ -1,3 +1,9 @@
+# ==== Workmatch · NLP · สกัดทักษะ ====
+# หน้าที่: รับข้อความเรซูเม่/รายละเอียดงาน แล้วคืนรายการทักษะ {name, category}
+# ดึงข้อมูลจาก: skill_dictionary.csv (ชื่อทักษะ คำพ้อง หมวด) + พจนานุกรมคำไทยของ PyThaiNLP
+# ถูกเรียกโดย: api_server.py (POST /extract, GET/PUT /dictionary), evaluation/*.py, tests/*.py
+# วิธีจับคำ: ภาษาอังกฤษจับแบบคำเต็มด้วย regex / ภาษาไทยตัดคำด้วย newmm แล้วเทียบทีละคำ
+# ====
 """สกัดทักษะจากข้อความภาษาไทย/อังกฤษ ด้วย PyThaiNLP + dictionary ทักษะ (skill_dictionary.csv)"""
 import csv
 import re
@@ -74,29 +80,66 @@ def write_dictionary(items: list[dict]) -> int:
     tmp.replace(SKILLS_FILE)
     load_skills.cache_clear()
     _trie.cache_clear()
+    _latin_pattern.cache_clear()
     return len(rows)
+
+
+THAI = re.compile(r"[\u0E00-\u0E7F]")
+
+
+def _is_thai(form: str) -> bool:
+    return bool(THAI.search(form))
 
 
 @lru_cache(maxsize=1)
 def _trie():
+    """พจนานุกรมตัดคำภาษาไทย + คำทักษะภาษาไทย (คำภาษาอังกฤษจับด้วย regex แยกต่างหาก)"""
     surface, _, _ = load_skills()
-    return Trie(list(thai_words()) + list(surface.keys()))
+    return Trie(list(thai_words()) + [f for f in surface if _is_thai(f)])
+
+
+@lru_cache(maxsize=1)
+def _latin_pattern():
+    """regex เดียวของคำทักษะภาษาอังกฤษทั้งหมด เรียงยาวก่อน (tailwind css ชนะ css)
+    ต้องเป็นคำเต็ม: ด้านหน้าห้ามเป็นตัวอักษร/ตัวเลข/จุด (กัน D3.js -> js) ด้านหลังห้ามเป็นตัวอักษร/ตัวเลข/+/#
+    (กัน Excellent -> Excel, JSON -> js, GitLab -> Git) ส่วน / - , เว้นวรรค ถือเป็นตัวคั่น (C/C++/Python)"""
+    surface, _, _ = load_skills()
+    forms = sorted((f for f in surface if not _is_thai(f)), key=len, reverse=True)
+    if not forms:
+        return None
+    alt = "|".join(re.escape(f) for f in forms)
+    return re.compile(r"(?<![a-z0-9.])(?:" + alt + r")(?![a-z0-9+#])")
 
 
 def clean(text: str) -> str:
-    """ลบเครื่องหมายที่ทำให้ token ติดกัน เช่น (pandas, -> pandas
+    """ลบเครื่องหมายที่ทำให้ token ติดกัน เช่น (pandas, -> pandas (แทนด้วยช่องว่าง ความยาวข้อความเท่าเดิม)
     เก็บ . + # / - ไว้ เพราะอยู่ในชื่อทักษะ (Node.js, C#, UI/UX, scikit-learn)"""
     return re.sub(r"[(),;:!?\[\]{}\"“”‘’]", " ", text)
 
 
 def extract_skills(text: str) -> list[dict]:
-    """คืนรายการทักษะที่เจอ ไม่ซ้ำ เรียงตามลำดับที่เจอในข้อความ"""
+    """คืนรายการทักษะที่เจอ ไม่ซ้ำ เรียงตามลำดับที่เจอในข้อความ
+    คำภาษาอังกฤษ: จับแบบคำเต็มด้วย regex / คำภาษาไทย: ตัดคำด้วย PyThaiNLP (newmm) แล้วเทียบทีละ token"""
     surface, categories, _ = load_skills()
-    tokens = word_tokenize(clean(text).lower(), engine="newmm", custom_dict=_trie())
+    lowered = clean(text).lower()
+    hits = []  # (ตำแหน่ง, ชื่อทักษะ)
+
+    pattern = _latin_pattern()
+    if pattern:
+        for m in pattern.finditer(lowered):
+            hits.append((m.start(), surface[m.group(0)]))
+
+    if THAI.search(lowered):
+        pos = 0
+        for tok in word_tokenize(lowered, engine="newmm", custom_dict=_trie()):
+            key = tok.strip()
+            if key and _is_thai(key) and key in surface:
+                hits.append((pos, surface[key]))
+            pos += len(tok)
+
     found, seen = [], set()
-    for tok in tokens:
-        name = surface.get(tok.strip())
-        if name and name not in seen:
+    for _, name in sorted(hits, key=lambda h: h[0]):
+        if name not in seen:
             seen.add(name)
             found.append({"name": name, "category": categories[name]})
     return found

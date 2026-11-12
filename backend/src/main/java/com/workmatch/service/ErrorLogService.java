@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/ErrorLogService.java
+ * หน้าที่: บันทึกข้อผิดพลาดลงตาราง error_logs (ไม่ทำให้หน้าเว็บล้มถ้าบันทึกไม่ได้)
+ * เรียกใช้: ErrorLogRepository
+ * ถูกเรียกโดย: AdminController, AdminService, GlobalExceptionHandler
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.ErrorLog;

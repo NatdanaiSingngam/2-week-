@@ -1,0 +1,42 @@
+<!--/*
+  ==== Workmatch · Frontend · หน้า admin/synonyms.html ====
+  หน้าที่: คำพ้องความหมายของทักษะ
+  แสดงโดย: AdminController (GET /admin/synonyms)
+  ข้อมูลที่ได้รับจาก Controller: section, skills, synonyms
+  ส่งฟอร์มไปที่: POST /admin/synonyms, POST /admin/synonyms/{id}/delete
+  ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
+*/-->
+<!DOCTYPE html>
+<html lang="th" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('คำพ้องความหมาย')}"><title>คำพ้องความหมาย | Workmatch</title></head>
+<!--/* หน้าจอจัดการคำพ้องความหมายทักษะ ตามเอกสาร รูปที่ 51: เพิ่มคำพ้อง -> ทักษะหลัก และรายการที่แมปไว้ */-->
+<body class="admin-body">
+<aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
+<main id="main" class="admin-main">
+<div class="page-title"><h1>จัดการคำพ้องความหมาย (Synonyms Mapping)</h1><p>จับคู่คำศัพท์ที่ผู้ใช้มักพิมพ์ผิดหรือย่อ เข้ากับทักษะหลัก เพื่อเพิ่มความแม่นยำในการจับคู่ (Match Score)</p></div>
+<th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<div class="admin-grid">
+  <section class="card" aria-labelledby="add-title">
+    <h2 id="add-title">เพิ่มคำพ้องความหมายใหม่</h2>
+    <form method="post" th:action="@{/admin/synonyms}">
+      <div class="field"><label for="alias">คำศัพท์ที่ต้องการแมพ (เช่น JS, ReactJS)</label><input id="alias" name="alias" required="required" maxlength="100" /></div>
+      <div class="field"><label for="target">เชื่อมโยงไปยังทักษะหลัก (Target Skill)</label><input id="target" name="target" required="required" list="skill-list" maxlength="100" placeholder="เช่น JavaScript" /><datalist id="skill-list"><option th:each="s : ${skills}" th:value="${s.name}"></option></datalist></div>
+      <button type="submit" class="full">บันทึกการเชื่อมโยง</button>
+    </form>
+  </section>
+  <section class="card" aria-labelledby="list-title">
+    <div class="card-head"><h2 id="list-title">ตัวอย่างการแมปข้อมูล</h2><span class="count" th:text="${#lists.size(synonyms) + ' คำ'}">0 คำ</span></div>
+    <p class="muted" th:if="${#lists.isEmpty(synonyms)}">ยังไม่มีคำพ้องความหมาย</p>
+    <div style="max-height:520px;overflow:auto">
+      <div class="map-row" th:each="m : ${synonyms}">
+        <span class="from" th:text="${'“' + m.alias + '”'}">"JS"</span>
+        <span aria-hidden="true">→</span><span class="visually-hidden">แปลงเป็น</span>
+        <span class="to" th:text="${m.skill.name}">JavaScript</span>
+        <form method="post" th:action="@{/admin/synonyms/{id}/delete(id=${m.id})}" th:attr="data-confirm=${'ลบคำพ้อง ' + m.alias + '?'}"><button type="submit" class="icon-button" th:aria-label="${'ลบคำพ้อง ' + m.alias}" title="ลบ"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></form>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>

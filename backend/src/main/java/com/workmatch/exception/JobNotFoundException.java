@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ข้อผิดพลาด ====
+ * ไฟล์: backend/src/main/java/com/workmatch/exception/JobNotFoundException.java
+ * หน้าที่: ไม่พบประกาศงาน หรือเป็นประกาศของบริษัทอื่น -> ตอบ 404
+ * ถูกเรียกโดย: ApplicationService, BookmarkService, GlobalExceptionHandler, JobController,
+ *     JobPostingService, JobService
+ */
 package com.workmatch.exception;
 
 import org.springframework.http.HttpStatus;

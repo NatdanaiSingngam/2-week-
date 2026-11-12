@@ -1,3 +1,10 @@
+# ==== Workmatch · NLP · API (FastAPI) ====
+# หน้าที่: ประตูรับคำขอของ NLP service รันที่ http://localhost:8000 (เอกสาร API อัตโนมัติ /docs)
+# รับคำขอจาก: backend (backend/.../nlp/NlpClient.java) เท่านั้น เบราว์เซอร์ไม่ได้เรียกตรง
+# Endpoint: GET /health, POST /extract, POST /match, GET /dictionary, PUT /dictionary
+# ส่งต่อไปที่: skill_extractor.py (สกัดทักษะ), match_scorer.py (คิดคะแนน)
+# ข้อตกลงรูปแบบข้อมูล: nlp-service/api-contract.md
+# ====
 """FastAPI service ของฝั่ง NLP: Spring Boot เรียก /extract และ /match
 รัน: uvicorn nlp_service.api_server:app --port 8000   เอกสาร API อัตโนมัติ: http://localhost:8000/docs
 """

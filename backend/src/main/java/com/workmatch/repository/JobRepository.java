@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · เข้าถึงฐานข้อมูล (Repository) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/repository/JobRepository.java
+ * หน้าที่: ค้นหา / บันทึก / ลบข้อมูลในตาราง jobs (Spring Data สร้างคำสั่ง SQL จากชื่อเมธอดให้เอง)
+ * อ่าน/เขียนตาราง: jobs (entity Job) ผ่าน Spring Data JPA
+ * ถูกเรียกโดย: AdminService, ApplicationService, BookmarkService, DemoDataLoader, JobPostingService,
+ *     JobService, MatchService
+ */
 package com.workmatch.repository;
 
 import com.workmatch.entity.Job;

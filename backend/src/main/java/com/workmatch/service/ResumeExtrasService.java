@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/ResumeExtrasService.java
+ * หน้าที่: ส่วนเสริมเรซูเม่: อัปโหลด PDF -> ดึงข้อความ -> สกัดทักษะ, เพิ่ม/ลบทักษะเอง
+ * เรียกใช้: ResumeService, ResumeRepository, ResumeSkillRepository, FileStorageService, DictionaryService
+ * ถูกเรียกโดย: ResumeController
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.Resume;

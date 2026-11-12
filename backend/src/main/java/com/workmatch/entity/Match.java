@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/Match.java
+ * หน้าที่: ผลจับคู่เรซูเม่กับประกาศงาน (คะแนน, cosine, ทักษะที่ตรง/ขาด) คำนวณโดย NLP
+ * ตารางในฐานข้อมูล: matches
+ * ถูกเรียกโดย: MatchRepository, MatchService
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

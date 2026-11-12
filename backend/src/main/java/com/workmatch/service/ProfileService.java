@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/ProfileService.java
+ * หน้าที่: ข้อมูลส่วนตัวนักศึกษา และข้อมูลบริษัท + อัปโหลดเอกสารยืนยันตัวตน
+ * เรียกใช้: StudentProfileRepository, CompanyProfileRepository, UserRepository, FileStorageService
+ * ถูกเรียกโดย: CompanyController, RegistrationService, StudentController, StudentDashboardController
+ */
 package com.workmatch.service;
 
 import com.workmatch.entity.CompanyProfile;

@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/service/JobPostingService.java
+ * หน้าที่: ประกาศงานแบบเต็ม: สร้าง/แก้ไข/ลบ/แบบร่าง/เปลี่ยนสถานะ, ค้นหางาน, รายละเอียดงานฝั่งนักศึกษา
+ * เรียกใช้: JobRepository, JobSkillRepository, MatchRepository, ResumeRepository, JobApplicationRepository,
+ *     BookmarkRepository, CompanyProfileRepository, NlpClient, DictionaryService, MatchService
+ * ถูกเรียกโดย: GlobalModelAdvice, JobController, StudentController, ThaiFormat
+ */
 package com.workmatch.service;
 
 import com.workmatch.dto.MatchView;

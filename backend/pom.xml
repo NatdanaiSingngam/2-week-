@@ -85,6 +85,25 @@
     </dependencies>
 
     <build>
+        <!--
+          หน้าเว็บ (Thymeleaf templates + CSS/JS/รูป) แยกไปอยู่ที่โฟลเดอร์ ../frontend เพื่อให้หาง่าย
+          ตอน build (mvnw spring-boot:run / test / package) Maven จะคัดลอกเข้า classpath ที่
+          templates/ และ static/ ให้ Spring Boot ใช้ได้เหมือนเดิม ไม่ต้องตั้งค่าอื่นเพิ่ม
+          ถ้าแก้ไฟล์ใน frontend ระหว่างที่ server รันอยู่ ให้รัน "mvnw process-resources" หรือรีสตาร์ต
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>../frontend/templates</directory>
+                <targetPath>templates</targetPath>
+            </resource>
+            <resource>
+                <directory>../frontend/static</directory>
+                <targetPath>static</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

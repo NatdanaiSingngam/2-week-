@@ -1,3 +1,10 @@
+/*
+ * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/entity/Bookmark.java
+ * หน้าที่: งานที่นักศึกษาบันทึกไว้
+ * ตารางในฐานข้อมูล: bookmarks
+ * ถูกเรียกโดย: BookmarkRepository, BookmarkService, DemoDataLoader
+ */
 package com.workmatch.entity;
 
 import jakarta.persistence.*;

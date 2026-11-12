@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · Controller (รับคำขอจากเบราว์เซอร์) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/controller/HomeController.java
+ * หน้าที่: หน้าแรก /: ยังไม่ล็อกอินแสดง landing ล็อกอินแล้วพาไปหน้าหลักตามบทบาท
+ * URL ที่รับ: GET /
+ * แสดงผลที่หน้า: frontend/templates/landing.html
+ * ถูกเรียกโดย: SecurityConfig
+ */
 package com.workmatch.controller;
 
 import com.workmatch.security.RoleRedirectSuccessHandler;

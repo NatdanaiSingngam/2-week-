@@ -2,7 +2,7 @@ skill,aliases,category
 Java,,programming
 Python,ไพธอน|ไพทอน,programming
 JavaScript,js,programming
-TypeScript,ts,programming
+TypeScript,,programming
 C#,,programming
 C++,,programming
 PHP,,programming
@@ -28,7 +28,7 @@ Laravel,,backend
 Django,,backend
 Flask,,backend
 FastAPI,,backend
-REST API,restful|rest,backend
+REST API,restful|rest apis|restful api,backend
 Flutter,,mobile
 Android,,mobile
 Git,,tools
@@ -39,7 +39,7 @@ Postman,,tools
 Figma,,design
 Photoshop,,design
 Illustrator,,design
-UI/UX,ux|ui,design
+UI/UX,ux|ux/ui|ui design|ux design|user interface,design
 Excel,,office
 Microsoft Office,ms office,office
 Power BI,powerbi,data
@@ -53,23 +53,56 @@ TensorFlow,,data
 PyTorch,,data
 NLP,,data
 Selenium,,testing
-Software Testing,การทดสอบซอฟต์แวร์|ทดสอบซอฟต์แวร์,testing
-Networking,เครือข่าย|ระบบเครือข่าย,infrastructure
+Software Testing,การทดสอบซอฟต์แวร์|ทดสอบซอฟต์แวร์|manual testing,testing
+Networking,เครือข่าย|ระบบเครือข่าย|network administrator|network administration,infrastructure
 Cybersecurity,ความปลอดภัยไซเบอร์,infrastructure
-การสื่อสาร,สื่อสาร,soft
-การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น,soft
-การแก้ปัญหา,แก้ปัญหา,soft
+การสื่อสาร,สื่อสาร|communication|communication skills,soft
+การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น|teamwork|team player,soft
+การแก้ปัญหา,แก้ปัญหา|problem solving|problem-solving,soft
 ความรับผิดชอบ,รับผิดชอบ,soft
-การบริหารเวลา,จัดการเวลา|บริหารเวลา,soft
-ความคิดสร้างสรรค์,,soft
-ภาวะผู้นำ,ผู้นำ,soft
-การคิดวิเคราะห์,,soft
+การบริหารเวลา,จัดการเวลา|บริหารเวลา|time management,soft
+ความคิดสร้างสรรค์,creativity|creative thinking,soft
+ภาวะผู้นำ,ผู้นำ|leadership,soft
+การคิดวิเคราะห์,critical thinking|analytical thinking,soft
 ภาษาอังกฤษ,english,language
 ภาษาจีน,chinese,language
 การนำเสนอ,นำเสนอ,soft
 AWS,amazon web services,infrastructure
 Cisco,,infrastructure
-Shell Script,shell scripting|bash script,infrastructure
+Shell Script,shell scripting|bash script|bash,infrastructure
 Cypress,,testing
 Jira,,tools
 Jupyter Notebook,jupyter,data
+Redis,,database
+Scrum,,tools
+Agile,,tools
+CI/CD,ci/cd pipeline|continuous integration,infrastructure
+Kubernetes,k8s,infrastructure
+GraphQL,,backend
+Next.js,nextjs,frontend
+NestJS,nest.js,backend
+NoSQL,,database
+Microservices,microservice|microservice architecture,backend
+Terraform,,infrastructure
+Kafka,apache kafka,backend
+Elasticsearch,elastic search,database
+OOP,object-oriented programming,programming
+Test Automation,automation testing|automated testing,testing
+User Stories,user story,design
+Wireframing,wireframe|wireframes,design
+Ruby,,programming
+Ruby on Rails,rails|ror,backend
+.NET,dotnet|.net core|asp.net,backend
+jQuery,,frontend
+Redux,,frontend
+SQLite,,database
+Sass,scss,frontend
+GCP,google cloud|google cloud platform,infrastructure
+Azure,microsoft azure,infrastructure
+Apache Spark,spark|pyspark,data
+Deep Learning,,data
+Statistics,statistical,data
+Matplotlib,,data
+Unity,,tools
+Trello,,tools
+Slack,,tools

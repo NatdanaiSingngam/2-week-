@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · เชื่อมต่อ NLP service (Python) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/nlp/MatchResult.java
+ * หน้าที่: ผลคะแนนที่ NLP ตอบกลับจาก POST /match
+ * ถูกเรียกโดย: MatchService, NlpClient
+ */
 package com.workmatch.nlp;
 
 import java.util.List;

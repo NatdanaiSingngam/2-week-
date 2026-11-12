@@ -1,3 +1,11 @@
+/*
+ * ==== Workmatch · Backend · เชื่อมต่อ NLP service (Python) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/nlp/NlpClient.java
+ * หน้าที่: ตัวเรียก NLP service (Python FastAPI ที่ http://localhost:8000) ทุกครั้งที่ backend ต้องสกัดทักษะหรือคิดคะแนน
+ * ส่งไปที่: NLP service POST /extract, POST /match, GET/PUT /dictionary, GET /health (ดู nlp-service/api-contract.md)
+ * ที่อยู่ NLP ตั้งใน backend/src/main/resources/application.properties (nlp.base-url)
+ * ถูกเรียกโดย: AdminService, DictionaryService, JobPostingService, JobService, MatchService, ResumeService
+ */
 package com.workmatch.nlp;
 
 import org.springframework.beans.factory.annotation.Value;

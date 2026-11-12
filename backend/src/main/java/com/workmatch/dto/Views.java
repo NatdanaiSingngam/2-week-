@@ -1,3 +1,9 @@
+/*
+ * ==== Workmatch · Backend · ข้อมูลที่ส่งให้หน้าเว็บ (DTO) ====
+ * ไฟล์: backend/src/main/java/com/workmatch/dto/Views.java
+ * หน้าที่: รวม record ข้อมูลที่ส่งให้หน้าเว็บของฟีเจอร์บทที่ 3 (ค้นหางาน สมัครงาน ผู้สมัคร ฯลฯ)
+ * ถูกเรียกโดย: AdminService, ApplicationService, BookmarkService, JobController, JobPostingService
+ */
 package com.workmatch.dto;
 
 import com.workmatch.entity.ApplicationStatus;

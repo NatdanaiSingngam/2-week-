@@ -1,3 +1,8 @@
+# ==== Workmatch · NLP · ทดสอบ (pytest) ====
+# หน้าที่: ทดสอบการสกัดทักษะ การคิดคะแนน และ API /extract /match /health
+# ดึงข้อมูลจาก: tests/sample_resume_*.txt
+# รัน: cd nlp-service แล้ว venv\Scripts\python -m pytest
+# ====
 from pathlib import Path
 
 from fastapi.testclient import TestClient
