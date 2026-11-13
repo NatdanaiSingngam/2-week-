@@ -21,7 +21,7 @@
   <div class="stat"><span class="stat-label">ประกาศงานที่เปิดรับ</span><div class="stat-row"><span class="stat-value" th:text="${o.openJobs()}">0</span><span class="stat-note" style="color:var(--success-text)">เปิดรับสมัครอยู่</span></div></div>
   <div class="stat"><span class="stat-label">ผู้สมัครทั้งหมด</span><div class="stat-row"><span class="stat-value blue" th:text="${o.totalApplications()}">0</span><span class="stat-note">คน</span></div></div>
   <div class="stat"><span class="stat-label">รอการพิจารณา</span><div class="stat-row"><span class="stat-value" style="color:var(--warn)" th:text="${o.pending()}">0</span><a class="stat-note" style="color:var(--warn-text)" th:href="@{/company/applications(status='PENDING')}">ต้องตรวจสอบ</a></div></div>
-  <div class="stat"><span class="stat-label">รับเข้าทำงานแล้ว</span><div class="stat-row"><span class="stat-value green" th:text="${o.hired()}">0</span><span class="stat-note">คน</span></div></div>
+  <div class="stat"><span class="stat-label">ผ่านการพิจารณาแล้ว</span><div class="stat-row"><span class="stat-value green" th:text="${o.hired()}">0</span><span class="stat-note">คน</span></div></div>
 </div>
 
 <section class="card empty" th:if="${#lists.isEmpty(o.recentJobs())}">

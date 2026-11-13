@@ -12,7 +12,7 @@ Python service (FastAPI) ที่ Spring Boot เรียกใช้ มี 2
 |---|---|
 | `nlp_service/api_server.py` | กำหนด endpoint `/extract`, `/match`, `/health` |
 | `nlp_service/skill_extractor.py` | ตัดคำไทย/อังกฤษด้วย PyThaiNLP แล้วหาทักษะที่อยู่ใน dictionary |
-| `nlp_service/match_scorer.py` | คำนวณคะแนน (ตรง ÷ ที่ต้องการ × 100) และค่า Cosine เทียบ |
+| `nlp_service/match_scorer.py` | คำนวณค่าร้อยละความสอดคล้องด้วย TF-IDF + Cosine Similarity (และ Cosine แบบ 0/1 ไว้เทียบ) |
 | `nlp_service/skill_dictionary.csv` | รายการทักษะ + ชื่อเรียกอื่น + หมวด (แก้ไฟล์นี้เพื่อเพิ่มทักษะ ไม่ต้องแก้โค้ด) |
 | `tests/test_extract_and_match.py` | ชุดทดสอบ 10 ข้อ |
 | `tests/sample_resume_backend.txt` | เรซูเม่ตัวอย่างสาย Backend (Java, Spring Boot, MySQL) |

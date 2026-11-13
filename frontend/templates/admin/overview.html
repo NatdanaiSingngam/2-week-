@@ -18,7 +18,7 @@
   <div class="admin-stat" style="--c:#3B82F6"><span class="stat-label">นักศึกษาทั้งหมด</span><span class="stat-value" th:text="${o.students()}">0</span><span class="unit">บัญชี</span></div>
   <div class="admin-stat" style="--c:#8B5CF6"><span class="stat-label">บริษัทที่อนุมัติแล้ว</span><span class="stat-value" th:text="${o.approvedCompanies()}">0</span><span class="unit" th:text="${'แห่ง (จาก ' + o.companies() + ')'}">แห่ง</span></div>
   <div class="admin-stat" style="--c:#14B8A6"><span class="stat-label">ประกาศงานที่เปิดรับ</span><span class="stat-value" th:text="${o.openJobs()}">0</span><span class="unit">ตำแหน่ง</span></div>
-  <div class="admin-stat" style="--c:#22C55E"><span class="stat-label">การจับคู่สำเร็จ (รับเข้าทำงาน)</span><span class="stat-value" th:text="${o.hired()}">0</span><span class="unit">คู่</span></div>
+  <div class="admin-stat" style="--c:#22C55E"><span class="stat-label">การจับคู่สำเร็จ (ผ่านการพิจารณา)</span><span class="stat-value" th:text="${o.hired()}">0</span><span class="unit">คู่</span></div>
 </div>
 <div class="admin-grid">
   <section class="card" aria-labelledby="chart-title">
@@ -40,6 +40,10 @@
       <div><dt>คะแนนเฉลี่ย</dt><dd th:text="${o.averageScore() == null ? '-' : #numbers.formatDecimal(o.averageScore(), 1, 1) + '%'}">0%</dd></div>
       <div><dt>บริษัทรออนุมัติ</dt><dd><a th:href="@{/admin/companies}" th:text="${o.pendingCompanies() + ' แห่ง'}">0 แห่ง</a></dd></div>
     </dl>
+    <form method="post" th:action="@{/admin/matches/recalculate}" data-busy="กำลังคำนวณคะแนนใหม่..." data-confirm="คำนวณคะแนนจับคู่ใหม่ทุกคู่ด้วยสูตร TF-IDF + Cosine ปัจจุบัน?" style="margin-top:12px">
+      <button type="submit" class="secondary sm">คำนวณคะแนนใหม่ทั้งหมด</button>
+      <span class="field-note">ใช้เมื่อมีเรซูเม่หรือประกาศงานเพิ่มจำนวนมาก (น้ำหนัก TF-IDF เปลี่ยน) หรือหลังเปลี่ยนสูตร</span>
+    </form>
   </section>
 </div>
 </main>

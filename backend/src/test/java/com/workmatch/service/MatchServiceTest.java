@@ -57,7 +57,7 @@ class MatchServiceTest {
         when(jobs.findAll()).thenReturn(List.of(job));
         when(jobSkills.findByJobId(2L)).thenReturn(List.of(
                 new JobSkill(job, "Python", "programming"), new JobSkill(job, "SQL", "database"), new JobSkill(job, "Docker", "tools")));
-        when(nlpClient.match(List.of("Python", "SQL"), List.of("Python", "SQL", "Docker")))
+        when(nlpClient.match(eq(List.of("Python", "SQL")), eq(List.of("Python", "SQL", "Docker")), any()))
                 .thenReturn(new MatchResult(66.66666, 81.649, List.of("Python", "SQL"), List.of("Docker")));
         when(matches.findByResumeIdAndJobId(1L, 2L)).thenReturn(Optional.empty());
 
@@ -72,6 +72,45 @@ class MatchServiceTest {
     }
 
     @Test
+    void corpusStatsForTfIdfCountResumesAndOpenJobs() {
+        // เอกสาร 2.3.3: เอกสาร 1 ฉบับ = ชุดทักษะของเรซูเม่ หรือประกาศงานที่เปิดรับ นับว่าแต่ละทักษะอยู่ในกี่เอกสาร
+        Resume other = new Resume();
+        other.setId(9L);
+        Job closed = new Job();
+        closed.setId(3L);
+        closed.setStatus(com.workmatch.entity.JobStatus.CLOSED);
+        when(resumeSkills.findAll()).thenReturn(List.of(
+                new ResumeSkill(resume, "Python", "programming"), new ResumeSkill(resume, "SQL", "database"),
+                new ResumeSkill(other, "python", "programming")));
+        when(jobSkills.findAll()).thenReturn(List.of(
+                new JobSkill(job, "Python", "programming"), new JobSkill(job, "Docker", "tools"),
+                new JobSkill(closed, "Kafka", "backend")));
+        when(jobs.findAll()).thenReturn(List.of(job));
+        when(jobSkills.findByJobId(2L)).thenReturn(List.of(new JobSkill(job, "Python", "programming"), new JobSkill(job, "Docker", "tools")));
+        when(nlpClient.match(anyList(), anyList(), any())).thenReturn(new MatchResult(50.0, 50.0, List.of("Python"), List.of("Docker")));
+        when(matches.findByResumeIdAndJobId(1L, 2L)).thenReturn(Optional.empty());
+
+        service.recalculateForResume(1L);
+
+        ArgumentCaptor<com.workmatch.nlp.CorpusStats> stats = ArgumentCaptor.forClass(com.workmatch.nlp.CorpusStats.class);
+        verify(nlpClient).match(anyList(), anyList(), stats.capture());
+        assertThat(stats.getValue().totalDocs()).isEqualTo(3); // เรซูเม่ 2 + งานที่เปิดรับ 1 (งานที่ปิดรับไม่นับ)
+        assertThat(stats.getValue().docFreq()).containsEntry("python", 3).containsEntry("sql", 1)
+                .containsEntry("docker", 1).doesNotContainKey("kafka");
+    }
+
+    @Test
+    void recalculateAllCoversEveryResume() {
+        when(resumes.findAll()).thenReturn(List.of(resume));
+        when(jobs.findAll()).thenReturn(List.of(job));
+        when(jobSkills.findByJobId(2L)).thenReturn(List.of(new JobSkill(job, "Python", "programming")));
+        when(nlpClient.match(anyList(), anyList(), any())).thenReturn(new MatchResult(100.0, 100.0, List.of("Python"), List.of()));
+        when(matches.findByResumeIdAndJobId(1L, 2L)).thenReturn(Optional.empty());
+        assertThat(service.recalculateAll()).isEqualTo(1);
+        verify(matches).save(any(Match.class));
+    }
+
+    @Test
     void recalculatingUpdatesExistingRowInsteadOfAddingOne() {
         Match existing = new Match();
         existing.setResume(resume);
@@ -79,7 +118,7 @@ class MatchServiceTest {
         existing.setScore(new BigDecimal("10.0"));
         when(jobs.findAll()).thenReturn(List.of(job));
         when(jobSkills.findByJobId(2L)).thenReturn(List.of(new JobSkill(job, "Python", "programming")));
-        when(nlpClient.match(anyList(), anyList())).thenReturn(new MatchResult(100.0, 100.0, List.of("Python"), List.of()));
+        when(nlpClient.match(anyList(), anyList(), any())).thenReturn(new MatchResult(100.0, 100.0, List.of("Python"), List.of()));
         when(matches.findByResumeIdAndJobId(1L, 2L)).thenReturn(Optional.of(existing));
 
         service.recalculateForResume(1L);
@@ -102,7 +141,7 @@ class MatchServiceTest {
     void nlpFailurePropagatesSoCallerCanWarn() {
         when(jobs.findAll()).thenReturn(List.of(job));
         when(jobSkills.findByJobId(2L)).thenReturn(List.of(new JobSkill(job, "Python", "programming")));
-        when(nlpClient.match(anyList(), anyList())).thenThrow(new NlpUnavailableException());
+        when(nlpClient.match(anyList(), anyList(), any())).thenThrow(new NlpUnavailableException());
 
         assertThatThrownBy(() -> service.recalculateForResume(1L)).isInstanceOf(NlpUnavailableException.class);
         verify(matches, never()).save(any());

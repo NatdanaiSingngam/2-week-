@@ -117,16 +117,27 @@ def clean(text: str) -> str:
     return re.sub(r"[(),;:!?\[\]{}\"“”‘’]", " ", text)
 
 
+# คำที่เป็นทั้งชื่อเครื่องมือและคำภาษาอังกฤษทั่วไป เช่น "excel in ..." (ทำได้ดีเยี่ยม), "swift response", "unity", "slack"
+# นับเป็นทักษะเฉพาะเมื่อขึ้นต้นด้วยตัวพิมพ์ใหญ่ตามชื่อเครื่องมือ (Excel, EXCEL) ตัวพิมพ์เล็กทั้งคำถือว่าเป็นคำทั่วไป
+CASE_SENSITIVE = {
+    "excel", "swift", "unity", "slack", "spark", "flask", "angular", "agile",
+    "postman", "illustrator", "rails", "ruby", "dart",
+}
+
+
 def extract_skills(text: str) -> list[dict]:
     """คืนรายการทักษะที่เจอ ไม่ซ้ำ เรียงตามลำดับที่เจอในข้อความ
     คำภาษาอังกฤษ: จับแบบคำเต็มด้วย regex / คำภาษาไทย: ตัดคำด้วย PyThaiNLP (newmm) แล้วเทียบทีละ token"""
     surface, categories, _ = load_skills()
-    lowered = clean(text).lower()
+    cleaned = clean(text)
+    lowered = cleaned.lower()  # ความยาวเท่าเดิม ตำแหน่งตัวอักษรตรงกับ cleaned
     hits = []  # (ตำแหน่ง, ชื่อทักษะ)
 
     pattern = _latin_pattern()
     if pattern:
         for m in pattern.finditer(lowered):
+            if m.group(0) in CASE_SENSITIVE and not cleaned[m.start()].isupper():
+                continue  # เช่น "จะ excel ในสายงาน" ไม่ใช่โปรแกรม Excel
             hits.append((m.start(), surface[m.group(0)]))
 
     if THAI.search(lowered):

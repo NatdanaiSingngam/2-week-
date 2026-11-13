@@ -12,7 +12,7 @@
 <!--/* หน้าจอรายละเอียดประกาศงาน ตามเอกสาร รูปที่ 39: ข้อมูลบริษัทและตำแหน่ง + ปุ่ม "บันทึกงานนี้" / "สมัครงาน"
      เพิ่มจากรูป: คะแนนความสอดคล้องและทักษะที่ตรง/ควรเตรียมเพิ่ม (เอกสาร 1.4.1.2.2) */-->
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="narrow main" th:with="m=${job.match()}, s=${m == null ? 0 : m.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+<main id="main" class="narrow main" th:with="m=${job.match()}, s=${m == null ? 0 : m.score}, lv=${@fmt.level(s)}">
 <a class="back-link" th:href="@{/student/jobs}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>กลับไปค้นหางาน</a>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 <article class="card">
@@ -40,7 +40,7 @@
 
   <div class="match-summary" th:if="${m != null}">
     <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความสอดคล้อง ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 0, 0) + '%'}">0%</strong></div>
-    <div><strong>ค่าร้อยละความสอดคล้องกับทักษะของคุณ</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span><span th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(m.cosine == null ? 0 : m.cosine, 1, 1) + '%'}">0%</span></div></div>
+    <div><strong>ค่าร้อยละความสอดคล้องกับทักษะของคุณ</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(m.matched) + ' จาก ' + (#lists.size(m.matched) + #lists.size(m.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div></div>
   </div>
   <div class="skill-cols" th:if="${m != null}">
     <section><h4>ทักษะที่คุณมี</h4><div><span class="badge badge-ok" th:each="sk : ${m.matched}" th:text="${sk}">Java</span><span class="muted" th:if="${#lists.isEmpty(m.matched)}">ยังไม่มีทักษะที่ตรง</span></div></section>

@@ -47,10 +47,28 @@ def test_no_skills_text():
 
 
 def test_match_basic():
+    # ไม่ส่งสถิติคลังเอกสาร: ทุกทักษะน้ำหนักเท่ากัน = Cosine แบบ 0/1 -> 2 / sqrt(3 x 4) = 57.7
     r = match_skills(["Java", "Python", "Git"], ["Java", "Spring Boot", "Git", "MySQL"])
-    assert r["score"] == 50.0
+    assert r["score"] == 57.7 and r["cosine"] == 57.7
     assert r["matched"] == ["Java", "Git"]
     assert r["missing"] == ["Spring Boot", "MySQL"]
+
+
+def test_match_tfidf_weights_rare_skills_higher():
+    # TF-IDF + Cosine ตามเอกสาร 2.3.3: ทักษะหายาก (พบในเอกสารน้อย) มีน้ำหนักมากกว่าทักษะที่พบบ่อย
+    doc_freq = {"java": 9, "git": 9, "spring boot": 1, "kafka": 1, "python": 5}
+    job = ["Java", "Git", "Spring Boot", "Kafka"]
+    has_common = match_skills(["Java", "Git"], job, doc_freq, 10)       # มีแต่ทักษะที่พบบ่อย
+    has_rare = match_skills(["Spring Boot", "Kafka"], job, doc_freq, 10)  # มีแต่ทักษะหายาก
+    assert has_common["cosine"] == has_rare["cosine"] == 70.7            # แบบ 0/1 แยกไม่ออก
+    assert has_rare["score"] > has_common["score"]                        # TF-IDF แยกได้
+    assert 0 < has_common["score"] < 70.7 < has_rare["score"] < 100
+
+
+def test_match_tfidf_skill_in_every_document_still_counts():
+    # ทักษะที่มีในทุกเอกสารต้องไม่ได้น้ำหนัก 0 (ใช้ IDF แบบ +1)
+    r = match_skills(["Java"], ["Java"], {"java": 10}, 10)
+    assert r["score"] == 100.0
 
 
 def test_match_case_and_duplicates():
@@ -88,3 +106,11 @@ def test_english_resume_without_skills():
     r = client.post("/extract", json={"text": text})
     assert r.status_code == 200 and r.json() == {"skills": []}
     assert match_skills([], ["Python", "Git"])["score"] == 0.0
+
+
+def test_common_english_words_need_capital_letter():
+    # "excel" ที่เป็นกริยา (ทำได้ดีเยี่ยม) ไม่ใช่โปรแกรม Excel; ชื่อเครื่องมือเขียนตัวใหญ่จึงจะนับ
+    assert names("ผมมุ่งมั่นที่จะ excel ในสายงานพัฒนาแอป") == set()
+    assert names("ใช้ Excel ทำรายงาน และ EXCEL pivot") == {"Excel"}
+    assert names("swift response to customers, team unity") == set()
+    assert names("เขียนแอป iOS ด้วย Swift และเกมด้วย Unity") >= {"Swift", "Unity"}

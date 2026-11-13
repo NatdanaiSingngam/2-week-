@@ -151,7 +151,7 @@ public class JobPostingService {
                 .sorted(Comparator.comparing(Job::getId).reversed())
                 .map(j -> new CompanyJobRow(j.getId(), j.getTitle(), j.getCreatedAt(), j.getStatus(),
                         jobSkills.countByJobId(j.getId()),
-                        matches.countByJobIdAndScoreGreaterThan(j.getId(), BigDecimal.ZERO),
+                        matches.countByJobIdAndScoreGreaterThan(j.getId(), MatchService.RECOMMEND_MIN),
                         applications.countByJobId(j.getId())))
                 .toList();
     }
@@ -163,7 +163,7 @@ public class JobPostingService {
         return new CompanyOverview(open,
                 applications.countByJobCompanyId(company.getId()),
                 applications.countByJobCompanyIdAndStatus(company.getId(), ApplicationStatus.PENDING),
-                applications.countByJobCompanyIdAndStatus(company.getId(), ApplicationStatus.HIRED),
+                applications.countByJobCompanyIdAndStatus(company.getId(), ApplicationStatus.ACCEPTED),
                 rows.stream().limit(5).toList());
     }
 

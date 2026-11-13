@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -65,7 +66,7 @@ class MainFlowIntegrationTest {
             for (String s : List.of("Python", "SQL", "Docker")) if (text.contains(s)) out.add(new ExtractedSkill(s, "x"));
             return out;
         });
-        when(nlpClient.match(anyList(), anyList())).thenAnswer(inv -> {
+        when(nlpClient.match(anyList(), anyList(), any())).thenAnswer(inv -> {
             List<String> have = inv.getArgument(0), need = inv.getArgument(1);
             List<String> matched = new ArrayList<>(), missing = new ArrayList<>();
             for (String s : need) (have.contains(s) ? matched : missing).add(s);

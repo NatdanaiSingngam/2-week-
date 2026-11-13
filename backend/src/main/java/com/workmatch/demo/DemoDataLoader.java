@@ -211,9 +211,9 @@ public class DemoDataLoader implements CommandLineRunner {
         apply(s1, "Backend Developer", ApplicationStatus.PENDING,
                 "สวัสดีครับ ผมสนใจตำแหน่ง Backend Developer เนื่องจากมีประสบการณ์พัฒนา REST API ด้วย Java และ Spring Boot "
                         + "อยากได้โอกาสเรียนรู้การทำงานจริงร่วมกับทีมครับ (ข้อความตัวอย่าง)");
-        apply(s2, "Backend Developer", ApplicationStatus.INTERVIEW, "สนใจเรียนรู้งานหลังบ้านเพิ่มเติมค่ะ (ข้อความตัวอย่าง)");
-        apply(s2, "Frontend Developer", ApplicationStatus.INTERVIEW, "ถนัดงานหน้าเว็บด้วย React และ Figma ค่ะ (ข้อความตัวอย่าง)");
-        apply(s3, "Data Analyst", ApplicationStatus.HIRED, "สนใจงานวิเคราะห์ข้อมูลด้วย Python และ SQL ครับ (ข้อความตัวอย่าง)");
+        apply(s2, "Backend Developer", ApplicationStatus.REVIEWED, "สนใจเรียนรู้งานหลังบ้านเพิ่มเติมค่ะ (ข้อความตัวอย่าง)");
+        apply(s2, "Frontend Developer", ApplicationStatus.REVIEWED, "ถนัดงานหน้าเว็บด้วย React และ Figma ค่ะ (ข้อความตัวอย่าง)");
+        apply(s3, "Data Analyst", ApplicationStatus.ACCEPTED, "สนใจงานวิเคราะห์ข้อมูลด้วย Python และ SQL ครับ (ข้อความตัวอย่าง)");
         apply(s3, "Backend Developer", ApplicationStatus.REJECTED, null);
         apply(s1, "DevOps / QA", ApplicationStatus.PENDING, null);
         bookmark(s1, "Frontend Developer");

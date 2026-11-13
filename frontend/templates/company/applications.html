@@ -23,7 +23,7 @@
     <table>
       <thead><tr><th scope="col">ผู้สมัคร</th><th scope="col">ตำแหน่ง</th><th scope="col">คะแนน</th><th scope="col">วันที่สมัคร</th><th scope="col">สถานะ</th><th scope="col"><span class="visually-hidden">การจัดการ</span></th></tr></thead>
       <tbody>
-        <tr th:each="a : ${applications}" th:with="s=${a.score()}, lv=${s == null ? 'low' : (s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low'))}">
+        <tr th:each="a : ${applications}" th:with="s=${a.score()}, lv=${@fmt.level(s)}">
           <td><strong th:text="${a.studentName()}">ชื่อ</strong><div class="muted" style="font-size:.82rem" th:text="${a.major() != null ? a.major() : ''}">สาขา</div></td>
           <td><a class="table-link" style="color:var(--text)" th:href="@{/company/jobs/{id}(id=${a.jobId()})}" th:text="${a.jobTitle()}">ตำแหน่ง</a></td>
           <td><span class="score-pill" th:classappend="${lv}" th:text="${s == null ? '-' : #numbers.formatDecimal(s, 1, 1) + '%'}">95%</span></td>

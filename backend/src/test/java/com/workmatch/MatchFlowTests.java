@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -73,7 +74,7 @@ class MatchFlowTests {
                 EXTRACT.getOrDefault(inv.<String>getArgument(0), List.of()).stream()
                         .map(n -> new ExtractedSkill(n, "x")).toList());
         // NLP จำลอง: score = ตรง/ที่งานต้องการ x 100 (เหมือน api-contract) ใช้เฉพาะในเทสต์
-        when(nlpClient.match(anyList(), anyList())).thenAnswer(inv -> {
+        when(nlpClient.match(anyList(), anyList(), any())).thenAnswer(inv -> {
             List<String> have = inv.getArgument(0);
             List<String> need = inv.getArgument(1);
             List<String> matched = new ArrayList<>(), missing = new ArrayList<>();
@@ -147,17 +148,18 @@ class MatchFlowTests {
 
         // หน้าผู้สมัครของบริษัท A เรียงคะแนน ไม่มีอีเมล
         List<ApplicantView> applicants = modelList(dataJob, "a@co.com", "COMPANY", "applicants");
-        assertThat(applicants).extracting(ApplicantView::getStudentName).containsExactly("นักศึกษา 1", "นักศึกษา 2");
-        assertThat(applicants).extracting(ApplicantView::getScore).containsExactly(100.0, 33.3);
+        // แท็บระบบแนะนำแสดงเฉพาะคะแนนมากกว่า 40% (นักศึกษา 2 ได้ 33.3 จึงไม่แสดง)
+        assertThat(applicants).extracting(ApplicantView::getStudentName).containsExactly("นักศึกษา 1");
+        assertThat(applicants).extracting(ApplicantView::getScore).containsExactly(100.0);
         String html = mvc.perform(get(dataJob).with(user("a@co.com").roles("COMPANY")))
                 .andReturn().getResponse().getContentAsString();
         assertThat(html).doesNotContain("s1@test.com").doesNotContain("s2@test.com");
 
-        // applicantCount นับเฉพาะคะแนนมากกว่า 0 (s1 ได้ 0 กับงาน backend)
+        // applicantCount นับเฉพาะคะแนนมากกว่า 40 (Data: s1 100 นับ, s2 33.3 ไม่นับ / Backend: s2 100 นับ, s1 0 ไม่นับ)
         List<JobListItem> jobsOfA = modelList("/company/jobs", "a@co.com", "COMPANY", "jobs");
         assertThat(jobsOfA).extracting(JobListItem::getTitle, JobListItem::getApplicantCount)
                 .containsExactlyInAnyOrder(
-                        org.assertj.core.groups.Tuple.tuple("Data Intern", 2L),
+                        org.assertj.core.groups.Tuple.tuple("Data Intern", 1L),
                         org.assertj.core.groups.Tuple.tuple("Backend Intern", 1L));
 
         // บริษัท B ไม่เห็นผู้สมัครของงานบริษัท A

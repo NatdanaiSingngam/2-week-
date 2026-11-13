@@ -34,7 +34,7 @@
   <div class="actions"><a class="button secondary" th:href="@{/student/jobs}">ล้างการค้นหา</a></div>
 </div>
 
-<article class="job-row" th:each="j : ${jobs}" th:with="lv=${j.score() == null ? '' : (j.score() >= 70 ? 'high' : (j.score() >= 40 ? 'medium' : 'low'))}">
+<article class="job-row" th:each="j : ${jobs}" th:with="lv=${j.score() == null ? '' : @fmt.level(j.score())}">
   <span class="mono" aria-hidden="true" th:text="${@fmt.initial(j.companyName())}">B</span>
   <div class="grow">
     <h3><a th:href="@{/student/jobs/{id}(id=${j.jobId()})}" th:text="${j.title()}">Software Engineer (Intern)</a></h3>

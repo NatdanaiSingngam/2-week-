@@ -33,11 +33,13 @@ class ExtractOut(BaseModel):
 class MatchIn(BaseModel):
     resume_skills: list[str] = Field(..., description="ทักษะของผู้สมัคร")
     job_skills: list[str] = Field(..., description="ทักษะที่ตำแหน่งงานต้องการ")
+    doc_freq: dict[str, int] | None = Field(None, description="จำนวนเอกสาร (เรซูเม่ + ประกาศงาน) ที่มีแต่ละทักษะ ใช้คิด IDF")
+    total_docs: int | None = Field(None, description="จำนวนเอกสารทั้งหมดในคลัง (N)")
 
 
 class MatchOut(BaseModel):
-    score: float = Field(..., description="matched / required x 100")
-    cosine: float = Field(..., description="Cosine similarity x 100 (ไว้เทียบสูตร)")
+    score: float = Field(..., description="ค่าร้อยละความสอดคล้อง = TF-IDF + Cosine Similarity x 100")
+    cosine: float = Field(..., description="Cosine แบบ 0/1 x 100 (ทุกทักษะน้ำหนักเท่ากัน ไว้เทียบในรายงาน)")
     matched: list[str]
     missing: list[str]
 
@@ -54,7 +56,7 @@ def extract(body: ExtractIn):
 
 @app.post("/match", response_model=MatchOut)
 def match(body: MatchIn):
-    return match_skills(body.resume_skills, body.job_skills)
+    return match_skills(body.resume_skills, body.job_skills, body.doc_freq, body.total_docs)
 
 
 # ---------- พจนานุกรมทักษะ (หน้าผู้ดูแลระบบ: Skill Dictionary / Synonyms ในเอกสาร รูปที่ 50-51) ----------

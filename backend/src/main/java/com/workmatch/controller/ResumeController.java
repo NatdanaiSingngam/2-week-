@@ -23,6 +23,7 @@ import com.workmatch.service.ResumeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,48 +55,78 @@ public class ResumeController {
         this.dictionary = dictionary;
     }
 
+    /** id ไฟล์ PDF ที่อัปโหลดแล้วแต่ยังไม่กด "บันทึก" (เก็บใน session ของผู้ใช้) */
+    static final String PENDING_PDF = "pendingResumePdf";
+
     @GetMapping("/student/resume")
-    public String show(Model model) {
+    public String show(Model model, HttpSession session) {
         User student = currentUserService.getCurrentUser();
         model.addAttribute("resumeText", resumeService.findResume(student).map(Resume::getRawText).orElse(""));
         model.addAttribute("skills", resumeService.findSkills(student));
-        addExtras(student, model);
+        addExtras(student, model, session);
         // message มาจาก flash หลังบันทึกสำเร็จ (ถ้าไม่มี หน้าเว็บจะไม่แสดง)
         return "student/resume";
     }
 
+    /**
+     * ฟอร์มข้อความเรซูเม่ (เอกสาร UC-06, รูปที่ 49) มี 2 ปุ่ม:
+     * action=preview "คำนวณทักษะ" -> NLP สกัดทักษะแล้วแสดงก่อน ยังไม่บันทึก
+     * action=save (ค่าเริ่มต้น) "บันทึก" -> บันทึกข้อความ + ทักษะ + ไฟล์ PDF ที่รออยู่ แล้วคำนวณคะแนนจับคู่ใหม่
+     */
     @PostMapping("/student/resume")
     public String save(@RequestParam(name = "text", required = false) String text,
-                       Model model, RedirectAttributes redirect) {
+                       @RequestParam(name = "action", required = false) String action,
+                       Model model, HttpSession session, RedirectAttributes redirect) {
         User student = currentUserService.getCurrentUser();
+        if ("preview".equals(action)) {
+            try {
+                model.addAttribute("previewSkills", resumeService.previewSkills(text));
+                model.addAttribute("message", "ตรวจทักษะด้านล่าง ถ้าถูกต้องกด \"บันทึก\" (ยังไม่ได้บันทึก)");
+            } catch (NlpUnavailableException | IllegalArgumentException e) {
+                model.addAttribute("error", e.getMessage());
+            }
+            model.addAttribute("resumeText", text == null ? "" : text);
+            model.addAttribute("skills", resumeService.findSkills(student));
+            addExtras(student, model, session);
+            return "student/resume";
+        }
         Resume saved;
         try {
-            saved = resumeService.saveResume(student, text);
+            saved = resumeExtras.saveResume(student, text, (Long) session.getAttribute(PENDING_PDF));
         } catch (NlpUnavailableException | IllegalArgumentException e) {
             // แสดง error บนหน้าเดิม และคงข้อความที่กรอกไว้ ทักษะที่แสดงยังเป็นชุดเดิม
             model.addAttribute("error", e.getMessage());
             model.addAttribute("resumeText", text == null ? "" : text);
             model.addAttribute("skills", resumeService.findSkills(student));
-            addExtras(student, model);
+            addExtras(student, model, session);
             return "student/resume";
         }
+        session.removeAttribute(PENDING_PDF);
         redirect.addFlashAttribute("message", "บันทึกและวิเคราะห์ทักษะแล้ว");
         recalculate(saved.getId(), redirect);
         return "redirect:/student/resume";
     }
 
-    /** อัปโหลดไฟล์ PDF: อ่านข้อความแล้วสกัดทักษะด้วย NLP (แทนข้อความเดิม) */
+    /**
+     * อัปโหลดไฟล์ PDF: ดึงข้อความออกมาใส่ช่องข้อความให้ตรวจ/แก้ก่อน (ยังไม่บันทึก ยังไม่ส่ง NLP)
+     * อ่านข้อความไม่ได้ -> แจ้งให้กรอก Raw Text เอง
+     */
     @PostMapping("/student/resume/upload")
-    public String upload(@RequestParam(name = "file", required = false) MultipartFile file, RedirectAttributes redirect) {
+    public String upload(@RequestParam(name = "file", required = false) MultipartFile file,
+                         Model model, HttpSession session, RedirectAttributes redirect) {
         User student = currentUserService.getCurrentUser();
         try {
-            Resume saved = resumeExtras.uploadPdf(student, file);
-            redirect.addFlashAttribute("message", "อัปโหลดและสกัดทักษะจากไฟล์ PDF แล้ว");
-            recalculate(saved.getId(), redirect);
-        } catch (NlpUnavailableException | IllegalArgumentException e) {
+            ResumeExtrasService.PendingPdf pending = resumeExtras.preparePdf(student, file, (Long) session.getAttribute(PENDING_PDF));
+            session.setAttribute(PENDING_PDF, pending.fileId());
+            model.addAttribute("message", "ดึงข้อความจากไฟล์ PDF แล้ว ตรวจหรือแก้ไขข้อความด้านล่าง แล้วกด \"คำนวณทักษะ\" หรือ \"บันทึก\"");
+            model.addAttribute("resumeText", pending.text());
+            model.addAttribute("skills", resumeService.findSkills(student));
+            addExtras(student, model, session);
+            return "student/resume";
+        } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
+            return "redirect:/student/resume";
         }
-        return "redirect:/student/resume";
     }
 
     @PostMapping("/student/resume/file/delete")
@@ -136,8 +167,9 @@ public class ResumeController {
         return "redirect:/student/resume";
     }
 
-    private void addExtras(User student, Model model) {
+    private void addExtras(User student, Model model, HttpSession session) {
         model.addAttribute("pdfName", resumeExtras.pdfName(student).orElse(null));
+        model.addAttribute("pendingPdfName", resumeExtras.pendingName(student, (Long) session.getAttribute(PENDING_PDF)).orElse(null));
         model.addAttribute("dictionarySkills", dictionary.activeSkills());
     }
 

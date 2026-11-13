@@ -51,15 +51,23 @@ public class NlpClient {
     }
 
     /**
-     * POST /match {"resume_skills":[...],"job_skills":[...]} -> {score, cosine, matched, missing}
-     * คะแนนคำนวณฝั่ง NLP เท่านั้น ห้ามคำนวณเองใน Java
+     * POST /match {"resume_skills":[...],"job_skills":[...],"doc_freq":{...},"total_docs":N} -> {score, cosine, matched, missing}
+     * score = ค่าร้อยละความสอดคล้องแบบ TF-IDF + Cosine Similarity (คำนวณฝั่ง NLP เท่านั้น ห้ามคำนวณเองใน Java)
+     * stats = สถิติคลังเอกสารสำหรับคิด IDF (CorpusStats.empty() = ทุกทักษะน้ำหนักเท่ากัน)
      */
-    public MatchResult match(List<String> resumeSkills, List<String> jobSkills) {
+    public MatchResult match(List<String> resumeSkills, List<String> jobSkills, CorpusStats stats) {
         try {
+            Map<String, Object> request = new java.util.HashMap<>();
+            request.put("resume_skills", resumeSkills);
+            request.put("job_skills", jobSkills);
+            if (stats != null && stats.totalDocs() > 0) {
+                request.put("doc_freq", stats.docFreq());
+                request.put("total_docs", stats.totalDocs());
+            }
             MatchResult body = restClient.post()
                     .uri("/match")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("resume_skills", resumeSkills, "job_skills", jobSkills))
+                    .body(request)
                     .retrieve()
                     .body(MatchResult.class);
             if (body == null) throw new NlpUnavailableException();

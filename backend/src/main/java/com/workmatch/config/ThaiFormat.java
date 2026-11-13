@@ -58,6 +58,16 @@ public class ThaiFormat {
         return com.workmatch.service.SkillCategories.ordered(codes);
     }
 
+    /** ระดับของค่าร้อยละความสอดคล้อง: high / medium / low (เกณฑ์อยู่ที่ MatchLevels) เรียกด้วย ${@fmt.level(score)} */
+    public String level(Number score) {
+        return com.workmatch.service.MatchLevels.level(score);
+    }
+
+    /** ชื่อไทยของระดับ: เหมาะ / ปานกลาง / ไม่เหมาะ เรียกด้วย ${@fmt.levelLabel(lv)} */
+    public String levelLabel(String level) {
+        return com.workmatch.service.MatchLevels.label(level);
+    }
+
     /** ขนาดไฟล์ เช่น 1.2 MB */
     public String size(Long bytes) {
         if (bytes == null) return "";

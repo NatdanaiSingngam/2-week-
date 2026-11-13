@@ -10,9 +10,9 @@
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('รายละเอียดผู้สมัคร')}"><title>รายละเอียดผู้สมัคร | Workmatch</title></head>
 <!--/* หน้าจอรายละเอียดผู้สมัคร ตามเอกสาร รูปที่ 46: ข้อมูลนักศึกษา + Match Score + สถานะ, Cover Letter,
-     ทักษะที่ตรงกับตำแหน่ง, ไฟล์เรซูเม่ (PDF), ปุ่มดำเนินการ ปฏิเสธ / นัดสัมภาษณ์ / รับเข้าทำงาน */-->
+     ทักษะที่ตรงกับตำแหน่ง, ไฟล์เรซูเม่ (PDF), ปุ่มดำเนินการ ไม่ผ่าน / ตรวจสอบแล้ว / ผ่านการพิจารณา */-->
 <body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
-<main id="main" class="narrow main" th:with="s=${c.score() == null ? 0 : c.score()}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+<main id="main" class="narrow main" th:with="s=${c.score() == null ? 0 : c.score()}, lv=${@fmt.level(s)}">
 <a class="back-link" th:href="@{/company/jobs/{id}(id=${c.jobId()})}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>กลับไปหน้ารายชื่อผู้สมัคร</a>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 
@@ -57,9 +57,9 @@
 <section class="card decision" id="decision" aria-labelledby="decision-title">
   <div><h2 id="decision-title" style="font-size:1rem;margin:0">การดำเนินการพิจารณา</h2><p>การเปลี่ยนสถานะจะแสดงในหน้า "ประวัติการสมัครงาน" ของนักศึกษาทันที</p></div>
   <div class="actions">
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ปฏิเสธใบสมัครนี้?"><input type="hidden" name="status" value="REJECTED" /><button type="submit" class="red" th:attr="aria-pressed=${c.status().name() == 'REJECTED'}">ปฏิเสธใบสมัคร</button></form>
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="INTERVIEW" /><button type="submit" class="amber" th:attr="aria-pressed=${c.status().name() == 'INTERVIEW'}">นัดสัมภาษณ์</button></form>
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="HIRED" /><button type="submit" class="green" th:attr="aria-pressed=${c.status().name() == 'HIRED'}">รับเข้าทำงาน</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ตั้งสถานะใบสมัครนี้เป็นไม่ผ่านการพิจารณา?"><input type="hidden" name="status" value="REJECTED" /><button type="submit" class="red" th:attr="aria-pressed=${c.status().name() == 'REJECTED'}">ไม่ผ่านการพิจารณา</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="REVIEWED" /><button type="submit" class="amber" th:attr="aria-pressed=${c.status().name() == 'REVIEWED'}">ตรวจสอบแล้ว</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="ACCEPTED" /><button type="submit" class="green" th:attr="aria-pressed=${c.status().name() == 'ACCEPTED'}">ผ่านการพิจารณา</button></form>
   </div>
 </section>
 </main>

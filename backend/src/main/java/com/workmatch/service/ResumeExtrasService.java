@@ -42,22 +42,60 @@ public class ResumeExtrasService {
         this.dictionary = dictionary;
     }
 
-    /** อัปโหลด PDF: อ่านข้อความ -> บันทึกเรซูเม่ผ่าน ResumeService (สกัดทักษะด้วย NLP) -> เก็บไฟล์ไว้ให้บริษัทดาวน์โหลด */
+    /** PDF ที่อัปโหลดแล้วแต่ยังไม่บันทึกเป็นเรซูเม่: id ไฟล์ ชื่อไฟล์ และข้อความที่สกัดได้ (ให้ผู้ใช้ตรวจก่อน) */
+    public record PendingPdf(Long fileId, String fileName, String text) {
+    }
+
+    /**
+     * อัปโหลด PDF (เอกสาร UC-06 ข้อ 2-5, รูปที่ 49): อ่านข้อความออกมาให้ผู้ใช้ตรวจ/แก้ก่อน ยังไม่ส่ง NLP และยังไม่บันทึกเรซูเม่
+     * เก็บไฟล์ไว้ก่อน (ผูกกับเรซูเม่ตอนกด "บันทึก" ผ่าน saveResume) ไฟล์ที่ค้างจากการอัปโหลดครั้งก่อนจะถูกลบ
+     * อ่านข้อความไม่ได้ (เช่น PDF ภาพสแกน) -> แจ้งให้กรอกหรือวาง Raw Text เอง (Exception Flow ของ UC-06)
+     */
     @Transactional
-    public Resume uploadPdf(User student, MultipartFile upload) {
+    public PendingPdf preparePdf(User student, MultipartFile upload, Long previousPendingId) {
         byte[] data = fileStorage.readPdf(upload);
-        String text = fileStorage.extractText(data);
+        String text = fileStorage.extractText(data).trim();
         if (text.isBlank()) {
-            throw new IllegalArgumentException("ไม่พบข้อความในไฟล์ PDF (อาจเป็นภาพสแกน) แนะนำให้ใช้ไฟล์ PDF แบบ Text-based หรือกรอกข้อความเอง");
+            throw new IllegalArgumentException("อ่านข้อความจากไฟล์ PDF ไม่ได้ (อาจเป็นภาพสแกน) กรุณากรอกหรือวางข้อความเรซูเม่ (Raw Text) ในช่องด้านล่างแทน");
         }
         if (text.length() > ResumeService.MAX_LENGTH) text = text.substring(0, ResumeService.MAX_LENGTH);
-        Resume resume = resumeService.saveResume(student, text);
+        discardPending(student, previousPendingId);
         StoredFile saved = fileStorage.storePdf(student, upload);
-        Long old = resume.getResumeFileId();
-        resume.setResumeFileId(saved.getId());
-        resume = resumes.save(resume);
-        fileStorage.delete(old);
+        return new PendingPdf(saved.getId(), saved.getFileName(), text);
+    }
+
+    /**
+     * ปุ่ม "บันทึก": บันทึกข้อความ (สกัดทักษะด้วย NLP ผ่าน ResumeService) แล้วผูกไฟล์ PDF ที่รออยู่ (ถ้ามี) แทนไฟล์เดิม
+     * ไฟล์ที่รออยู่ต้องเป็นของผู้ใช้คนนี้และยังไม่ถูกผูกกับเรซูเม่ใด
+     */
+    @Transactional
+    public Resume saveResume(User student, String text, Long pendingFileId) {
+        Resume resume = resumeService.saveResume(student, text);
+        if (pendingFileId != null && ownedUnlinked(student, pendingFileId)) {
+            Long old = resume.getResumeFileId();
+            resume.setResumeFileId(pendingFileId);
+            resume = resumes.save(resume);
+            if (old != null && !old.equals(pendingFileId)) fileStorage.delete(old);
+        }
         return resume;
+    }
+
+    /** ลบไฟล์ PDF ที่อัปโหลดค้างไว้แต่ไม่ได้บันทึก (เฉพาะของผู้ใช้คนนี้ที่ยังไม่ผูกกับเรซูเม่) */
+    @Transactional
+    public void discardPending(User student, Long pendingFileId) {
+        if (pendingFileId != null && ownedUnlinked(student, pendingFileId)) fileStorage.delete(pendingFileId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> pendingName(User student, Long pendingFileId) {
+        if (pendingFileId == null || !ownedUnlinked(student, pendingFileId)) return Optional.empty();
+        return fileStorage.fileName(pendingFileId);
+    }
+
+    private boolean ownedUnlinked(User student, Long fileId) {
+        boolean owned = fileStorage.find(fileId).map(f -> f.getOwner().getId().equals(student.getId())).orElse(false);
+        boolean linked = resumes.findByUserId(student.getId()).map(r -> fileId.equals(r.getResumeFileId())).orElse(false);
+        return owned && !linked;
     }
 
     /** ลบไฟล์ PDF ที่แนบ (ข้อความและทักษะยังอยู่) */

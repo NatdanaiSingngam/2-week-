@@ -47,9 +47,7 @@ public class ResumeService {
      */
     @Transactional
     public Resume saveResume(User student, String rawText) {
-        String text = rawText == null ? "" : rawText.trim();
-        if (text.isEmpty()) throw new IllegalArgumentException("กรุณากรอกข้อความ resume");
-        if (text.length() > MAX_LENGTH) throw new IllegalArgumentException("ข้อความ resume ยาวเกิน 20,000 ตัวอักษร");
+        String text = validText(rawText);
 
         List<ExtractedSkill> extracted = nlpClient.extractSkills(text); // ล้มเหลวจะโยน NlpUnavailableException
 
@@ -69,6 +67,25 @@ public class ResumeService {
         }
         resumeSkills.saveAll(rows);
         return resume;
+    }
+
+    /**
+     * ปุ่ม "คำนวณทักษะ" (เอกสาร UC-06 ข้อ 5-6, รูปที่ 49): ส่ง Raw Text ให้ NLP แล้วคืนทักษะที่ตรวจพบ
+     * ยังไม่บันทึกอะไรลงฐานข้อมูล ผู้ใช้ตรวจแล้วค่อยกด "บันทึก"
+     */
+    public List<SkillView> previewSkills(String rawText) {
+        String text = validText(rawText);
+        return dedupe(nlpClient.extractSkills(text)).stream()
+                .map(s -> new SkillView(s.name(), s.category()))
+                .toList();
+    }
+
+    /** ตรวจข้อความเรซูเม่: ห้ามว่าง และยาวไม่เกิน 20,000 ตัวอักษร คืนข้อความที่ตัดช่องว่างหัวท้ายแล้ว */
+    static String validText(String rawText) {
+        String text = rawText == null ? "" : rawText.trim();
+        if (text.isEmpty()) throw new IllegalArgumentException("กรุณากรอกข้อความ resume");
+        if (text.length() > MAX_LENGTH) throw new IllegalArgumentException("ข้อความ resume ยาวเกิน 20,000 ตัวอักษร");
+        return text;
     }
 
     @Transactional(readOnly = true)

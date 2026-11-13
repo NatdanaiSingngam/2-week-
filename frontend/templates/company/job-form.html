@@ -29,7 +29,7 @@
       <div class="field"><label for="transport">สวัสดิการรถรับส่ง</label><input id="transport" name="transport" maxlength="255" th:value="${f?.transport()}" placeholder="เช่น ไม่มีรถรับส่งพนักงาน" /></div>
     </div>
     <fieldset style="border-top:1px solid var(--border);padding-top:14px">
-      <legend>ทักษะวิชาชีพที่ต้องการ (ดึงเข้าสู่การคำนวณ Cosine Similarity)</legend>
+      <legend>ทักษะวิชาชีพที่ต้องการ (ใช้คำนวณ TF-IDF + Cosine Similarity)</legend>
       <p class="field-note" style="margin:0 0 8px">เลือกจากพจนานุกรมทักษะของระบบ (ไม่บังคับ ถ้าระบุในรายละเอียดงานแล้ว)</p>
       <div class="skill-toggles">
         <label class="skill-toggle" th:each="s : ${dictionarySkills}"><input type="checkbox" name="skills" th:value="${s.name}" th:checked="${f != null and f.selectedSkills() != null and f.selectedSkills().contains(s.name)}" /><span th:text="${s.name}">Java</span></label>

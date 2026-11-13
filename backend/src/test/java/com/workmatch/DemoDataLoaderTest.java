@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,7 +55,7 @@ class DemoDataLoaderTest {
         users.deleteAll();
         when(nlpClient.extractSkills(anyString())).thenReturn(List.of(
                 new ExtractedSkill("Python", "programming"), new ExtractedSkill("Git", "tools")));
-        when(nlpClient.match(anyList(), anyList())).thenReturn(new MatchResult(50.0, 50.0, List.of("Python"), List.of("Git")));
+        when(nlpClient.match(anyList(), anyList(), any())).thenReturn(new MatchResult(50.0, 50.0, List.of("Python"), List.of("Git")));
 
         loader.run();
 

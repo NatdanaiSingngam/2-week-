@@ -43,6 +43,15 @@ def load_texts():
     return texts
 
 
+def corpus(skill_sets):
+    """สถิติคลังเอกสารสำหรับ TF-IDF: แต่ละทักษะ (ตัวพิมพ์เล็ก) อยู่ในกี่เอกสาร และจำนวนเอกสารทั้งหมด"""
+    df = {}
+    for skills in skill_sets.values():
+        for k in {s.strip().lower() for s in skills if s.strip()}:
+            df[k] = df.get(k, 0) + 1
+    return df, len(skill_sets)
+
+
 def prf(tp, fp, fn):
     p = tp / (tp + fp) if tp + fp else 0.0
     r = tp / (tp + fn) if tp + fn else 0.0
@@ -89,12 +98,14 @@ def main():
     add("คะแนนคาดหวัง = คำนวณด้วยสูตรเดียวกันจากทักษะใน expected.csv; คะแนนระบบ = จากทักษะที่ระบบดึงได้\n")
     add("| คู่ (resume-job) | คะแนนคาดหวัง | คะแนนระบบ | ผลต่าง | Cosine ระบบ |")
     add("| --- | --- | --- | --- | --- |")
+    want_df, want_n = corpus(exp)
+    have_df, have_n = corpus(got)
     errs = []
     with open(DATA / "pairs.csv", encoding="utf-8", newline="") as f:
         for r in csv.DictReader(f):
             ri, ji = int(r["resume_id"]), int(r["job_id"])
-            want = match_skills(exp[("resume", ri)], exp[("job", ji)])
-            have = match_skills(got[("resume", ri)], got[("job", ji)])
+            want = match_skills(exp[("resume", ri)], exp[("job", ji)], want_df, want_n)
+            have = match_skills(got[("resume", ri)], got[("job", ji)], have_df, have_n)
             d = have["score"] - want["score"]
             errs.append(abs(d))
             add(f"| {ri}-{ji} | {want['score']:.1f} | {have['score']:.1f} | {d:+.1f} | {have['cosine']:.1f} |")
@@ -107,8 +118,8 @@ def main():
     add("| --- | --- | --- | --- |")
     agree = 0
     for ri in range(1, 11):
-        want = {j: match_skills(exp[("resume", ri)], exp[("job", j)])["score"] for j in range(1, 11)}
-        have = {j: match_skills(got[("resume", ri)], got[("job", j)])["score"] for j in range(1, 11)}
+        want = {j: match_skills(exp[("resume", ri)], exp[("job", j)], want_df, want_n)["score"] for j in range(1, 11)}
+        have = {j: match_skills(got[("resume", ri)], got[("job", j)], have_df, have_n)["score"] for j in range(1, 11)}
         wbest = sorted(j for j, s in want.items() if s == max(want.values()))
         hbest = sorted(j for j, s in have.items() if s == max(have.values()))
         ok = bool(set(wbest) & set(hbest))

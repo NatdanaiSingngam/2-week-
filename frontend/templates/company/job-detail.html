@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('ผู้สมัครตำแหน่งงาน')}"><title>ผู้สมัครตำแหน่งงาน | Workmatch</title></head>
-<!--/* หน้าจอจัดการรายชื่อผู้สมัคร ตามเอกสาร รูปที่ 45: แท็บสถานะ (รอพิจารณา/นัดสัมภาษณ์/รับเข้าทำงาน/ปฏิเสธ) + ส่งออก CSV
+<!--/* หน้าจอจัดการรายชื่อผู้สมัคร ตามเอกสาร รูปที่ 45: แท็บสถานะ (รอพิจารณา/ตรวจสอบแล้ว/ผ่านการพิจารณา/ไม่ผ่านการพิจารณา) + ส่งออก CSV
      แท็บ "ระบบแนะนำ" = นักศึกษาที่ระบบจับคู่ได้แต่ยังไม่ได้สมัคร (applicants) แสดงเฉพาะชื่อและทักษะ
      job == null: backend ตอบ 404 เมื่อไม่พบตำแหน่งงานหรือเป็นของบริษัทอื่น แล้วแสดงส่วน "ไม่พบตำแหน่งงาน" (TODO ข้อ 3 แก้ 27 ต.ค.) */-->
 <body class="theme-company"><header th:replace="~{fragments/layout :: navbar}"></header>
@@ -46,11 +46,11 @@
 <th:block th:if="${tab != 'RECOMMENDED'}">
   <div class="card empty" th:if="${#lists.isEmpty(applications)}"><div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>ยังไม่มีผู้สมัครในสถานะนี้</p><div class="actions"><a class="button secondary" th:href="@{/company/jobs/{id}(id=${job.id},tab='RECOMMENDED')}">ดูนักศึกษาที่ระบบแนะนำ</a></div></div>
   <div class="applicant-list">
-    <article class="applicant" th:each="a : ${applications}" th:with="s=${a.score() == null ? 0 : a.score()}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+    <article class="applicant" th:each="a : ${applications}" th:with="s=${a.score() == null ? 0 : a.score()}, lv=${@fmt.level(s)}">
       <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความเหมาะสม ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 0, 0) + '%'}">0%</strong></div>
       <div class="applicant-info">
         <h3 th:text="${a.studentName()}">ชื่อนักศึกษา</h3>
-        <div class="applicant-meta"><span th:text="${(a.major() != null ? a.major() : 'นักศึกษา') + (a.studentId() != null ? ' · ' + a.studentId() : '')}">สาขา</span><span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span></div>
+        <div class="applicant-meta"><span th:text="${(a.major() != null ? a.major() : 'นักศึกษา') + (a.studentId() != null ? ' · ' + a.studentId() : '')}">สาขา</span><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span></div>
         <div class="tags"><span class="tag" th:each="sk : ${a.matchedSkills()}" th:text="${sk}">Java</span></div>
       </div>
       <div class="applicant-side">
@@ -63,14 +63,15 @@
 
 <!--/* นักศึกษาที่ระบบจับคู่ได้ (คะแนน > 0) ยังไม่ได้สมัคร แสดงเฉพาะชื่อและทักษะ ไม่มีอีเมล */-->
 <th:block th:if="${tab == 'RECOMMENDED'}">
-  <div class="legend" style="margin-bottom:12px" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะมาก 70%+</span><span class="level medium">ปานกลาง 40–69%</span><span class="level low">ควรพัฒนาเพิ่ม &lt;40%</span></div>
-  <div class="card empty" th:if="${#lists.isEmpty(applicants)}"><p>ยังไม่มีนักศึกษาที่จับคู่ได้</p></div>
+  <div class="legend" style="margin-bottom:12px" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะ 90–100%</span><span class="level medium">ปานกลาง 41–89%</span><span class="level low">ไม่เหมาะ 0–40%</span></div>
+  <p class="field-note" style="margin:0 0 12px">นักศึกษาทุกคนที่มีเรซูเม่ในระบบ (ยังไม่จำเป็นต้องสมัคร) ที่ได้คะแนนกับตำแหน่งนี้มากกว่า 40% (ระดับปานกลางขึ้นไป) เรียงจากคะแนนมากไปน้อย</p>
+  <div class="card empty" th:if="${#lists.isEmpty(applicants)}"><p>ยังไม่มีนักศึกษาที่คะแนนมากกว่า 40%</p></div>
   <div class="applicant-list">
-    <article class="applicant" th:each="applicant, stat : ${applicants}" th:with="s=${applicant.score == null ? 0 : applicant.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}">
+    <article class="applicant" th:each="applicant, stat : ${applicants}" th:with="s=${applicant.score == null ? 0 : applicant.score}, lv=${@fmt.level(s)}">
       <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความเหมาะสม ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 0, 0) + '%'}">0%</strong></div>
       <div class="applicant-info">
         <h3><span class="rank" th:classappend="${stat.count <= 3 ? 'top' : ''}" th:text="${'#' + stat.count}">#1</span><span th:text="${applicant.studentName}">นักศึกษา</span></h3>
-        <div class="applicant-meta"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong><span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span><span th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(applicant.cosine == null ? 0 : applicant.cosine, 1, 1) + '%'}">0%</span></div>
+        <div class="applicant-meta"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(applicant.matched) + ' จาก ' + (#lists.size(applicant.matched) + #lists.size(applicant.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div>
         <div class="skill-rows">
           <div class="skill-row"><span>ทักษะที่มี</span><div><span class="badge badge-ok" th:each="skill : ${applicant.matched}" th:text="${skill}">ทักษะ</span><span th:if="${#lists.isEmpty(applicant.matched)}" class="muted">ยังไม่มีทักษะที่ตรง</span></div></div>
           <div class="skill-row"><span>ควรเตรียมเพิ่ม</span><div><span class="badge badge-missing" th:each="skill : ${applicant.missing}" th:text="${skill}">ทักษะ</span><span th:if="${#lists.isEmpty(applicant.missing)}" class="badge badge-ok">มีทักษะครบทุกข้อ</span></div></div>

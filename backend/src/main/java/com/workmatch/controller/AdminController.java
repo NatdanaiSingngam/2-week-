@@ -13,6 +13,9 @@
  */
 package com.workmatch.controller;
 
+import com.workmatch.service.MatchService;
+import com.workmatch.nlp.NlpUnavailableException;
+
 import com.workmatch.service.AdminService;
 import com.workmatch.service.CurrentUserService;
 import com.workmatch.service.DictionaryService;
@@ -39,9 +42,11 @@ public class AdminController {
     private final ErrorLogService errorLogs;
     private final FileStorageService fileStorage;
     private final CurrentUserService currentUserService;
+    private final MatchService matchService;
 
     public AdminController(AdminService adminService, DictionaryService dictionary, ErrorLogService errorLogs,
-                           FileStorageService fileStorage, CurrentUserService currentUserService) {
+                           FileStorageService fileStorage, CurrentUserService currentUserService, MatchService matchService) {
+        this.matchService = matchService;
         this.adminService = adminService;
         this.dictionary = dictionary;
         this.errorLogs = errorLogs;
@@ -54,6 +59,18 @@ public class AdminController {
         model.addAttribute("o", adminService.overview());
         model.addAttribute("section", "overview");
         return "admin/overview";
+    }
+
+    /** ปุ่ม "คำนวณคะแนนใหม่ทั้งหมด" (หน้าภาพรวม): คำนวณทุกคู่ด้วยสูตร TF-IDF + Cosine ปัจจุบัน */
+    @PostMapping("/admin/matches/recalculate")
+    public String recalculateMatches(RedirectAttributes redirect) {
+        try {
+            int n = matchService.recalculateAll();
+            redirect.addFlashAttribute("message", "คำนวณคะแนนใหม่แล้ว " + n + " คู่");
+        } catch (NlpUnavailableException e) {
+            redirect.addFlashAttribute("error", "เชื่อมต่อ NLP ไม่ได้ ยังไม่ได้เปลี่ยนคะแนน ลองใหม่อีกครั้ง");
+        }
+        return "redirect:/admin";
     }
 
     // ---------- อนุมัติสถานประกอบการ ----------

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -90,7 +91,7 @@ class DocumentFeaturesTest {
             for (String s : KNOWN) if (text.contains(s.toLowerCase(Locale.ROOT))) out.add(new ExtractedSkill(s, "programming"));
             return out;
         });
-        when(nlpClient.match(anyList(), anyList())).thenAnswer(inv -> {
+        when(nlpClient.match(anyList(), anyList(), any())).thenAnswer(inv -> {
             List<String> have = inv.getArgument(0);
             List<String> need = inv.getArgument(1);
             List<String> matched = new ArrayList<>(), missing = new ArrayList<>();
@@ -195,10 +196,10 @@ class DocumentFeaturesTest {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertThat(candidate).contains("สนใจตำแหน่งนี้ครับ").contains("Java (ตรงกัน)").contains("Docker (ยังไม่มี)");
         mvc.perform(post("/company/applications/" + appId + "/status").with(csrf()).with(user("a@co.com").roles("COMPANY"))
-                        .param("status", "INTERVIEW"))
+                        .param("status", "REVIEWED"))
                 .andExpect(redirectedUrl("/company/applications/" + appId));
-        assertThat(applications.findById(appId).map(JobApplication::getStatus).orElseThrow()).isEqualTo(ApplicationStatus.INTERVIEW);
-        assertThat(mvc.perform(get("/company/applications").param("status", "INTERVIEW").with(user("a@co.com").roles("COMPANY")))
+        assertThat(applications.findById(appId).map(JobApplication::getStatus).orElseThrow()).isEqualTo(ApplicationStatus.REVIEWED);
+        assertThat(mvc.perform(get("/company/applications").param("status", "REVIEWED").with(user("a@co.com").roles("COMPANY")))
                 .andReturn().getResponse().getContentAsString()).contains("นักศึกษา หนึ่ง");
 
         // บริษัทอื่นเปิดใบสมัครนี้ไม่ได้, นักศึกษาเปิดหน้าบริษัทไม่ได้
@@ -222,7 +223,23 @@ class DocumentFeaturesTest {
     void resumePdfUploadAndSkillEditing() throws Exception {
         registration.register("นักศึกษา PDF", "pdf@test.com", "password123", "STUDENT");
         MockMultipartFile pdf = new MockMultipartFile("file", "resume.pdf", "application/pdf", pdf("Skills: Java, Git and SQL"));
-        mvc.perform(multipart("/student/resume/upload").file(pdf).with(csrf()).with(user("pdf@test.com").roles("STUDENT")))
+        // เอกสาร UC-06: อัปโหลดแล้วแสดงข้อความให้ตรวจก่อน ยังไม่บันทึกเรซูเม่และยังไม่ส่ง NLP
+        org.springframework.mock.web.MockHttpSession session = new org.springframework.mock.web.MockHttpSession();
+        String reviewPage = mvc.perform(multipart("/student/resume/upload").file(pdf).session(session).with(csrf()).with(user("pdf@test.com").roles("STUDENT")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(reviewPage).contains("Skills: Java, Git and SQL").contains("resume.pdf");
+        assertThat(resumes.count()).isZero();
+
+        // กด "คำนวณทักษะ": แสดงทักษะที่ตรวจพบ แต่ยังไม่บันทึก
+        String preview = mvc.perform(post("/student/resume").session(session).with(csrf()).with(user("pdf@test.com").roles("STUDENT"))
+                        .param("text", "Skills: Java, Git and SQL").param("action", "preview"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(preview).contains("ทักษะที่ตรวจพบจากข้อความ (ยังไม่บันทึก)").contains(">Java<");
+        assertThat(resumes.count()).isZero();
+
+        // กด "บันทึก": บันทึกข้อความ + ทักษะ + แนบไฟล์ PDF ที่รออยู่
+        mvc.perform(post("/student/resume").session(session).with(csrf()).with(user("pdf@test.com").roles("STUDENT"))
+                        .param("text", "Skills: Java, Git and SQL").param("action", "save"))
                 .andExpect(redirectedUrl("/student/resume")).andExpect(flash().attributeExists("message"));
         Long resumeId = resumes.findAll().get(0).getId();
         assertThat(resumeSkills.findByResumeId(resumeId)).extracting("skillName").containsExactly("Java", "SQL", "Git");

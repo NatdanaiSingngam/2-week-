@@ -77,7 +77,7 @@ public class JobService {
         return jobs.findByCompanyId(company.getId()).stream()
                 .sorted(Comparator.comparing(Job::getId).reversed())
                 .map(j -> new JobListItem(j.getId(), j.getTitle(), jobSkills.countByJobId(j.getId()),
-                        matches.countByJobIdAndScoreGreaterThan(j.getId(), BigDecimal.ZERO)))
+                        matches.countByJobIdAndScoreGreaterThan(j.getId(), MatchService.RECOMMEND_MIN)))
                 .toList();
     }
 

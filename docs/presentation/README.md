@@ -32,7 +32,7 @@
 | ทำครบตามแผน 2 สัปดาห์ไหม | สไลด์เช็คลิสต์ (ลิงก์ใน `slide-links.txt`) + เอกสารแผนงาน (PDF เก็บนอก repo ดูหัวข้อ "ไม่ได้รวมไว้") |
 | สกัดทักษะอย่างไร ตัดคำอย่างไร | `nlp-service/nlp_service/skill_extractor.py`, `nlp-service/evaluation/tokenize_samples/` |
 | พจนานุกรมทักษะมีอะไรบ้าง | `nlp-service/nlp_service/skill_dictionary.csv` (74 รายการ) หรือหน้าผู้ดูแลระบบ `/admin/skills` |
-| คะแนนคำนวณอย่างไร | `nlp-service/nlp_service/match_scorer.py` (ตรง ÷ ที่งานต้องการ × 100, แสดง Cosine เทียบ) |
+| คะแนนคำนวณอย่างไร | `nlp-service/nlp_service/match_scorer.py` (TF-IDF + Cosine Similarity ตามเอกสาร 2.3.3) |
 | วัดความแม่นยำอย่างไร ตัวเลขมาจากไหน | `nlp-service/evaluation/run_eval.py`, `results_after_dictionary_update.md`, `sample-data/expected.csv` |
 | ก่อนปรับพจนานุกรมผลเป็นอย่างไร | `nlp-service/evaluation/results_baseline.md` |
 | เรซูเม่ภาษาอังกฤษ / ไม่มีทักษะ / ว่าง | `results_after_dictionary_update.md` หัวข้อ "กรณีพิเศษ" และ `nlp-service/tests/test_extract_and_match.py` |
@@ -54,7 +54,7 @@ Precision 98.1% · Recall 99.3% · อันดับ 1 ตรงเฉลย 10
 
 ## สิ่งที่ทำแล้ว / ยังไม่ทำ (เทียบรายงาน A04)
 - **ทำแล้ว:** หน้าจอครบ 21 หน้าตามบทที่ 3 (อัปโหลด PDF, ค้นหา/บันทึก/สมัครงาน, สถานะผู้สมัคร + CSV, ยืนยันตัวตนบริษัท, หน้าผู้ดูแลระบบ พจนานุกรม/คำพ้อง/บันทึกข้อผิดพลาด)
-- **ยังไม่ทำ:** TF-IDF (ตอนนี้ใช้สูตรนับทักษะที่ตรง + Cosine แบบ 0/1), ลืมรหัสผ่าน, อัปโหลดรูปโปรไฟล์
+- **ยังไม่ทำ:** ดู `docs/changes-v2.md` หัวข้อ "สิ่งที่ยังทำไม่ได้"
 
 ## ไม่ได้รวมไว้ใน repo
 - **เอกสารแผนงาน PDF** (Plan-2weeks-all-members, Plan-Backend-Thanawat, Plan-Frontend-Chayanatthapon): มีชื่อและรหัสนิสิตของสมาชิก

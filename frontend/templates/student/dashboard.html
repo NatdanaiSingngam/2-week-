@@ -22,7 +22,7 @@
         <div th:if="${profile.faculty != null}"><dt>คณะ</dt><dd th:text="${profile.faculty}">คณะ</dd></div>
         <div th:if="${profile.major != null}"><dt>สาขาวิชา</dt><dd th:text="${profile.major}">สาขา</dd></div>
         <div th:if="${hasResume == true}"><dt>ตำแหน่งที่จับคู่ได้</dt><dd th:text="${#lists.size(matches) + ' ตำแหน่ง'}">0 ตำแหน่ง</dd></div>
-        <div th:if="${hasResume == true}"><dt>เหมาะมาก (70%+)</dt><dd th:text="${#lists.size(matches.?[score != null and score >= 70]) + ' ตำแหน่ง'}">0</dd></div>
+        <div th:if="${hasResume == true}"><dt>เหมาะ (90%+)</dt><dd th:text="${#lists.size(matches.?[score != null and score >= 90]) + ' ตำแหน่ง'}">0</dd></div>
       </dl>
       <a class="button secondary sm full" style="margin-top:14px" th:href="@{/student/profile}" th:if="${profile.faculty == null}">เพิ่มคณะและสาขาวิชา</a>
     </section>
@@ -55,9 +55,9 @@
     </div>
 
     <div class="match-list" th:if="${not #lists.isEmpty(matches)}">
-      <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะมาก 70%+</span><span class="level medium">ปานกลาง 40–69%</span><span class="level low">ควรพัฒนาเพิ่ม &lt;40%</span></div>
+      <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะ 90–100%</span><span class="level medium">ปานกลาง 41–89%</span><span class="level low">ไม่เหมาะ 0–40%</span></div>
       <article class="match-card" th:each="match, it : ${matches}"
-               th:with="s=${match.score == null ? 0 : match.score}, lv=${s >= 70 ? 'high' : (s >= 40 ? 'medium' : 'low')}, saved=${bookmarkedIds.contains(match.jobId)}">
+               th:with="s=${match.score == null ? 0 : match.score}, lv=${@fmt.level(s)}, saved=${bookmarkedIds.contains(match.jobId)}">
         <span class="match-ribbon" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(s, 1, 1) + '%'}">Match 0.0%</span>
         <div class="match-body">
           <span class="mono" th:text="${it.count}" th:aria-label="${'อันดับ ' + it.count}">1</span>
@@ -66,8 +66,8 @@
             <span class="match-company" th:text="${match.companyName}">บริษัท</span>
             <div class="tags" th:if="${not #lists.isEmpty(match.matched)}"><span class="tag" th:each="skill : ${match.matched}" th:text="${skill}">Java</span></div>
             <div class="match-meta">
-              <span class="level" th:classappend="${lv}" th:text="${lv == 'high' ? 'เหมาะมาก' : (lv == 'medium' ? 'ปานกลาง' : 'ควรพัฒนาเพิ่ม')}">ระดับ</span>
-              <span title="ค่า Cosine similarity ระหว่างทักษะใน resume กับทักษะของตำแหน่ง" th:text="${'ความคล้ายของทักษะ ' + #numbers.formatDecimal(match.cosine == null ? 0 : match.cosine, 1, 1) + '%'}">ความคล้ายของทักษะ 0.0%</span>
+              <span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span>
+              <span th:text="${'ทักษะตรง ' + #lists.size(match.matched) + ' จาก ' + (#lists.size(match.matched) + #lists.size(match.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span>
             </div>
             <div class="actions" style="margin-top:12px">
               <a class="button sm" th:href="@{/student/jobs/{id}(id=${match.jobId})}">ดูรายละเอียดงาน</a>

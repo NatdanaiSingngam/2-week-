@@ -81,7 +81,7 @@ public class AdminService {
                 users.countByRole(Role.STUDENT),
                 companyProfiles.countByVerificationStatus(VerificationStatus.APPROVED),
                 jobs.countOpenJobs(),
-                applications.countByStatus(ApplicationStatus.HIRED),
+                applications.countByStatus(ApplicationStatus.ACCEPTED),
                 users.countByRole(Role.COMPANY),
                 companyProfiles.countByVerificationStatus(VerificationStatus.PENDING),
                 applications.count(),

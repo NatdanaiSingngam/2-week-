@@ -29,7 +29,7 @@
             <tr th:each="a : ${applications}">
               <td><strong th:text="${a.jobTitle()}">Software Engineer (Intern)</strong><div class="muted" style="font-size:.84rem" th:text="${a.companyName()}">บริษัท</div></td>
               <td th:text="${@fmt.date(a.appliedAt())}">31 ส.ค. 2569</td>
-              <td><span class="status" th:classappend="${a.status().name()}" th:text="${a.status().name() == 'INTERVIEW' ? 'กำลังพิจารณา / นัดสัมภาษณ์' : (a.status().name() == 'REJECTED' ? 'ปิดรับสมัคร / ไม่ผ่าน' : a.status().label)}">รอพิจารณา</span></td>
+              <td><span class="status" th:classappend="${a.status().name()}" th:text="${a.status().label}">รอพิจารณา</span></td>
               <td style="text-align:right"><a class="table-link" th:href="@{/student/jobs/{id}(id=${a.jobId()})}">ดูรายละเอียด</a></td>
             </tr>
           </tbody>
