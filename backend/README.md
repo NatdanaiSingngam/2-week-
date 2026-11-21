@@ -237,7 +237,7 @@ cd backend
 | GET /company/jobs | company/jobs | jobs[{id,title,skillCount,applicantCount}] |
 | GET /company/jobs/new | company/job-form | job{title,description}, error |
 | POST /company/jobs | redirect /company/jobs/{id} | title, description |
-| GET /company/jobs/{id} | company/job-detail | job{id,title,description,skills}, applicants[{studentName,score,cosine,matched,missing}] |
+| GET /company/jobs/{id} | company/job-detail | job{id,title,description,skills}, applications (ผู้สมัครในแท็บสถานะที่เลือก), counts, statuses, tab |
 
 - ทุกหน้าหลังเข้าสู่ระบบรับ `displayName`, `role` (STUDENT/COMPANY) เพิ่มเติม หน้าเว็บไม่เรียก FastAPI โดยตรง
 - ทุกหน้าใช้ `fragments/layout :: head(title)`, `navbar`, `footer` (หน้า login/สมัครสมาชิกใช้ `authPanel` เพิ่ม) CSS มีไฟล์เดียวคือ `static/css/style.css` ฟอร์มใช้ `th:action` เพื่อให้ Spring Security แนบ CSRF token
@@ -252,7 +252,7 @@ cd backend
 - Login: error/logout/registered; register role 2 แบบและ password อย่างน้อย 8 ตัว
 - Resume: ว่าง/มีทักษะ/ข้อความ error, ตัวนับ 20,000 ตัว, ป้องกันกดซ้ำและคืนสถานะเมื่อ Back
 - Dashboard: ไม่มี resume / ไม่มี matches / หลาย matches, ระดับ 70/40, ขยายการ์ด, ไม่มี missing
-- Company: jobs ว่าง, error ฟอร์ม, job ว่าง, applicants ว่าง, อันดับ 1–3, ไม่แสดงอีเมล
+- Company: jobs ว่าง, error ฟอร์ม, job ว่าง, ผู้สมัครว่างในแต่ละแท็บสถานะ, ไม่แสดงอีเมล
 - ตรวจที่ 375px, 768px และ desktop, keyboard focus, ภาษาไทย และข้อความผู้ใช้ที่มี HTML (ต้องแสดงเป็นข้อความ)
 
 ## สถานะงาน

@@ -12,7 +12,6 @@ package com.workmatch.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.workmatch.dto.ApplicantView;
 import com.workmatch.dto.MatchView;
 import com.workmatch.entity.Job;
 import com.workmatch.entity.JobSkill;
@@ -57,7 +56,7 @@ public class MatchService {
     private final NlpClient nlpClient;
     private final ObjectMapper objectMapper;
 
-    /** ระบบแนะนำนักศึกษาให้บริษัทเมื่อคะแนนมากกว่าค่านี้ = ระดับ "ปานกลาง" ขึ้นไป (เกณฑ์ระดับอยู่ที่ MatchLevels) */
+    /** ขั้นต่ำที่นับว่า "จับคู่ได้" = คะแนนมากกว่าค่านี้ คือระดับ "ปานกลาง" ขึ้นไป (เกณฑ์ระดับอยู่ที่ MatchLevels) */
     public static final double RECOMMEND_MIN_SCORE = MatchLevels.UNSUITABLE_MAX;
     public static final BigDecimal RECOMMEND_MIN = BigDecimal.valueOf(RECOMMEND_MIN_SCORE);
 
@@ -137,24 +136,6 @@ public class MatchService {
                                 .thenComparing(MatchView::getJobId, Comparator.reverseOrder()))
                         .toList())
                 .orElse(List.of());
-    }
-
-    /**
-     * แท็บ "ระบบแนะนำ" ของบริษัท: นักศึกษาทุกคนที่มีเรซูเม่ (ไม่จำเป็นต้องสมัคร) ที่คะแนนกับประกาศนี้มากกว่า RECOMMEND_MIN_SCORE
-     * เรียงคะแนนมากไปน้อย ไม่มีอีเมลหรือข้อมูลส่วนตัวอื่น
-     */
-    @Transactional(readOnly = true)
-    public List<ApplicantView> applicantsFor(Long jobId) {
-        return matches.findByJobId(jobId).stream()
-                .filter(m -> m.getScore().compareTo(RECOMMEND_MIN) > 0)
-                .map(m -> new ApplicantView(
-                        m.getResume().getUser().getDisplayName(),
-                        m.getScore().doubleValue(),
-                        m.getCosine().doubleValue(),
-                        fromJson(m.getMatchedSkills()),
-                        fromJson(m.getMissingSkills())))
-                .sorted(Comparator.comparing(ApplicantView::getScore).reversed())
-                .toList();
     }
 
     /** ผลจับคู่ของนักศึกษาคนนี้กับประกาศนี้ (ยังไม่มีเรซูเม่หรือยังไม่ได้คำนวณ = empty) */

@@ -3,7 +3,7 @@
  * ไฟล์: backend/src/main/java/com/workmatch/service/MatchLevels.java
  * หน้าที่: เกณฑ์ป้ายระดับของค่าร้อยละความสอดคล้อง (ที่เดียวที่ต้องแก้ ถ้าจะปรับเกณฑ์)
  *     0–40 = ไม่เหมาะ, มากกว่า 40 ถึงต่ำกว่า 90 = ปานกลาง, 90–100 = เหมาะ (ทีมกำหนด ไม่ได้มาจากเอกสาร)
- * ถูกเรียกโดย: ThaiFormat (${@fmt.level(score)}, ${@fmt.levelLabel(lv)} ในทุกหน้าที่แสดงคะแนน), MatchService (ขั้นต่ำของระบบแนะนำ)
+ * ถูกเรียกโดย: ThaiFormat (${@fmt.level(score)}, ${@fmt.levelLabel(lv)} ในทุกหน้าที่แสดงคะแนน), MatchService (ขั้นต่ำที่นับว่าจับคู่ได้)
  */
 package com.workmatch.service;
 

@@ -31,7 +31,7 @@ public final class Views {
 
     /** หนึ่งแถวประกาศงานของบริษัท (รูปที่ 44, 47) */
     public record CompanyJobRow(Long id, String title, LocalDateTime createdAt, JobStatus status, long skillCount,
-                                long matchedCount, long applicationCount) { }
+                                long applicationCount) { }
 
     /** ภาพรวมบริษัท (รูปที่ 47) */
     public record CompanyOverview(long openJobs, long totalApplications, long pending, long hired,

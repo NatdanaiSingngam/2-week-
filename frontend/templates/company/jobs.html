@@ -35,13 +35,12 @@
   <div class="card-head"><h2 id="recent-title">ประกาศรับสมัครงานล่าสุด</h2><a class="table-link" th:href="@{/company/postings}">ดูประกาศทั้งหมด</a></div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">ชื่อตำแหน่ง</th><th scope="col">วันที่สร้าง</th><th scope="col">ผู้สมัคร</th><th scope="col">จับคู่ได้ (ระบบแนะนำ)</th><th scope="col">สถานะ</th><th scope="col"><span class="visually-hidden">การจัดการ</span></th></tr></thead>
+      <thead><tr><th scope="col">ชื่อตำแหน่ง</th><th scope="col">วันที่สร้าง</th><th scope="col">ผู้สมัคร</th><th scope="col">สถานะ</th><th scope="col"><span class="visually-hidden">การจัดการ</span></th></tr></thead>
       <tbody>
         <tr th:each="r : ${o.recentJobs()}">
           <td><strong th:text="${r.title()}">Software Engineer (Intern)</strong></td>
           <td th:text="${@fmt.date(r.createdAt())}">15 ส.ค. 2569</td>
           <td class="num" th:text="${r.applicationCount() + ' คน'}">8 คน</td>
-          <td th:text="${r.matchedCount() + ' คน'}">3 คน</td>
           <td><span class="status" th:classappend="${r.status().name()}" th:text="${r.status().label}">เปิดรับสมัคร</span></td>
           <td style="text-align:right"><a class="table-link" th:href="@{/company/jobs/{id}(id=${r.id()})}">ดูผู้สมัคร<span class="visually-hidden" th:text="${' ตำแหน่ง ' + r.title()}"></span></a></td>
         </tr>

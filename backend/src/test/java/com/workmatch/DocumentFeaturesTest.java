@@ -186,7 +186,7 @@ class DocumentFeaturesTest {
                 .andReturn().getResponse().getContentAsString()).contains("แบบร่าง").contains("Draft Intern");
         String tab = mvc.perform(get("/company/jobs/" + jobId).with(user("a@co.com").roles("COMPANY")))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(tab).contains("รอพิจารณา (1)").contains("นักศึกษา หนึ่ง").contains("67%"); // วงกลมแสดงจำนวนเต็ม (66.7 -> 67)
+        assertThat(tab).contains("รอพิจารณา (1)").contains("นักศึกษา หนึ่ง").contains("66.7%").doesNotContain(">67%<"); // วงกลมแสดงทศนิยม 1 ตำแหน่ง ตัวเดียว
         String csv = mvc.perform(get("/company/jobs/" + jobId + "/applicants.csv").with(user("a@co.com").roles("COMPANY")))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         assertThat(csv).contains("\"นักศึกษา หนึ่ง\"").contains("66.7").contains("รอพิจารณา");

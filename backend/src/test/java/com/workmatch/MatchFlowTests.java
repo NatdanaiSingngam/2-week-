@@ -5,7 +5,6 @@
  */
 package com.workmatch;
 
-import com.workmatch.dto.ApplicantView;
 import com.workmatch.dto.JobListItem;
 import com.workmatch.dto.MatchView;
 import com.workmatch.entity.Role;
@@ -147,10 +146,6 @@ class MatchFlowTests {
         assertThat(modelList("/student/dashboard", "s1@test.com", "STUDENT", "matches")).hasSize(3);
 
         // หน้าผู้สมัครของบริษัท A เรียงคะแนน ไม่มีอีเมล
-        List<ApplicantView> applicants = modelList(dataJob, "a@co.com", "COMPANY", "applicants");
-        // แท็บระบบแนะนำแสดงเฉพาะคะแนนมากกว่า 40% (นักศึกษา 2 ได้ 33.3 จึงไม่แสดง)
-        assertThat(applicants).extracting(ApplicantView::getStudentName).containsExactly("นักศึกษา 1");
-        assertThat(applicants).extracting(ApplicantView::getScore).containsExactly(100.0);
         String html = mvc.perform(get(dataJob).with(user("a@co.com").roles("COMPANY")))
                 .andReturn().getResponse().getContentAsString();
         assertThat(html).doesNotContain("s1@test.com").doesNotContain("s2@test.com");

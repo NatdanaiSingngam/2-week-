@@ -170,15 +170,15 @@ public class JobController {
             // ไม่มีประกาศนี้ หรือเป็นของบริษัทอื่น: ตอบ 404 แต่ใช้หน้า job-detail ส่วน job == null
             // ("ไม่พบตำแหน่งงาน" + ปุ่มกลับไปรายการตำแหน่ง) ไม่ส่งข้อมูลงานหรือผู้สมัครใด ๆ ออกไป (TODO ข้อ 3)
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            model.addAttribute("applicants", List.of());
             return "company/job-detail";
         }
-        // applicants = นักศึกษาที่ระบบจับคู่ได้ (แท็บ "ระบบแนะนำ"), applications = ผู้ที่กดสมัครจริง แยกตามสถานะ
+        // applications = ผู้ที่กดสมัครจริง แยกตามสถานะ (แท็บเริ่มต้น = รอพิจารณา)
         List<ApplicantItem> applications = applicationService.forJob(company, id);
         String current = tab;
-        if (current == null || current.isBlank()) current = applications.isEmpty() ? "RECOMMENDED" : "PENDING";
+        if (current == null || java.util.Arrays.stream(ApplicationStatus.values()).noneMatch(st -> st.name().equals(tab))) {
+            current = "PENDING"; // ไม่ระบุ หรือแท็บที่ไม่มีแล้ว (เช่นลิงก์เก่า ?tab=RECOMMENDED) -> รอพิจารณา
+        }
         final String selected = current;
-        model.addAttribute("applicants", matchService.applicantsFor(id));
         model.addAttribute("applications", applications.stream().filter(a -> a.status().name().equals(selected)).toList());
         model.addAttribute("counts", ApplicationService.countByStatus(applications));
         model.addAttribute("statuses", ApplicationStatus.values());
