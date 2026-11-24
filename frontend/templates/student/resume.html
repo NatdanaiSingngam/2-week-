@@ -59,7 +59,7 @@
 <section class="card" aria-labelledby="skills-title">
   <div class="card-head">
     <div><h2 id="skills-title">ทักษะที่ระบบตรวจพบ</h2><p class="field-note" style="margin:0" th:text="${'พบ ' + (skills == null ? 0 : #lists.size(skills)) + ' ทักษะ · กรุณาตรวจสอบ ลบ หรือเพิ่มทักษะให้ครบถ้วน'}">พบ 0 ทักษะ</p></div>
-    <span class="pill green nlp-ok" th:if="${skills != null and not #lists.isEmpty(skills)}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>NLP Processing Complete</span>
+    <span class="pill green nlp-ok" th:if="${skills != null and not #lists.isEmpty(skills)}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>สกัดทักษะเสร็จแล้ว</span>
   </div>
   <div id="skill-results" class="skill-box"><div class="empty" style="padding:18px" th:if="${#lists.isEmpty(skills)}"><p style="margin:0">ยังไม่พบทักษะ อัปโหลดไฟล์หรือกรอกข้อความเรซูเม่ก่อน</p></div>
 <!--/* หัวข้อหมวดทักษะ: เรียงหมวดและแปลงคีย์อังกฤษเป็นชื่อไทยด้วย SkillCategories (ผ่าน @fmt)

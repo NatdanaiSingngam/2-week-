@@ -262,7 +262,7 @@ class DocumentFeaturesTest {
         assertThat(resumeSkills.findByResumeId(resumeId)).extracting("skillName").containsExactly("Java", "SQL", "JavaScript");
         String page = mvc.perform(get("/student/resume").with(user("pdf@test.com").roles("STUDENT")))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(page).contains("resume.pdf").contains("NLP Processing Complete");
+        assertThat(page).contains("resume.pdf").contains("สกัดทักษะเสร็จแล้ว");
     }
 
     @Test

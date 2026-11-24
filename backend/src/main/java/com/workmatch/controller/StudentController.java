@@ -56,6 +56,7 @@ public class StudentController {
         model.addAttribute("businessTypes", jobPostingService.businessTypes());
         model.addAttribute("q", q == null ? "" : q);
         model.addAttribute("type", type == null ? "" : type);
+        model.addAttribute("back", jobsUrl(q, type));
         return "student/jobs";
     }
 
@@ -141,6 +142,18 @@ public class StudentController {
         }
         redirect.addFlashAttribute("message", "บันทึกข้อมูลแล้ว");
         return "redirect:/student/profile";
+    }
+
+    /** URL หน้าค้นหาพร้อมตัวกรองเดิม เข้ารหัสทุกตัวอักษรพิเศษ (รวม "/") ให้ผ่าน safeBack */
+    static String jobsUrl(String q, String type) {
+        StringBuilder url = new StringBuilder("/student/jobs");
+        if (q != null && !q.isBlank()) url.append("?q=").append(encode(q));
+        if (type != null && !type.isBlank()) url.append(url.indexOf("?") < 0 ? "?" : "&").append("type=").append(encode(type));
+        return url.toString();
+    }
+
+    private static String encode(String value) {
+        return java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20").replace("*", "%2A");
     }
 
     static String safeBack(String back, String fallback) {
