@@ -134,9 +134,22 @@ public class AdminController {
 
     // ---------- พจนานุกรมทักษะ ----------
 
+    private static final int SKILLS_PER_PAGE = 25;
+
     @GetMapping("/admin/skills")
-    public String skills(@RequestParam(required = false) String q, @RequestParam(required = false) Long edit, Model model) {
-        model.addAttribute("skills", dictionary.search(q));
+    public String skills(@RequestParam(required = false) String q, @RequestParam(required = false) Long edit,
+                         @RequestParam(defaultValue = "1") int page, Model model) {
+        var found = dictionary.search(q);
+        int pages = Math.max(1, (found.size() + SKILLS_PER_PAGE - 1) / SKILLS_PER_PAGE);
+        int current = Math.max(1, Math.min(page, pages));
+        // หลังแก้ไขไม่สำเร็จจะกลับมาด้วย ?edit= อย่างเดียว จึงหาหน้าที่มีทักษะนั้น
+        if (edit != null) {
+            for (int i = 0; i < found.size(); i++) if (edit.equals(found.get(i).getId())) current = i / SKILLS_PER_PAGE + 1;
+        }
+        model.addAttribute("skills", found.subList((current - 1) * SKILLS_PER_PAGE, Math.min(found.size(), current * SKILLS_PER_PAGE)));
+        model.addAttribute("page", current);
+        model.addAttribute("pages", pages);
+        model.addAttribute("total", found.size());
         model.addAttribute("q", q == null ? "" : q);
         model.addAttribute("edit", edit);
         model.addAttribute("categories", DictionaryService.CATEGORIES);
@@ -158,7 +171,8 @@ public class AdminController {
 
     @PostMapping("/admin/skills/{id}")
     public String updateSkill(@PathVariable Long id, @RequestParam(required = false) String name,
-                              @RequestParam(required = false) String category, RedirectAttributes redirect) {
+                              @RequestParam(required = false) String category, @RequestParam(required = false) String q,
+                              @RequestParam(defaultValue = "1") int page, RedirectAttributes redirect) {
         try {
             dictionary.updateSkill(id, name, category);
             synced(redirect, "บันทึกการแก้ไขแล้ว");
@@ -166,13 +180,21 @@ public class AdminController {
             redirect.addFlashAttribute("error", e.getMessage());
             return "redirect:/admin/skills?edit=" + id;
         }
-        return "redirect:/admin/skills";
+        return skillsPage(q, page, redirect);
     }
 
     @PostMapping("/admin/skills/{id}/toggle")
-    public String toggleSkill(@PathVariable Long id, RedirectAttributes redirect) {
+    public String toggleSkill(@PathVariable Long id, @RequestParam(required = false) String q,
+                              @RequestParam(defaultValue = "1") int page, RedirectAttributes redirect) {
         boolean active = dictionary.toggleSkill(id);
         synced(redirect, active ? "เปิดใช้งานทักษะแล้ว" : "ปิดใช้งานทักษะแล้ว");
+        return skillsPage(q, page, redirect);
+    }
+
+    /** กลับหน้าเดิมหลังแก้ไข พร้อมคำค้นและเลขหน้าเดิม */
+    private static String skillsPage(String q, int page, RedirectAttributes redirect) {
+        if (q != null && !q.isBlank()) redirect.addAttribute("q", q);
+        if (page > 1) redirect.addAttribute("page", page);
         return "redirect:/admin/skills";
     }
 

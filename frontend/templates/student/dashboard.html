@@ -56,6 +56,7 @@
 
     <div class="match-list" th:if="${not #lists.isEmpty(matches)}">
       <div class="legend" aria-label="ความหมายของระดับคะแนน"><span class="level high">เหมาะ 90–100%</span><span class="level medium">ปานกลาง 41–89%</span><span class="level low">ไม่เหมาะ 0–40%</span></div>
+      <p class="field-note" style="margin:0 0 10px">คะแนนให้น้ำหนักทักษะแต่ละตัวไม่เท่ากัน จึงไม่เท่ากับสัดส่วนจำนวนทักษะที่ตรง</p>
       <article class="match-card" th:each="match, it : ${matches}"
                th:with="s=${match.score == null ? 0 : match.score}, lv=${@fmt.level(s)}, saved=${bookmarkedIds.contains(match.jobId)}">
         <span class="match-ribbon" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(s, 1, 1) + '%'}">Match 0.0%</span>

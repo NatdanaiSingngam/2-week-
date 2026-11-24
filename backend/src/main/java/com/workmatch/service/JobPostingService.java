@@ -197,20 +197,25 @@ public class JobPostingService {
             CompanyProfile p = profiles.get(j.getCompany().getId());
             List<String> skills = jobSkills.findByJobId(j.getId()).stream().map(JobSkill::getSkillName).toList();
             if (!type.isEmpty() && (p == null || !type.equals(p.getBusinessType()))) continue;
+            String place = j.getLocation() != null ? j.getLocation() : p == null ? null : shortAddress(p.getAddress());
             if (!q.isEmpty()) {
                 boolean hit = j.getTitle().toLowerCase(Locale.ROOT).contains(q)
                         || j.getCompany().getDisplayName().toLowerCase(Locale.ROOT).contains(q)
-                        || skills.stream().anyMatch(s -> s.toLowerCase(Locale.ROOT).contains(q));
+                        || skills.stream().anyMatch(s -> s.toLowerCase(Locale.ROOT).contains(q))
+                        || place != null && place.toLowerCase(Locale.ROOT).contains(q)
+                        || j.getWorkMode() != null && j.getWorkMode().toLowerCase(Locale.ROOT).contains(q);
                 if (!hit) continue;
             }
             Double score = resumeId == null ? null : matches.findByResumeIdAndJobId(resumeId, j.getId())
                     .map(m -> m.getScore().doubleValue()).orElse(null);
             long days = Math.max(0, Duration.between(j.getCreatedAt(), LocalDateTime.now()).toDays());
             out.add(new ExploreItem(j.getId(), j.getTitle(), j.getCompany().getDisplayName(),
-                    j.getLocation() != null ? j.getLocation() : p == null ? null : shortAddress(p.getAddress()), p == null ? null : p.getBusinessType(),
+                    place, p == null ? null : p.getBusinessType(),
                     p != null && p.isVerified(), skills, j.getCreatedAt(), days, score, saved.contains(j.getId()),
                     j.getWorkMode(), j.getDeadline()));
         }
+        // ทักษะตรงทั้งคำขึ้นก่อน (ค้น "java" ให้งาน Java มาก่อน JavaScript) ที่เหลือคงลำดับล่าสุดก่อน
+        if (!q.isEmpty()) out.sort(java.util.Comparator.comparing(i -> i.skills().stream().noneMatch(s -> s.equalsIgnoreCase(q))));
         return out;
     }
 

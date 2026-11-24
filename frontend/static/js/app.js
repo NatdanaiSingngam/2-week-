@@ -138,12 +138,32 @@
         if (!custom) text.value = days ? kind.value + (start.value && end.value ? ' ' + start.value + '-' + end.value : '') : '';
       }
     };
-    [kind, amount, start, end].forEach(el => el && el.addEventListener('input', sync));
+    // Show the shift length; a very long one is only a warning because some jobs do run long shifts
+    const hours = times && document.createElement('p');
+    if (hours) {
+      hours.className = 'field-note';
+      hours.setAttribute('role', 'status');
+      times.after(hours);
+    }
+    const showHours = () => {
+      if (!hours) return;
+      const ready = !start.disabled && start.value && end.value && start.value !== end.value;
+      hours.hidden = !ready;
+      if (!ready) return;
+      const minutes = value => Number(value.slice(0, 2)) * 60 + Number(value.slice(3));
+      const overnight = minutes(end.value) < minutes(start.value);
+      const total = minutes(end.value) - minutes(start.value) + (overnight ? 1440 : 0);
+      const long = total > 720;
+      hours.classList.toggle('warn-note', long);
+      hours.textContent = start.value + '–' + end.value + ' น.' + (overnight ? ' (เลิกงานวันถัดไป)' : '') + ' รวม ' + Math.floor(total / 60) + ' ชม.' + (total % 60 ? ' ' + total % 60 + ' นาที' : '') + (long ? ' เวลาทำงานยาวผิดปกติ กรุณาตรวจ AM/PM อีกครั้ง' : '');
+    };
+    [kind, amount, start, end].forEach(el => el && el.addEventListener('input', () => { sync(); showHours(); }));
     kind.setAttribute('id', text.id + '-kind');
     wrap.querySelector('label').htmlFor = kind.id;
     text.setAttribute('aria-label', wrap.querySelector('label').textContent + ' (กำหนดเอง)');
     box.hidden = false;
     sync();
+    showHours();
   });
   // Job form: preview the skills NLP finds in the description and tick them below (nothing is saved yet)
   const extract = document.getElementById('extract-skills');
@@ -170,6 +190,8 @@
         auto.forEach(cb => { if (!found.includes(cb.value.toLowerCase())) cb.checked = false; });
         auto = boxes.filter(cb => found.includes(cb.value.toLowerCase()) && (!cb.checked || auto.includes(cb)));
         auto.forEach(cb => { cb.checked = true; });
+        const filter = extract.form.querySelector('.skill-filter');
+        if (filter) filter.dispatchEvent(new Event('input')); // newly ticked skills must be visible
         result.replaceChildren(...data.skills.map(name => { const tag = document.createElement('span'); tag.className = 'chip'; tag.textContent = name; return tag; }));
         result.hidden = !data.skills.length;
         note.textContent = data.skills.length ? 'พบ ' + data.skills.length + ' ทักษะ (เลือกให้ในรายการด้านล่างแล้ว)' : 'ไม่พบทักษะในรายละเอียดงาน เลือกจากรายการด้านล่างได้';
@@ -180,6 +202,62 @@
       }
     });
   }
+  // Skill pickers: filter the list by name; ticked skills always stay visible
+  document.querySelectorAll('.skill-toggles').forEach(list => {
+    const labels = [...list.querySelectorAll('.skill-toggle')];
+    if (labels.length < 12) return;
+    const filter = document.createElement('input');
+    filter.type = 'search';
+    filter.className = 'skill-filter';
+    filter.placeholder = 'ค้นหาทักษะในรายการ...';
+    filter.setAttribute('aria-label', filter.placeholder);
+    filter.autocomplete = 'off';
+    const none = document.createElement('p');
+    none.className = 'field-note';
+    none.setAttribute('role', 'status');
+    const apply = () => {
+      const q = filter.value.trim().toLowerCase();
+      let found = 0;
+      labels.forEach(label => {
+        const match = label.textContent.trim().toLowerCase().includes(q);
+        if (match) found++;
+        label.hidden = !match && !label.querySelector('input').checked;
+      });
+      none.textContent = q ? (found ? 'พบ ' + found + ' ทักษะ' : 'ไม่พบทักษะนี้ในพจนานุกรม') : '';
+    };
+    filter.addEventListener('input', apply);
+    filter.addEventListener('keydown', event => { if (event.key === 'Enter') event.preventDefault(); });
+    list.before(filter);
+    list.after(none);
+  });
+  // Date inputs follow the browser language, so show the chosen date in Thai format as well
+  document.querySelectorAll('input[type=date]').forEach(input => {
+    const note = document.createElement('p');
+    note.className = 'field-note';
+    const show = () => {
+      note.hidden = !input.value;
+      if (input.value) note.textContent = 'ตรงกับ ' + new Date(input.value + 'T00:00').toLocaleDateString('th-TH-u-ca-buddhist', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+    input.addEventListener('input', show);
+    input.after(note);
+    show();
+  });
+  // Small screens show table rows as cards; explicit roles keep table semantics when CSS changes display
+  document.querySelectorAll('.table-wrap table').forEach(table => {
+    const heads = [...table.querySelectorAll('thead th')];
+    table.classList.add('cards');
+    table.setAttribute('role', 'table');
+    table.querySelectorAll('thead, tbody').forEach(el => el.setAttribute('role', 'rowgroup'));
+    table.querySelectorAll('tr').forEach(el => el.setAttribute('role', 'row'));
+    heads.forEach(el => el.setAttribute('role', 'columnheader'));
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const cells = [...row.cells];
+      cells.forEach((cell, i) => {
+        cell.setAttribute('role', 'cell');
+        if (i && cells.length === heads.length) cell.dataset.label = heads[i].textContent.trim();
+      });
+    });
+  });
   // Forms that change or delete data ask for confirmation (data-confirm="ข้อความ")
   document.querySelectorAll('form[data-confirm]').forEach(form => {
     form.addEventListener('submit', event => { if (!window.confirm(form.dataset.confirm)) event.preventDefault(); });

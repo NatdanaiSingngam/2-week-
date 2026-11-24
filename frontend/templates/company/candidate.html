@@ -39,12 +39,15 @@
 </section>
 
 <section class="card" aria-labelledby="skill-title">
-  <h2 id="skill-title">ทักษะที่ตรงกับตำแหน่งงาน</h2>
-  <div class="tags">
-    <span th:each="sk : ${c.skills()}" th:class="${sk.matched()} ? 'badge badge-ok' : 'badge badge-missing'" th:text="${sk.name() + (sk.matched() ? ' (ตรงกัน)' : ' (ยังไม่มี)')}">Java (ตรงกัน)</span>
-    <span class="tag" th:each="o : ${c.otherSkills()}" th:text="${o}">Python</span>
+  <h2 id="skill-title">เปรียบเทียบทักษะกับตำแหน่งงาน</h2>
+  <div class="skill-set">
+    <h3 th:text="${'ทักษะที่ตรงกับตำแหน่ง (' + #lists.size(c.skills().?[matched()]) + ')'}">ทักษะที่ตรงกับตำแหน่ง</h3>
+    <div class="tags"><span class="badge badge-ok" th:each="sk : ${c.skills()}" th:if="${sk.matched()}" th:text="${sk.name() + ' (ตรงกัน)'}">Java (ตรงกัน)</span></div>
+    <h3 th:text="${'ทักษะที่ยังไม่มี (' + #lists.size(c.skills().?[!matched()]) + ')'}">ทักษะที่ยังไม่มี</h3>
+    <div class="tags"><span class="badge badge-missing" th:each="sk : ${c.skills()}" th:unless="${sk.matched()}" th:text="${sk.name() + ' (ยังไม่มี)'}">Docker (ยังไม่มี)</span></div>
+    <th:block th:if="${not #lists.isEmpty(c.otherSkills())}"><h3>ทักษะอื่นของผู้สมัคร (ตำแหน่งนี้ไม่ได้ระบุ)</h3>
+    <div class="tags"><span class="tag" th:each="o : ${c.otherSkills()}" th:text="${o}">Python</span></div></th:block>
   </div>
-  <p class="field-note" th:if="${not #lists.isEmpty(c.otherSkills())}">ป้ายสีเทาคือทักษะอื่นของผู้สมัครที่ตำแหน่งนี้ไม่ได้ระบุไว้</p>
 </section>
 
 <section class="card">
@@ -59,9 +62,10 @@
 <section class="card decision" id="decision" aria-labelledby="decision-title">
   <div><h2 id="decision-title" style="font-size:1rem;margin:0">การดำเนินการพิจารณา</h2><p>การเปลี่ยนสถานะจะแสดงในหน้า "ประวัติการสมัครงาน" ของนักศึกษาทันที</p></div>
   <div class="actions">
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ตั้งสถานะใบสมัครนี้เป็นไม่ผ่านการพิจารณา?"><input type="hidden" name="status" value="REJECTED" /><button type="submit" class="red" th:attr="aria-pressed=${c.status().name() == 'REJECTED'}">ไม่ผ่านการพิจารณา</button></form>
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="REVIEWED" /><button type="submit" class="amber" th:attr="aria-pressed=${c.status().name() == 'REVIEWED'}">ตรวจสอบแล้ว</button></form>
-    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="ACCEPTED" /><button type="submit" class="green" th:attr="aria-pressed=${c.status().name() == 'ACCEPTED'}">ผ่านการพิจารณา</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ตั้งสถานะใบสมัครนี้เป็นไม่ผ่านการพิจารณา?"><input type="hidden" name="status" value="REJECTED" /><button type="submit" class="red" th:disabled="${c.status().name() == 'REJECTED'}" th:attr="aria-pressed=${c.status().name() == 'REJECTED'}">ไม่ผ่านการพิจารณา</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}"><input type="hidden" name="status" value="REVIEWED" /><button type="submit" class="amber" th:disabled="${c.status().name() == 'REVIEWED'}" th:attr="aria-pressed=${c.status().name() == 'REVIEWED'}">ตรวจสอบแล้ว</button></form>
+    <form method="post" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ตั้งสถานะใบสมัครนี้เป็นผ่านการพิจารณา? นักศึกษาจะเห็นผลทันที"><input type="hidden" name="status" value="ACCEPTED" /><button type="submit" class="green" th:disabled="${c.status().name() == 'ACCEPTED'}" th:attr="aria-pressed=${c.status().name() == 'ACCEPTED'}">ผ่านการพิจารณา</button></form>
+    <form method="post" th:if="${c.status().name() != 'PENDING'}" th:action="@{/company/applications/{id}/status(id=${c.applicationId()})}" data-confirm="ย้อนสถานะใบสมัครนี้เป็นรอพิจารณา?"><input type="hidden" name="status" value="PENDING" /><button type="submit" class="secondary">ย้อนเป็นรอพิจารณา</button></form>
   </div>
 </section>
 </main>

@@ -29,6 +29,7 @@
 </div>
 
 <nav class="tabs" aria-label="สถานะผู้สมัคร">
+  <a th:href="@{/company/jobs/{id}(id=${job.id})}" th:attr="aria-current=${tab == ''} ? 'page'" th:text="${'ทั้งหมด (' + total + ')'}">ทั้งหมด (0)</a>
   <a th:each="s : ${statuses}" th:href="@{/company/jobs/{id}(id=${job.id},tab=${s.name()})}" th:attr="aria-current=${tab == s.name()} ? 'page'" th:text="${s.label + ' (' + counts.get(s) + ')'}">รอพิจารณา (3)</a>
 </nav>
 
@@ -41,13 +42,13 @@
 
 <!--/* ผู้ที่กดสมัครจริงในแท็บที่เลือก */-->
 <th:block>
-  <div class="card empty" th:if="${#lists.isEmpty(applications)}"><div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p>ยังไม่มีผู้สมัครในสถานะนี้</p></div>
+  <div class="card empty" th:if="${#lists.isEmpty(applications)}"><div class="empty-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><p th:text="${tab == ''} ? 'ยังไม่มีผู้สมัครตำแหน่งนี้' : 'ยังไม่มีผู้สมัครในสถานะนี้'">ยังไม่มีผู้สมัครในสถานะนี้</p></div>
   <div class="applicant-list">
     <article class="applicant" th:each="a : ${applications}" th:with="s=${a.score() == null ? 0 : a.score()}, lv=${@fmt.level(s)}">
       <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความเหมาะสม ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong></div>
       <div class="applicant-info">
         <h3 th:text="${a.studentName()}">ชื่อนักศึกษา</h3>
-        <div class="applicant-meta"><span th:text="${(a.major() != null ? a.major() : 'นักศึกษา') + (a.studentId() != null ? ' · ' + a.studentId() : '')}">สาขา</span><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span></div>
+        <div class="applicant-meta"><span th:text="${(a.major() != null ? a.major() : 'นักศึกษา') + (a.studentId() != null ? ' · ' + a.studentId() : '')}">สาขา</span><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span class="status" th:classappend="${a.status().name()}" th:text="${a.status().label}">รอพิจารณา</span></div>
         <div class="tags"><span class="tag" th:each="sk : ${a.matchedSkills()}" th:text="${sk}">Java</span></div>
       </div>
       <div class="applicant-side">

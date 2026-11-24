@@ -50,7 +50,7 @@
 
   <div class="match-summary" th:if="${m != null}">
     <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความสอดคล้อง ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong></div>
-    <div><strong>ค่าร้อยละความสอดคล้องกับทักษะของคุณ</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(m.matched) + ' จาก ' + (#lists.size(m.matched) + #lists.size(m.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div></div>
+    <div><strong>ค่าร้อยละความสอดคล้องกับทักษะของคุณ</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(m.matched) + ' จาก ' + (#lists.size(m.matched) + #lists.size(m.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div><p class="field-note">คะแนนให้น้ำหนักทักษะแต่ละตัวไม่เท่ากัน จึงไม่เท่ากับสัดส่วนจำนวนทักษะที่ตรง</p></div>
   </div>
   <div class="skill-cols" th:if="${m != null}">
     <section><h4>ทักษะที่คุณมี</h4><div><span class="badge badge-ok" th:each="sk : ${m.matched}" th:text="${sk}">Java</span><span class="muted" th:if="${#lists.isEmpty(m.matched)}">ยังไม่มีทักษะที่ตรง</span></div></section>

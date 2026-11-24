@@ -32,7 +32,7 @@
       <span class="star" aria-hidden="true">★</span>
       <div class="actions">
         <form method="post" class="inline-form" th:action="@{/student/bookmarks/{id}/remove(id=${b.jobId()})}"><button type="submit" class="secondary sm" th:aria-label="${'ลบออก: ' + b.title()}">ลบออก</button></form>
-        <a class="button sm" th:href="@{/student/jobs/{id}(id=${b.jobId()})}">ดูรายละเอียดและสมัคร</a>
+        <a class="button sm" th:href="@{/student/jobs/{id}(id=${b.jobId()})}" th:text="${b.applied() or !b.open()} ? 'ดูรายละเอียด' : 'ดูรายละเอียดและสมัคร'">ดูรายละเอียดและสมัคร</a>
       </div>
     </article>
   </section>

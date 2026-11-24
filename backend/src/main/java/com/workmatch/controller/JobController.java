@@ -240,14 +240,15 @@ public class JobController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "company/job-detail";
         }
-        // applications = ผู้ที่กดสมัครจริง แยกตามสถานะ (แท็บเริ่มต้น = รอพิจารณา)
+        // applications = ผู้ที่กดสมัครจริง แยกตามสถานะ (แท็บเริ่มต้น = ทั้งหมด)
         List<ApplicantItem> applications = applicationService.forJob(company, id);
         String current = tab;
         if (current == null || java.util.Arrays.stream(ApplicationStatus.values()).noneMatch(st -> st.name().equals(tab))) {
-            current = "PENDING"; // ไม่ระบุ หรือแท็บที่ไม่มีแล้ว (เช่นลิงก์เก่า ?tab=RECOMMENDED) -> รอพิจารณา
+            current = ""; // ไม่ระบุ หรือแท็บที่ไม่มีแล้ว (เช่นลิงก์เก่า ?tab=RECOMMENDED) -> ทั้งหมด
         }
         final String selected = current;
-        model.addAttribute("applications", applications.stream().filter(a -> a.status().name().equals(selected)).toList());
+        model.addAttribute("applications", applications.stream().filter(a -> selected.isEmpty() || a.status().name().equals(selected)).toList());
+        model.addAttribute("total", applications.size());
         model.addAttribute("counts", ApplicationService.countByStatus(applications));
         model.addAttribute("statuses", ApplicationStatus.values());
         model.addAttribute("tab", selected);
