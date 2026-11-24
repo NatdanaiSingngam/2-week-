@@ -281,6 +281,14 @@ public class JobPostingService {
         return ResumeService.dedupe(all);
     }
 
+    /** ชื่อทักษะที่ NLP พบในรายละเอียดงาน ให้ดูก่อนบันทึก */
+    public List<String> previewSkills(String description) {
+        String d = nz(description).trim();
+        if (d.isEmpty()) throw new IllegalArgumentException("กรุณากรอกรายละเอียดงาน");
+        if (d.length() > JobService.MAX_DESCRIPTION) throw new IllegalArgumentException("รายละเอียดงานยาวเกิน 20,000 ตัวอักษร");
+        return ResumeService.dedupe(nlpClient.extractSkills(d)).stream().map(ExtractedSkill::name).toList();
+    }
+
     private void saveSkills(Job job, List<ExtractedSkill> skills) {
         List<JobSkill> rows = new ArrayList<>();
         for (ExtractedSkill s : skills) rows.add(new JobSkill(job, s.name(), s.category()));

@@ -453,6 +453,18 @@ details.text-entry summary{cursor:pointer;color:var(--primary-text);font-weight:
 .skill-toggle:has(input:checked)::before{content:"\2713";margin-right:6px;font-weight:700}
 .skill-toggle:has(input:focus-visible){outline:3px solid #93C5FD;outline-offset:1px}
 
+/* ฟอร์มประกาศงาน: ตัวช่วยกรอกค่าตอบแทน / เวลาทำงาน และปุ่มสกัดทักษะ */
+.builder{display:grid;gap:8px}
+.builder .select{width:100%}
+.builder+input{margin-top:8px}
+.times{display:flex;align-items:center;gap:8px}
+.times[hidden]{display:none}
+.times input{flex:1;min-width:0}
+.extract-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:8px}
+.extract-row .field-note{margin:0}
+#extract-result{margin-top:8px}
+#extract-result[hidden],.builder[hidden]{display:none}
+
 /* ---------- รายละเอียดผู้สมัคร (รูปที่ 46) ---------- */
 .candidate-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
 .candidate-head .avatar{width:60px;height:60px;font-size:1.15rem}

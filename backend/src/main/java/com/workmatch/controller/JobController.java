@@ -38,11 +38,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 /**
  * หน้าของสถานประกอบการตามเอกสาร: ภาพรวม (รูปที่ 47), จัดการประกาศงาน (รูปที่ 44),
@@ -118,6 +120,19 @@ public class JobController {
         }
         afterSave(id, input, redirect, input.draft() ? "บันทึกแบบร่างแล้ว" : "เผยแพร่ประกาศงานแล้ว");
         return "redirect:/company/jobs/" + id;
+    }
+
+    /** ปุ่ม "สกัดทักษะ" ในฟอร์มประกาศงาน: ตอบ JSON ให้ดูก่อน ยังไม่บันทึก */
+    @PostMapping("/company/jobs/extract-skills")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> extractSkills(@RequestParam(required = false) String description) {
+        try {
+            return ResponseEntity.ok(Map.of("skills", jobPostingService.previewSkills(description)));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (NlpUnavailableException e) {
+            return ResponseEntity.status(503).body(Map.of("error", NlpUnavailableException.MESSAGE));
+        }
     }
 
     @GetMapping("/company/jobs/{id}/edit")

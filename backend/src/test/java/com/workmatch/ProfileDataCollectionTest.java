@@ -131,6 +131,22 @@ class ProfileDataCollectionTest {
     }
 
     @Test
+    void extractSkillsButtonReturnsPreviewWithoutSaving() throws Exception {
+        long before = jobs.count();
+        when(nlp.extractSkills(anyString())).thenReturn(List.of(new com.workmatch.nlp.ExtractedSkill("Java", "programming")));
+        var asCompany = user("pdc-c@test.com").roles("COMPANY");
+        company();
+        String json = mvc.perform(post("/company/jobs/extract-skills").with(csrf()).with(asCompany).param("description", "ใช้ Java"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertThat(json).isEqualTo("{\"skills\":[\"Java\"]}");
+        assertThat(jobs.count()).isEqualTo(before);
+        mvc.perform(post("/company/jobs/extract-skills").with(csrf()).with(asCompany).param("description", " ")).andExpect(status().isBadRequest());
+        when(nlp.extractSkills(anyString())).thenThrow(new com.workmatch.nlp.NlpUnavailableException());
+        mvc.perform(post("/company/jobs/extract-skills").with(csrf()).with(asCompany).param("description", "Java")).andExpect(status().isServiceUnavailable());
+        mvc.perform(post("/company/jobs/extract-skills").with(csrf()).with(user("pdc-s@test.com").roles("STUDENT")).param("description", "Java")).andExpect(status().isForbidden());
+    }
+
+    @Test
     void staleLoginPageReturnsToLoginInsteadOf403() throws Exception {
         mvc.perform(post("/login").param("username", "x@test.com").param("password", "x")).andExpect(redirectedUrl("/login?expired"));
         mvc.perform(post("/register")).andExpect(status().isForbidden());
