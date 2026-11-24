@@ -12,6 +12,7 @@ package com.workmatch.config;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ThaiBuddhistDate;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +29,10 @@ public class ThaiFormat {
 
     public String date(LocalDateTime t) {
         return t == null ? "-" : DATE.format(ThaiBuddhistDate.from(t));
+    }
+
+    public String date(LocalDate d) {
+        return d == null ? "-" : DATE.format(ThaiBuddhistDate.from(d));
     }
 
     public String dateTime(LocalDateTime t) {

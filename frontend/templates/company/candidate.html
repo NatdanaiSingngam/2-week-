@@ -22,6 +22,8 @@
     <h1 th:text="${c.studentName()}">ชื่อผู้สมัคร</h1>
     <div class="meta" th:text="${(c.studentId() != null ? 'รหัสนิสิต: ' + c.studentId() : 'นักศึกษา') + (c.major() != null ? ' · สาขา' + c.major() : '') + (c.faculty() != null ? ' · ' + c.faculty() : '')}">รหัสนิสิต · สาขา</div>
     <div class="meta" th:text="${'สมัครตำแหน่ง: ' + c.jobTitle() + ' · เมื่อ ' + @fmt.date(c.appliedAt())}">สมัครตำแหน่ง</div>
+    <div class="meta" th:if="${c.coopStart() != null or c.coopEnd() != null}" th:text="${'ช่วงสหกิจ: ' + @fmt.date(c.coopStart()) + ' ถึง ' + @fmt.date(c.coopEnd())}">ช่วงสหกิจ</div>
+    <div class="meta" th:if="${c.gpa() != null}" th:text="${'GPA: ' + c.gpa()}">GPA</div>
     <div class="meta"><a th:href="${'mailto:' + c.email()}" th:text="${c.email()}">email</a><th:block th:if="${c.phone() != null}"> · <span th:text="${c.phone()}">โทร</span></th:block></div>
   </div>
   <div class="right">

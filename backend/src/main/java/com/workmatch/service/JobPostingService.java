@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -59,6 +60,8 @@ import java.util.stream.Collectors;
 public class JobPostingService {
 
     private static final int MAX_EXTRA = 255;
+    /** รูปแบบการทำงานที่เลือกได้ในฟอร์มประกาศงาน */
+    public static final List<String> WORK_MODES = List.of("Onsite", "Hybrid", "Remote");
 
     private final JobRepository jobs;
     private final JobSkillRepository jobSkills;
@@ -140,7 +143,9 @@ public class JobPostingService {
         Job job = owned(company, jobId);
         List<String> selected = jobSkills.findByJobId(job.getId()).stream().map(JobSkill::getSkillName).toList();
         return new JobInput(job.getTitle(), job.getDescription(), nz(job.getCompensation()), nz(job.getWorkSchedule()),
-                nz(job.getAccommodation()), nz(job.getTransport()), selected, job.getStatus() == JobStatus.DRAFT);
+                nz(job.getAccommodation()), nz(job.getTransport()), selected, job.getStatus() == JobStatus.DRAFT,
+                nz(job.getLocation()), nz(job.getWorkMode()), job.getOpenings() == null ? "" : job.getOpenings().toString(),
+                job.getDeadline() == null ? "" : job.getDeadline().toString());
     }
 
     // ---------- บริษัท: รายการและภาพรวม ----------
@@ -151,14 +156,14 @@ public class JobPostingService {
                 .sorted(Comparator.comparing(Job::getId).reversed())
                 .map(j -> new CompanyJobRow(j.getId(), j.getTitle(), j.getCreatedAt(), j.getStatus(),
                         jobSkills.countByJobId(j.getId()),
-                        applications.countByJobId(j.getId())))
+                        applications.countByJobId(j.getId()), j.getDeadline(), j.isExpired()))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public CompanyOverview overview(User company) {
         List<CompanyJobRow> rows = companyJobs(company);
-        long open = rows.stream().filter(r -> r.status() == JobStatus.OPEN).count();
+        long open = rows.stream().filter(r -> r.status() == JobStatus.OPEN && !r.expired()).count();
         return new CompanyOverview(open,
                 applications.countByJobCompanyId(company.getId()),
                 applications.countByJobCompanyIdAndStatus(company.getId(), ApplicationStatus.PENDING),
@@ -179,6 +184,7 @@ public class JobPostingService {
         Long resumeId = resumes.findByUserId(student.getId()).map(r -> r.getId()).orElse(null);
         List<ExploreItem> out = new ArrayList<>();
         for (Job j : jobs.findOpenJobs()) {
+            if (j.isExpired()) continue;
             CompanyProfile p = profiles.get(j.getCompany().getId());
             List<String> skills = jobSkills.findByJobId(j.getId()).stream().map(JobSkill::getSkillName).toList();
             if (!type.isEmpty() && (p == null || !type.equals(p.getBusinessType()))) continue;
@@ -192,8 +198,9 @@ public class JobPostingService {
                     .map(m -> m.getScore().doubleValue()).orElse(null);
             long days = Math.max(0, Duration.between(j.getCreatedAt(), LocalDateTime.now()).toDays());
             out.add(new ExploreItem(j.getId(), j.getTitle(), j.getCompany().getDisplayName(),
-                    p == null ? null : shortAddress(p.getAddress()), p == null ? null : p.getBusinessType(),
-                    p != null && p.isVerified(), skills, j.getCreatedAt(), days, score, saved.contains(j.getId())));
+                    j.getLocation() != null ? j.getLocation() : p == null ? null : shortAddress(p.getAddress()), p == null ? null : p.getBusinessType(),
+                    p != null && p.isVerified(), skills, j.getCreatedAt(), days, score, saved.contains(j.getId()),
+                    j.getWorkMode(), j.getDeadline()));
         }
         return out;
     }
@@ -221,7 +228,9 @@ public class JobPostingService {
                 p.map(CompanyProfile::getSelectionMethod).orElse(null), j.getCompensation(), j.getAccommodation(),
                 j.getTransport(), skills, match, bookmarks.existsByStudentIdAndJobId(student.getId(), jobId),
                 app.map(JobApplication::getStatus).orElse(null), app.map(JobApplication::getAppliedAt).orElse(null),
-                resumes.findByUserId(student.getId()).isPresent());
+                resumes.findByUserId(student.getId()).isPresent(), j.getLocation(), j.getWorkMode(), j.getOpenings(),
+                j.getDeadline(), j.isAccepting(), p.map(CompanyProfile::getAbout).orElse(null),
+                p.map(CompanyProfile::getWebsite).orElse(null));
     }
 
     // ---------- ภายใน ----------
@@ -245,6 +254,17 @@ public class JobPostingService {
         job.setWorkSchedule(extra(in.workSchedule(), "วันและเวลาทำงาน"));
         job.setAccommodation(extra(in.accommodation(), "สวัสดิการที่พัก"));
         job.setTransport(extra(in.transport(), "สวัสดิการรถรับส่ง"));
+        job.setLocation(extra(in.location(), "สถานที่ปฏิบัติงาน"));
+        String mode = nz(in.workMode()).trim();
+        if (!mode.isEmpty() && !WORK_MODES.contains(mode)) throw new IllegalArgumentException("รูปแบบการทำงานไม่ถูกต้อง");
+        job.setWorkMode(mode.isEmpty() ? null : mode);
+        job.setOpenings(openings(in.openings()));
+        LocalDate deadline = ProfileService.parseDate(in.deadline(), "วันปิดรับสมัคร");
+        // ตั้งวันที่ผ่านมาแล้วไม่ได้ แต่แก้ประกาศเดิมที่หมดเขตแล้วโดยไม่เปลี่ยนวันได้
+        if (deadline != null && deadline.isBefore(LocalDate.now()) && !deadline.equals(job.getDeadline())) {
+            throw new IllegalArgumentException("วันปิดรับสมัครต้องไม่ใช่วันที่ผ่านมาแล้ว");
+        }
+        job.setDeadline(deadline);
         job.setStatus(in.draft() ? JobStatus.DRAFT : JobStatus.OPEN);
     }
 
@@ -265,6 +285,15 @@ public class JobPostingService {
         List<JobSkill> rows = new ArrayList<>();
         for (ExtractedSkill s : skills) rows.add(new JobSkill(job, s.name(), s.category()));
         jobSkills.saveAll(rows);
+    }
+
+    private static Integer openings(String value) {
+        String v = nz(value).trim();
+        if (v.isEmpty()) return null;
+        if (!v.matches("[0-9]{1,3}") || Integer.parseInt(v) < 1) {
+            throw new IllegalArgumentException("จำนวนที่รับต้องเป็นตัวเลข 1-999");
+        }
+        return Integer.valueOf(v);
     }
 
     private static String extra(String value, String label) {

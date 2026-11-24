@@ -15,7 +15,8 @@
     <a class="auth-logo" th:href="@{/}"><img src="/images/workmatch.svg" th:src="@{/images/workmatch.svg}" alt="Workmatch หน้าแรก" width="150" height="32" /></a>
     <h1 id="login-title">เข้าสู่ระบบ</h1>
     <p class="lead">จัดการโปรไฟล์และค้นหางานที่ใช่สำหรับคุณ</p>
-    <div class="alert error" role="alert" th:if="${param.error != null}">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+    <div class="alert error" role="alert" th:if="${param.error != null}">อีเมลหรือรหัสผ่านไม่ถูกต้อง (ตัวพิมพ์ใหญ่-เล็กของรหัสผ่านมีผล)</div>
+    <div class="alert info" role="status" th:if="${param.expired != null}">หน้าเดิมหมดอายุแล้ว กรุณาเข้าสู่ระบบอีกครั้ง</div>
     <div class="alert success" role="status" th:if="${param.logout != null}">ออกจากระบบแล้ว</div>
     <div class="alert success" role="status" th:if="${param.registered != null}">สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ</div>
     <form method="post" th:action="@{/login}">

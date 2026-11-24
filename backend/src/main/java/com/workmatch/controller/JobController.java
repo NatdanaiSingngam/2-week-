@@ -98,12 +98,17 @@ public class JobController {
                          @RequestParam(required = false) String workSchedule,
                          @RequestParam(required = false) String accommodation,
                          @RequestParam(required = false) String transport,
+                         @RequestParam(required = false) String location,
+                         @RequestParam(required = false) String workMode,
+                         @RequestParam(required = false) String openings,
+                         @RequestParam(required = false) String deadline,
                          @RequestParam(name = "skills", required = false) List<String> skills,
                          @RequestParam(required = false) String action,
                          Model model, RedirectAttributes redirect) {
         User company = currentUserService.getCurrentUser();
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
-                skills == null ? List.of() : skills, "draft".equals(action));
+                skills == null ? List.of() : skills, "draft".equals(action),
+                location, workMode, openings, deadline);
         Long id;
         try {
             id = jobPostingService.create(company, input);
@@ -128,11 +133,16 @@ public class JobController {
                          @RequestParam(required = false) String workSchedule,
                          @RequestParam(required = false) String accommodation,
                          @RequestParam(required = false) String transport,
+                         @RequestParam(required = false) String location,
+                         @RequestParam(required = false) String workMode,
+                         @RequestParam(required = false) String openings,
+                         @RequestParam(required = false) String deadline,
                          @RequestParam(name = "skills", required = false) List<String> skills,
                          @RequestParam(required = false) String action,
                          Model model, RedirectAttributes redirect) {
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
-                skills == null ? List.of() : skills, "draft".equals(action));
+                skills == null ? List.of() : skills, "draft".equals(action),
+                location, workMode, openings, deadline);
         try {
             jobPostingService.update(currentUserService.getCurrentUser(), id, input);
         } catch (NlpUnavailableException | IllegalArgumentException e) {
