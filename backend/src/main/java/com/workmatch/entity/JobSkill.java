@@ -1,7 +1,7 @@
 /*
  * ==== Workmatch · Backend · ตารางฐานข้อมูล (Entity) ====
  * ไฟล์: backend/src/main/java/com/workmatch/entity/JobSkill.java
- * หน้าที่: ทักษะที่ประกาศงานต้องการ (NLP สกัดจากรายละเอียดงาน)
+ * หน้าที่: ทักษะที่ประกาศงานต้องการ (NLP สกัดจากรายละเอียดงาน) + ธงทักษะบังคับ (is_required) สำหรับเกณฑ์คัดกรอง
  * ตารางในฐานข้อมูล: job_skills
  * ถูกเรียกโดย: ApplicationService, JobPostingService, JobService, JobSkillRepository, MatchService
  */
@@ -28,6 +28,13 @@ public class JobSkill {
     @Column(length = 50)
     private String category;
 
+    /**
+     * ทักษะบังคับในการคัดกรอง (A04 ตาราง 47 is_required, DEFAULT FALSE)
+     * ใช้เฉพาะเกณฑ์ Required Skills ไม่เปลี่ยนการคำนวณ TF-IDF / Cosine
+     */
+    @Column(name = "is_required", nullable = false, columnDefinition = "boolean default false not null")
+    private boolean required = false;
+
     public JobSkill() {}
 
     public JobSkill(Job job, String skillName, String category) {
@@ -43,4 +50,6 @@ public class JobSkill {
     public void setSkillName(String skillName) { this.skillName = skillName; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+    public boolean isRequired() { return required; }
+    public void setRequired(boolean required) { this.required = required; }
 }

@@ -3,6 +3,7 @@
 # ดึงข้อมูลจาก: skill_dictionary.csv (ชื่อทักษะ คำพ้อง หมวด) + พจนานุกรมคำไทยของ PyThaiNLP
 # ถูกเรียกโดย: api_server.py (POST /extract, GET/PUT /dictionary), evaluation/*.py, tests/*.py
 # วิธีจับคำ: ภาษาอังกฤษจับแบบคำเต็มด้วย regex / ภาษาไทยตัดคำด้วย newmm แล้วเทียบทีละคำ
+# แล้วตัดทักษะที่อยู่หลังคำปฏิเสธ/สิ่งที่อยากเรียนในประโยคเดียวกันออก (negated_spans)
 # ====
 """สกัดทักษะจากข้อความภาษาไทย/อังกฤษ ด้วย PyThaiNLP + dictionary ทักษะ (skill_dictionary.csv)"""
 import csv
@@ -125,9 +126,49 @@ CASE_SENSITIVE = {
 }
 
 
-def extract_skills(text: str) -> list[dict]:
+# ---------- กฎคำปฏิเสธและสิ่งที่อยากเรียน (แผน 28 พ.ย., backlog B3) ----------
+# ทักษะที่อยู่หลังคำกลุ่มนี้ "ในช่วงประโยคเดียวกัน" ไม่นับ เช่น "ไม่เคยใช้ Docker", "อยากเรียน Kubernetes", "never used Java"
+# ใช้เป็นวลีเฉพาะ ไม่ใช้ "ไม่" หรือ "interested in" เดี่ยว ๆ เพราะกว้างเกิน:
+#   "ไม่ว่าจะเป็น Python หรือ Java", "ไม่มีปัญหาในการใช้ Excel", "interested in backend development with Java" เป็นทักษะจริง
+NEGATION_RULES = True
+NEGATION_TRIGGERS_TH = [
+    "ไม่เคย", "ไม่ได้ใช้", "ไม่ถนัด", "ไม่มีประสบการณ์", "ไม่มีพื้นฐาน", "ไม่รู้จัก", "ไม่ค่อยได้ใช้",
+    "อยากเรียน", "อยากศึกษา", "อยากฝึก",
+]
+NEGATION_TRIGGERS_EN = [
+    "never", "no experience", "not familiar", "unfamiliar with", "haven't used", "have not used",
+    "want to learn", "wants to learn", "would like to learn", "interested in learning", "plan to learn",
+    "planning to learn", "hope to learn",
+]
+# ตัวตัดช่วงประโยค: ขึ้นบรรทัดใหม่, . ; • ที่ตามด้วยช่องว่าง/จบข้อความ (ไม่ตัด Node.js, ASP.NET), "แต่", "but", "however"
+# คำขึ้นช่วงประโยคใหม่ที่มักไม่มีเครื่องหมายคั่นในภาษาไทย (เว้นวรรคแล้วตามด้วย ปัจจุบัน / ตอนนี้ / ส่วน / ขณะที่ / นอกจากนี้ / และยัง)
+# "แต่" ไม่นับเมื่อเป็นส่วนของ แต่ง / แต่ละ / ไม่เพียงแต่ (ข้อยกเว้นตามแผน)
+_CLAUSE_BREAK = re.compile(r"\n|[.;•](?=\s|$)|(?<!เพียง)แต่(?!ง|ละ)|\bbut\b|\bhowever\b|,\s+and\b|\s(?=ปัจจุบัน|ตอนนี้|ส่วน|ขณะที่|นอกจากนี้|และยัง|currently\b|now\b)")
+_NEG_PATTERN = re.compile("|".join(
+    [re.escape(w) for w in NEGATION_TRIGGERS_TH] + [r"\b" + re.escape(w) + r"\b" for w in NEGATION_TRIGGERS_EN]))
+
+
+# ระยะสูงสุดที่คำปฏิเสธมีผล (ตัวอักษรนับจากต้นคำปฏิเสธ) ภาษาไทยมักไม่มีเครื่องหมายคั่นประโยค
+# ถ้าไม่จำกัด "อยากเรียน Kubernetes ในอนาคต มีความเป็นผู้นำ" จะตัดทักษะหลังจากนั้นทั้งหมดจนจบข้อความ
+NEGATION_WINDOW = 30
+
+
+def negated_spans(lowered: str) -> list[tuple[int, int]]:
+    """ช่วงตัวอักษรที่ทักษะไม่นับ: จากคำปฏิเสธตัวแรกในแต่ละช่วงประโยค ไปจนจบช่วงประโยค (ไม่เกิน NEGATION_WINDOW ตัวอักษร)"""
+    spans, start = [], 0
+    bounds = [m.start() for m in _CLAUSE_BREAK.finditer(lowered)] + [len(lowered)]
+    for end in bounds:
+        m = _NEG_PATTERN.search(lowered, start, end)
+        if m:
+            spans.append((m.start(), min(end, m.start() + NEGATION_WINDOW)))
+        start = end + 1
+    return spans
+
+
+def extract_skills(text: str, apply_negation: bool | None = None) -> list[dict]:
     """คืนรายการทักษะที่เจอ ไม่ซ้ำ เรียงตามลำดับที่เจอในข้อความ
-    คำภาษาอังกฤษ: จับแบบคำเต็มด้วย regex / คำภาษาไทย: ตัดคำด้วย PyThaiNLP (newmm) แล้วเทียบทีละ token"""
+    คำภาษาอังกฤษ: จับแบบคำเต็มด้วย regex / คำภาษาไทย: ตัดคำด้วย PyThaiNLP (newmm) แล้วเทียบทีละ token
+    apply_negation: None = ตาม NEGATION_RULES (ใช้ False ตอนวัดผลแบบ "ก่อนแก้")"""
     surface, categories, _ = load_skills()
     cleaned = clean(text)
     lowered = cleaned.lower()  # ความยาวเท่าเดิม ตำแหน่งตัวอักษรตรงกับ cleaned
@@ -147,6 +188,12 @@ def extract_skills(text: str) -> list[dict]:
             if key and _is_thai(key) and key in surface:
                 hits.append((pos, surface[key]))
             pos += len(tok)
+
+    if NEGATION_RULES if apply_negation is None else apply_negation:
+        # ใช้ข้อความก่อน clean() เพราะ clean() ลบ , ; ออก (ความยาวเท่าเดิม ตำแหน่งตรงกัน)
+        original = text.lower()
+        spans = negated_spans(original if len(original) == len(lowered) else lowered)
+        hits = [h for h in hits if not any(s <= h[0] < e for s, e in spans)]
 
     found, seen = [], set()
     for _, name in sorted(hits, key=lambda h: h[0]):

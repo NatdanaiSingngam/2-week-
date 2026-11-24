@@ -136,6 +136,17 @@ public class ResumeController {
         return "redirect:/student/resume";
     }
 
+    /** ลบเรซูเม่ทั้งฉบับ: ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF (หน้าเว็บถามยืนยันก่อนส่งฟอร์ม) */
+    @PostMapping("/student/resume/delete")
+    public String deleteResume(HttpSession session, RedirectAttributes redirect) {
+        User student = currentUserService.getCurrentUser();
+        resumeExtras.discardPending(student, (Long) session.getAttribute(PENDING_PDF));
+        session.removeAttribute(PENDING_PDF);
+        boolean deleted = resumeExtras.deleteResume(student);
+        redirect.addFlashAttribute("message", deleted ? "ลบเรซูเม่ทั้งฉบับแล้ว (ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF)" : "ยังไม่มีเรซูเม่ให้ลบ");
+        return "redirect:/student/resume";
+    }
+
     /** เปิดไฟล์ PDF ของตัวเอง */
     @GetMapping("/student/resume/file")
     public ResponseEntity<byte[]> file() {
@@ -171,6 +182,7 @@ public class ResumeController {
         model.addAttribute("pdfName", resumeExtras.pdfName(student).orElse(null));
         model.addAttribute("pendingPdfName", resumeExtras.pendingName(student, (Long) session.getAttribute(PENDING_PDF)).orElse(null));
         model.addAttribute("dictionarySkills", dictionary.activeSkills());
+        model.addAttribute("hasResume", resumeService.findResume(student).isPresent());
     }
 
     /** คำนวณคะแนนจับคู่ใหม่ ถ้าพังให้เก็บ log และเตือน แต่สิ่งที่บันทึกแล้วไม่หาย */

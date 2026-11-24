@@ -1,0 +1,13 @@
+id,text,expected_skills
+1,เขียนโปรแกรมด้วยจาวาและจาวาสคริปต์ ใช้เอ็กเซลทำรายงาน,Java|JavaScript|Excel
+2,ทำแอปมือถือด้วย React Native และ Flutter,React Native|Flutter
+3,ใช้ด็อกเกอร์ deploy บนลินุกซ์ เขียนคิวรีเอสคิวแอล,Docker|Linux|SQL
+4,ออกแบบหน้าจอด้วยฟิกม่า แต่งรูปด้วยโฟโต้ช็อป และทำโปสเตอร์ใน Canva,Figma|Photoshop|Canva
+5,"Strong communication and leadership skills, team lead of a 4-person project.",การสื่อสาร|ภาวะผู้นำ
+6,มีความเป็นผู้นำ ทำงานร่วมกันเป็นทีมได้ดี และมีความรับผิดชอบสูง,ภาวะผู้นำ|การทำงานเป็นทีม|ความรับผิดชอบ
+7,Built a React web app and a React Native mobile app,React|React Native
+8,"Quality assurance engineer, manual testing and Selenium automation.",Software Testing|Selenium
+9,ใช้ macOS และ Windows เขียนโค้ดด้วย Python,macOS|Python
+10,ฝึกพูดในที่สาธารณะ มีทักษะ presentation skills ดี,การนำเสนอ
+11,พัฒนาแอปด้วยฟลัตเตอร์ และใช้รีแอคทำเว็บ,Flutter|React
+12,"Good sense of responsibility, problem solving and time management.",ความรับผิดชอบ|การแก้ปัญหา|การบริหารเวลา

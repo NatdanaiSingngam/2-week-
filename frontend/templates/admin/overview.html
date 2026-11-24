@@ -44,6 +44,10 @@
       <button type="submit" class="secondary sm">คำนวณคะแนนใหม่ทั้งหมด</button>
       <span class="field-note">ใช้เมื่อมีเรซูเม่หรือประกาศงานเพิ่มจำนวนมาก (น้ำหนัก TF-IDF เปลี่ยน) หรือหลังเปลี่ยนสูตร</span>
     </form>
+    <form method="post" th:action="@{/admin/files/cleanup}" style="margin-top:8px">
+      <button type="submit" class="secondary sm">ลบไฟล์ PDF ที่ค้าง</button>
+      <span class="field-note">ไฟล์ที่อัปโหลดแล้วไม่ได้กดบันทึกเกิน 24 ชั่วโมง (ระบบลบเองทุกชั่วโมงอยู่แล้ว)</span>
+    </form>
   </section>
 </div>
 </main>

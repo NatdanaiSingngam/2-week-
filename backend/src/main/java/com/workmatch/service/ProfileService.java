@@ -91,7 +91,12 @@ public class ProfileService {
         p.setLastName(parts.length > 1 ? parts[1] : "");
         p.setPhone(blankToNull(tel));
         p.setFaculty(blankToNull(limit(trim(faculty), 150)));
-        p.setMajor(blankToNull(limit(trim(major), 150)));
+        // สาขาต้องเลือกจากรายการมาตรฐาน (Majors) ยกเว้นค่าเดิมที่เคยพิมพ์ไว้ก่อนเปลี่ยนเป็น dropdown ให้คงไว้ได้
+        String m = trim(major);
+        if (!m.isEmpty() && !Majors.isStandard(m) && !m.equals(p.getMajor())) {
+            throw new IllegalArgumentException("กรุณาเลือกสาขาวิชาจากรายการ");
+        }
+        p.setMajor(blankToNull(limit(m, 150)));
         p.setGpa(grade);
         p.setGpaVisible(grade != null && gpaVisible);
         p.setCoopStart(start);

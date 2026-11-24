@@ -4,9 +4,10 @@
  * หน้าที่: หน้าบริษัทฝั่งประกาศงาน: ภาพรวม, จัดการประกาศ, สร้าง/แก้ไข/ลบ, เปลี่ยนสถานะ, ดูผู้สมัครที่จับคู่ได้, ดาวน์โหลด CSV
  * URL ที่รับ: GET /company/jobs, GET /company/postings, GET /company/jobs/new, POST /company/jobs,
  *     GET /company/jobs/{id}/edit, POST /company/jobs/{id}, POST /company/jobs/{id}/status,
- *     POST /company/jobs/{id}/delete, GET /company/jobs/{id}, GET /company/jobs/{id}/applicants.csv
+ *     POST /company/jobs/{id}/delete, GET /company/jobs/{id}, GET /company/jobs/{id}/applicants.csv,
+ *     GET /company/jobs/{id}/criteria, POST /company/jobs/{id}/criteria (เกณฑ์คัดกรอง UC-32)
  * แสดงผลที่หน้า: frontend/templates/company/job-detail.html, frontend/templates/company/job-form.html,
- *     frontend/templates/company/jobs.html, frontend/templates/company/postings.html
+ *     frontend/templates/company/jobs.html, frontend/templates/company/postings.html, frontend/templates/company/criteria.html
  * เรียกใช้: JobService, MatchService, CurrentUserService, JobPostingService, ApplicationService,
  *     DictionaryService
  * ถูกเรียกโดย: JobNotFoundException
@@ -26,6 +27,9 @@ import com.workmatch.service.DictionaryService;
 import com.workmatch.service.JobPostingService;
 import com.workmatch.service.JobService;
 import com.workmatch.service.MatchService;
+import com.workmatch.service.Majors;
+import com.workmatch.service.ScreeningCriteriaService;
+import com.workmatch.service.ScreeningCriteriaService.CriteriaInput;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,16 +65,55 @@ public class JobController {
     private final JobPostingService jobPostingService;
     private final ApplicationService applicationService;
     private final DictionaryService dictionary;
+    private final ScreeningCriteriaService screening;
 
     public JobController(JobService jobService, MatchService matchService, CurrentUserService currentUserService,
                          JobPostingService jobPostingService, ApplicationService applicationService,
-                         DictionaryService dictionary) {
+                         DictionaryService dictionary, ScreeningCriteriaService screening) {
         this.jobService = jobService;
         this.matchService = matchService;
         this.currentUserService = currentUserService;
         this.jobPostingService = jobPostingService;
         this.applicationService = applicationService;
         this.dictionary = dictionary;
+        this.screening = screening;
+    }
+
+    /** ฟอร์มเกณฑ์คัดกรองของประกาศ (A04 UC-32, รูป 56): เปิดได้เฉพาะบริษัทเจ้าของประกาศ */
+    @GetMapping("/company/jobs/{id}/criteria")
+    public String criteria(@PathVariable Long id, Model model) {
+        var view = screening.forCompany(currentUserService.getCurrentUser(), id);
+        return criteriaForm(model, view, view.toInput(), null);
+    }
+
+    @PostMapping("/company/jobs/{id}/criteria")
+    public String saveCriteria(@PathVariable Long id,
+                               @RequestParam(required = false) String minMatchScore,
+                               @RequestParam(required = false) String minGpa,
+                               @RequestParam(required = false) String requiredMajor,
+                               @RequestParam(required = false) String availableStart,
+                               @RequestParam(required = false) String availableEnd,
+                               @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
+                               Model model, RedirectAttributes redirect) {
+        User company = currentUserService.getCurrentUser();
+        CriteriaInput input = new CriteriaInput(minMatchScore, minGpa, requiredMajor, availableStart, availableEnd,
+                requiredSkills == null ? List.of() : requiredSkills);
+        try {
+            screening.save(company, id, input);
+        } catch (IllegalArgumentException e) {
+            // ค่าผิด = ไม่บันทึก แสดงฟอร์มเดิมพร้อมค่าที่กรอกและข้อความเตือน
+            return criteriaForm(model, screening.forCompany(company, id), input, e.getMessage());
+        }
+        redirect.addFlashAttribute("message", "บันทึกเกณฑ์คัดกรองแล้ว");
+        return "redirect:/company/jobs/" + id + "/criteria";
+    }
+
+    private String criteriaForm(Model model, ScreeningCriteriaService.CriteriaView view, CriteriaInput input, String error) {
+        model.addAttribute("job", view);
+        model.addAttribute("f", input);
+        model.addAttribute("majors", Majors.optionsWith(input.requiredMajor()));
+        if (error != null) model.addAttribute("error", error);
+        return "company/criteria";
     }
 
     /** หน้าหลักบริษัท: jobs (รายการเดิม) + overview (สถิติและประกาศล่าสุด) */

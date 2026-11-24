@@ -34,6 +34,25 @@ public class Resume {
     @Column(name = "resume_file_id")
     private Long resumeFileId;
 
+    /**
+     * ทักษะที่นักศึกษากดลบเอง คั่นด้วย | (แผน 30 พ.ย.) ตอนสกัดใหม่ทั้งหมดหลังแก้พจนานุกรม NLP อาจเจอคำเดิมอีก
+     * จึงต้องจำไว้ว่านักศึกษาไม่ต้องการ ล้างทิ้งเมื่อนักศึกษาบันทึกข้อความเรซูเม่ใหม่
+     */
+    @Column(name = "removed_skills", columnDefinition = "TEXT")
+    private String removedSkills;
+
+    public java.util.Set<String> getRemovedSkillSet() {
+        java.util.Set<String> out = new java.util.LinkedHashSet<>();
+        if (removedSkills != null) {
+            for (String s : removedSkills.split("\\|")) if (!s.isBlank()) out.add(s.trim());
+        }
+        return out;
+    }
+
+    public void setRemovedSkillSet(java.util.Set<String> names) {
+        removedSkills = names == null || names.isEmpty() ? null : String.join("|", names);
+    }
+
     public Long getResumeFileId() { return resumeFileId; }
     public void setResumeFileId(Long resumeFileId) { this.resumeFileId = resumeFileId; }
 

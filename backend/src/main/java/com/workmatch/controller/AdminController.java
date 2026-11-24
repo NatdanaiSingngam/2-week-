@@ -5,7 +5,8 @@
  * URL ที่รับ: GET /admin, GET /admin/companies, POST /admin/companies/{userId}/review,
  *     GET /admin/companies/{userId}/document, GET /admin/skills, POST /admin/skills,
  *     POST /admin/skills/{id}, POST /admin/skills/{id}/toggle, GET /admin/synonyms, POST /admin/synonyms,
- *     POST /admin/synonyms/{id}/delete, GET /admin/logs, GET /admin/users, POST /admin/users/{id}/toggle
+ *     POST /admin/synonyms/{id}/delete, GET /admin/logs, GET /admin/users, POST /admin/users/{id}/toggle,
+ *     POST /admin/skills/reextract (สกัดทักษะเรซูเม่ใหม่ทั้งหมด), POST /admin/files/cleanup (ลบไฟล์ PDF ที่ค้าง)
  * แสดงผลที่หน้า: frontend/templates/admin/companies.html, frontend/templates/admin/logs.html,
  *     frontend/templates/admin/overview.html, frontend/templates/admin/skills.html,
  *     frontend/templates/admin/synonyms.html, frontend/templates/admin/users.html
@@ -14,6 +15,8 @@
 package com.workmatch.controller;
 
 import com.workmatch.service.MatchService;
+import com.workmatch.service.SkillReextractService;
+import com.workmatch.service.StoredFileCleanupService;
 import com.workmatch.nlp.NlpUnavailableException;
 
 import com.workmatch.service.AdminService;
@@ -43,10 +46,15 @@ public class AdminController {
     private final FileStorageService fileStorage;
     private final CurrentUserService currentUserService;
     private final MatchService matchService;
+    private final SkillReextractService reextract;
+    private final StoredFileCleanupService fileCleanup;
 
     public AdminController(AdminService adminService, DictionaryService dictionary, ErrorLogService errorLogs,
-                           FileStorageService fileStorage, CurrentUserService currentUserService, MatchService matchService) {
+                           FileStorageService fileStorage, CurrentUserService currentUserService, MatchService matchService,
+                           SkillReextractService reextract, StoredFileCleanupService fileCleanup) {
         this.matchService = matchService;
+        this.reextract = reextract;
+        this.fileCleanup = fileCleanup;
         this.adminService = adminService;
         this.dictionary = dictionary;
         this.errorLogs = errorLogs;
@@ -70,6 +78,31 @@ public class AdminController {
         } catch (NlpUnavailableException e) {
             redirect.addFlashAttribute("error", "เชื่อมต่อ NLP ไม่ได้ ยังไม่ได้เปลี่ยนคะแนน ลองใหม่อีกครั้ง");
         }
+        return "redirect:/admin";
+    }
+
+    /** ปุ่ม "สกัดทักษะเรซูเม่ใหม่ทั้งหมด" (หน้าพจนานุกรม): ใช้หลังทีมเพิ่มคำใน skill_dictionary.csv ผ่าน git แล้วเปิดระบบใหม่ */
+    @PostMapping("/admin/skills/reextract")
+    public String reextractAll(RedirectAttributes redirect) {
+        redirect.addFlashAttribute("message", reextractSummary());
+        return "redirect:/admin/skills";
+    }
+
+    private String reextractSummary() {
+        try {
+            SkillReextractService.Result r = reextract.reextractAll();
+            return "สกัดทักษะเรซูเม่ใหม่ " + r.resumes() + " ฉบับ (ทักษะเปลี่ยน " + r.changed() + " ฉบับ"
+                    + (r.pairs() > 0 ? ", คำนวณคะแนนใหม่ " + r.pairs() + " คู่" : "") + ")";
+        } catch (NlpUnavailableException e) {
+            return "ยังไม่ได้สกัดทักษะเรซูเม่ใหม่ เพราะเชื่อมต่อ NLP ไม่ได้ (กดปุ่มสกัดใหม่ทั้งหมดในหน้าพจนานุกรมภายหลัง)";
+        }
+    }
+
+    /** ปุ่ม "ลบไฟล์ PDF ที่ค้าง" (หน้าภาพรวม): ปกติระบบลบเองทุกชั่วโมง ปุ่มนี้สั่งทันที (ไฟล์ที่ค้างเกิน 24 ชั่วโมง) */
+    @PostMapping("/admin/files/cleanup")
+    public String cleanupFiles(RedirectAttributes redirect) {
+        int n = fileCleanup.deleteOrphans(StoredFileCleanupService.MIN_AGE);
+        redirect.addFlashAttribute("message", n == 0 ? "ไม่มีไฟล์ PDF ที่ค้าง" : "ลบไฟล์ PDF ที่ค้างแล้ว " + n + " ไฟล์");
         return "redirect:/admin";
     }
 
@@ -200,9 +233,13 @@ public class AdminController {
     }
 
     /** หลังแก้พจนานุกรม ส่งชุดใหม่ให้ NLP แล้วบอกผู้ดูแลว่าซิงก์สำเร็จหรือไม่ */
+    /**
+     * หลังแก้พจนานุกรม: ส่งชุดใหม่ให้ NLP แล้วสกัดทักษะใหม่ให้เรซูเม่ทุกฉบับ + คำนวณคะแนนใหม่ (แผน 30 พ.ย.)
+     * ทักษะในเรซูเม่เก่าจึงอัปเดตตามทันที ไม่ต้องรอนักศึกษากดบันทึกใหม่
+     */
     private void synced(RedirectAttributes redirect, String message) {
         if (dictionary.pushToNlp()) {
-            redirect.addFlashAttribute("message", message + " · ระบบ NLP ใช้ชุดใหม่แล้ว");
+            redirect.addFlashAttribute("message", message + " · ระบบ NLP ใช้ชุดใหม่แล้ว · " + reextractSummary());
         } else {
             redirect.addFlashAttribute("message", message);
             redirect.addFlashAttribute("error", "บันทึกในฐานข้อมูลแล้ว แต่ส่งให้ระบบ NLP ไม่สำเร็จ (NLP อาจปิดอยู่) จะซิงก์อีกครั้งเมื่อเปิดระบบใหม่");

@@ -1,0 +1,21 @@
+id,text,expected_skills
+1,ไม่เคยใช้ Docker และ Kubernetes แต่ใช้ Git เป็นประจำ,Git
+2,อยากเรียน React เพิ่มเติม ปัจจุบันใช้ Vue ทำโปรเจกต์,Vue
+3,"I have never used Java, but I write Python every day.",Python
+4,ไม่ว่าจะเป็น Python หรือ Java ก็เขียนได้คล่อง,Python|Java
+5,ไม่เพียงแต่เขียน Java ได้ ยังใช้ Spring Boot ทำ API,Java|Spring Boot
+6,แต่ละโปรเจกต์ใช้ React และ Node.js,React|Node.js
+7,Interested in learning Docker. Experienced with Git and Linux.,Git|Linux
+8,ใช้ Node.js ทำ API ได้ แต่ไม่ถนัด CSS,Node.js
+9,ไม่มีประสบการณ์ด้าน Kubernetes ใช้ Docker ในงานเล็ก ๆ,Docker
+10,Not only Java but also Kotlin for Android apps.,Java|Kotlin|Android
+11,ไม่มีปัญหาในการใช้ Excel และ Power BI ทำรายงาน,Excel|Power BI
+12,"No experience with AWS; currently using GCP.",GCP
+13,อยากศึกษา Machine Learning ด้วย TensorFlow ในอนาคต,
+14,เขียน SQL ได้ ส่วน MongoDB ไม่เคยใช้,SQL
+15,Want to learn Flutter. I build web apps with Angular and TypeScript.,Angular|TypeScript
+16,ทำงานเป็นทีมได้ดี ไม่เคยใช้ Figma แต่ใช้ Canva ออกแบบโปสเตอร์,การทำงานเป็นทีม|Canva
+17,"Skills: Python, SQL, Git. Never worked with Jenkins.",Python|SQL|Git
+18,ใช้ Linux เป็นประจำ ขณะที่ Windows ไม่ค่อยได้ใช้,Linux
+19,มีพื้นฐาน C++ และ Java จากรายวิชา อยากฝึก Go เพิ่ม,C++|Java
+20,"I plan to learn Rust, and I already use C# with .NET.",C#|.NET

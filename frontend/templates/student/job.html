@@ -58,9 +58,22 @@
   </div>
   <div th:if="${m == null}">
     <h2 style="font-size:1rem">ทักษะที่ต้องการ</h2>
-    <div class="tags"><span class="chip" th:each="sk : ${job.skills()}" th:text="${sk.name}">Java</span></div>
+    <div class="tags"><span class="chip" th:each="sk : ${job.skills()}" th:text="${sk.name}" th:classappend="${job.criteria() != null and job.criteria().requiredSkills().contains(sk.name)} ? 'chip-required'" th:title="${job.criteria() != null and job.criteria().requiredSkills().contains(sk.name)} ? 'ทักษะบังคับ'">Java</span></div>
     <p class="field-note" th:if="${!job.hasResume()}"><a th:href="@{/student/resume}">อัปโหลดเรซูเม่</a> เพื่อดูค่าร้อยละความสอดคล้องกับตำแหน่งนี้</p>
   </div>
+
+  <!--/* เกณฑ์คัดกรองที่บริษัทตั้งไว้ (A04 รูป 51, UC-32) ให้นักศึกษาเห็นก่อนสมัคร ตอนนี้แสดงอย่างเดียว ยังไม่ตัดสินผ่าน/ไม่ผ่าน */-->
+  <section class="criteria-box" aria-labelledby="criteria-title" th:with="c=${job.criteria()}">
+    <h2 id="criteria-title" style="font-size:1rem">เกณฑ์คัดกรองของบริษัท</h2>
+    <p class="muted" th:if="${c == null or c.isEmpty()}" style="margin:0">บริษัทยังไม่ได้กำหนดเกณฑ์คัดกรองสำหรับตำแหน่งนี้</p>
+    <dl class="criteria-list" th:if="${c != null and !c.isEmpty()}">
+      <div th:if="${c.minMatchScore() != null}"><dt>คะแนนความสอดคล้องขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minMatchScore(), 1, 1) + '%'}">50.0%</dd></div>
+      <div th:if="${c.minGpa() != null}"><dt>GPA ขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minGpa(), 1, 2)}">2.50</dd></div>
+      <div th:if="${c.requiredMajor() != null}"><dt>สาขาวิชา</dt><dd th:text="${c.requiredMajor()}">วิทยาการคอมพิวเตอร์</dd></div>
+      <div th:if="${c.availableStart() != null}"><dt>ช่วงสหกิจที่ต้องการ</dt><dd th:text="${@fmt.date(c.availableStart()) + ' – ' + @fmt.date(c.availableEnd())}">1 มิ.ย. 2570 – 30 ก.ย. 2570</dd></div>
+      <div th:if="${not #lists.isEmpty(c.requiredSkills())}"><dt>ทักษะบังคับ</dt><dd><span class="badge badge-required" th:each="sk : ${c.requiredSkills()}" th:text="${sk}">Java</span></dd></div>
+    </dl>
+  </section>
 
   <div class="apply-box">
     <div th:if="${job.applicationStatus() != null}" class="alert success" role="status">

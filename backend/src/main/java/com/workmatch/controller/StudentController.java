@@ -111,10 +111,16 @@ public class StudentController {
     @GetMapping("/student/profile")
     public String profile(Model model) {
         User student = currentUserService.getCurrentUser();
-        model.addAttribute("profile", profileService.studentProfile(student));
+        addProfileModel(student, model);
+        return "student/profile";
+    }
+
+    private void addProfileModel(User student, Model model) {
+        var profile = profileService.studentProfile(student);
+        model.addAttribute("profile", profile);
+        model.addAttribute("majors", com.workmatch.service.Majors.optionsWith(profile.getMajor()));
         model.addAttribute("email", student.getEmail());
         model.addAttribute("section", "profile");
-        return "student/profile";
     }
 
     @PostMapping("/student/profile")
@@ -130,9 +136,7 @@ public class StudentController {
             profileService.updateStudent(student, fullName, phone, studentId, faculty, major, gpa, gpaVisible, coopStart, coopEnd);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("profile", profileService.studentProfile(student));
-            model.addAttribute("email", student.getEmail());
-            model.addAttribute("section", "profile");
+            addProfileModel(student, model);
             return "student/profile";
         }
         redirect.addFlashAttribute("message", "บันทึกข้อมูลแล้ว");

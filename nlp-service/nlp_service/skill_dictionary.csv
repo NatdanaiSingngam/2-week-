@@ -1,7 +1,7 @@
 skill,aliases,category
-Java,,programming
+Java,จาวา,programming
 Python,ไพธอน|ไพทอน,programming
-JavaScript,js,programming
+JavaScript,js|จาวาสคริปต์|จาวาสคริปท์,programming
 TypeScript,,programming
 C#,,programming
 C++,,programming
@@ -9,14 +9,14 @@ PHP,,programming
 Kotlin,,programming
 Swift,,programming
 Dart,,programming
-SQL,,database
+SQL,เอสคิวแอล,database
 MySQL,,database
 PostgreSQL,postgres,database
 MongoDB,,database
 Firebase,,database
 HTML,html5,frontend
 CSS,css3,frontend
-React,react.js|reactjs,frontend
+React,react.js|reactjs|รีแอค|รีแอคท์,frontend
 Vue,vue.js|vuejs,frontend
 Angular,,frontend
 Bootstrap,,frontend
@@ -29,18 +29,18 @@ Django,,backend
 Flask,,backend
 FastAPI,,backend
 REST API,restful|rest apis|restful api,backend
-Flutter,,mobile
+Flutter,ฟลัตเตอร์,mobile
 Android,,mobile
 Git,,tools
 GitHub,,tools
-Docker,,tools
-Linux,,tools
+Docker,ด็อกเกอร์|ด๊อกเกอร์,tools
+Linux,ลินุกซ์|ลีนุกซ์,tools
 Postman,,tools
-Figma,,design
-Photoshop,,design
+Figma,ฟิกม่า,design
+Photoshop,โฟโต้ช็อป|โฟโต้ชอป,design
 Illustrator,,design
 UI/UX,ux|ux/ui|ui design|ux design|user interface,design
-Excel,,office
+Excel,เอ็กเซล|เอกเซล,office
 Microsoft Office,ms office,office
 Power BI,powerbi,data
 Tableau,,data
@@ -53,20 +53,20 @@ TensorFlow,,data
 PyTorch,,data
 NLP,,data
 Selenium,,testing
-Software Testing,การทดสอบซอฟต์แวร์|ทดสอบซอฟต์แวร์|manual testing,testing
+Software Testing,การทดสอบซอฟต์แวร์|ทดสอบซอฟต์แวร์|manual testing|quality assurance|qa engineer|software tester,testing
 Networking,เครือข่าย|ระบบเครือข่าย|network administrator|network administration,infrastructure
 Cybersecurity,ความปลอดภัยไซเบอร์,infrastructure
 การสื่อสาร,สื่อสาร|communication|communication skills,soft
-การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น|teamwork|team player,soft
+การทำงานเป็นทีม,ทำงานเป็นทีม|ทำงานร่วมกับทีม|การทำงานร่วมกับผู้อื่น|teamwork|team player|ทำงานร่วมกันเป็นทีม|teamwork skills,soft
 การแก้ปัญหา,แก้ปัญหา|problem solving|problem-solving,soft
-ความรับผิดชอบ,รับผิดชอบ,soft
+ความรับผิดชอบ,รับผิดชอบ|responsibility|sense of responsibility,soft
 การบริหารเวลา,จัดการเวลา|บริหารเวลา|time management,soft
 ความคิดสร้างสรรค์,creativity|creative thinking,soft
-ภาวะผู้นำ,ผู้นำ|leadership,soft
+ภาวะผู้นำ,ผู้นำ|leadership|ความเป็นผู้นำ|leadership skills,soft
 การคิดวิเคราะห์,critical thinking|analytical thinking,soft
 ภาษาอังกฤษ,english,language
 ภาษาจีน,chinese,language
-การนำเสนอ,นำเสนอ,soft
+การนำเสนอ,นำเสนอ|presentation skills|public speaking|พูดในที่สาธารณะ,soft
 AWS,amazon web services,infrastructure
 Cisco,,infrastructure
 Shell Script,shell scripting|bash script|bash,infrastructure
@@ -106,3 +106,6 @@ Matplotlib,,data
 Unity,,tools
 Trello,,tools
 Slack,,tools
+React Native,react-native,mobile
+macOS,mac os|osx|os x,tools
+Canva,แคนวา,design

@@ -3,7 +3,7 @@
   หน้าที่: จัดการเรซูเม่: กรอกข้อความ / อัปโหลด PDF / ดูและแก้ทักษะที่ระบบตรวจพบ
   แสดงโดย: ResumeController (GET /student/resume), ResumeController (POST /student/resume)
   ข้อมูลที่ได้รับจาก Controller: pdfName, resumeText, skills, dictionarySkills
-  ส่งฟอร์มไปที่: POST /student/resume/upload, POST /student/resume/file/delete, POST /student/resume,
+  ส่งฟอร์มไปที่: POST /student/resume/upload, POST /student/resume/file/delete, POST /student/resume/delete, POST /student/resume,
       POST /student/resume/skills/remove, POST /student/resume/skills/add
   ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
 */-->
@@ -73,6 +73,11 @@
     <button type="submit" class="secondary">เพิ่มทักษะ</button>
   </form>
   <p class="field-note">ผลลัพธ์ขึ้นอยู่กับคำทักษะในพจนานุกรมของระบบ เพิ่มได้เฉพาะทักษะที่อยู่ในพจนานุกรม</p>
+</section>
+
+<section class="card danger-zone" aria-labelledby="delete-resume-title" th:if="${hasResume}" style="margin-top:20px">
+  <div class="card-head"><div><h2 id="delete-resume-title">ลบเรซูเม่ทั้งฉบับ</h2><p class="field-note" style="margin:0">ลบข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF ทั้งหมด ใบสมัครที่ส่งไปแล้วยังอยู่ แต่บริษัทจะไม่เห็นคะแนนและทักษะ และสมัครงานใหม่ไม่ได้จนกว่าจะบันทึกเรซูเม่อีกครั้ง</p></div>
+  <form method="post" class="inline-form" th:action="@{/student/resume/delete}" data-confirm="ลบเรซูเม่ทั้งฉบับ? ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF จะหายทั้งหมด และกู้คืนไม่ได้"><button type="submit" class="danger sm">ลบเรซูเม่ทั้งฉบับ</button></form></div>
 </section>
 
 <div class="actions end" style="margin-top:20px"><a class="button secondary" th:href="@{/student/dashboard}">ยกเลิก</a><a class="button" th:href="@{/student/jobs}">บันทึกและค้นหางาน</a></div>

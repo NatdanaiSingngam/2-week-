@@ -30,7 +30,7 @@
           <input th:if="${profile.studentId == null}" id="studentId" name="studentId" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="66XXXXXX" aria-describedby="sid-note" />
           <p id="sid-note" class="field-note" th:text="${profile.studentId != null} ? 'รหัสนิสิตแก้ไขไม่ได้' : 'ตัวเลข 8 หลัก กรอกได้ครั้งเดียว'">รหัสนิสิตแก้ไขไม่ได้</p></div>
         <div class="field"><label for="faculty">คณะ</label><input id="faculty" name="faculty" maxlength="150" placeholder="เช่น เทคโนโลยีสารสนเทศและการสื่อสาร" th:value="${profile.faculty}" /></div>
-        <div class="field span-2"><label for="major">สาขาวิชา</label><input id="major" name="major" maxlength="150" placeholder="เช่น วิทยาการคอมพิวเตอร์" th:value="${profile.major}" /></div>
+        <div class="field span-2"><label for="major">สาขาวิชา</label><select id="major" name="major" class="select"><option value="">— ไม่ระบุ —</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == profile.major}">วิทยาการคอมพิวเตอร์</option></select><p class="field-note">บริษัทใช้สาขานี้คัดกรองผู้สมัคร</p></div>
       </div>
       <h2 class="form-section-title">ข้อมูลสำหรับสหกิจศึกษา <span class="muted" style="font-weight:400">ไม่บังคับ</span></h2>
       <div class="form-grid">

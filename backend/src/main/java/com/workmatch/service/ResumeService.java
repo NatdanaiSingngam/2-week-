@@ -57,6 +57,7 @@ public class ResumeService {
             return r;
         });
         resume.setRawText(text);
+        resume.setRemovedSkillSet(null); // ข้อความใหม่ = เริ่มชุดทักษะใหม่ทั้งหมด
         resume.touch();
         resume = resumes.save(resume);
 

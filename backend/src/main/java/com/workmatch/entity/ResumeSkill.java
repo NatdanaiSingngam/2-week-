@@ -28,6 +28,13 @@ public class ResumeSkill {
     @Column(length = 50)
     private String category;
 
+    /**
+     * true = นักศึกษาเพิ่มเองจากหน้าเรซูเม่ (ไม่ได้มาจาก NLP) ตอนสกัดทักษะใหม่ทั้งหมดหลังแก้พจนานุกรม (แผน 30 พ.ย.)
+     * ทักษะกลุ่มนี้ถูกเก็บไว้ ไม่ถูกแทนด้วยผลของ NLP
+     */
+    @Column(name = "is_manual", nullable = false, columnDefinition = "boolean default false not null")
+    private boolean manual = false;
+
     public ResumeSkill() {}
 
     public ResumeSkill(Resume resume, String skillName, String category) {
@@ -43,4 +50,6 @@ public class ResumeSkill {
     public void setSkillName(String skillName) { this.skillName = skillName; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+    public boolean isManual() { return manual; }
+    public void setManual(boolean manual) { this.manual = manual; }
 }

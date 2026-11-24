@@ -23,6 +23,10 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     // จำนวนผู้ที่จับคู่ได้คะแนนมากกว่า 0 (ใช้เป็น applicantCount)
     long countByJobIdAndScoreGreaterThan(Long jobId, java.math.BigDecimal score);
 
+    // ลบผลจับคู่ของเรซูเม่ (ตอนนิสิตลบเรซูเม่ทั้งฉบับ)
+    @Transactional
+    void deleteByResumeId(Long resumeId);
+
     // ลบผลจับคู่ของประกาศ (ก่อนลบประกาศงาน)
     @Transactional
     void deleteByJobId(Long jobId);

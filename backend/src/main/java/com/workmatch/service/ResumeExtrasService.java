@@ -12,6 +12,7 @@ import com.workmatch.entity.ResumeSkill;
 import com.workmatch.entity.SkillEntry;
 import com.workmatch.entity.StoredFile;
 import com.workmatch.entity.User;
+import com.workmatch.repository.MatchRepository;
 import com.workmatch.repository.ResumeRepository;
 import com.workmatch.repository.ResumeSkillRepository;
 import org.springframework.stereotype.Service;
@@ -32,14 +33,16 @@ public class ResumeExtrasService {
     private final ResumeSkillRepository resumeSkills;
     private final FileStorageService fileStorage;
     private final DictionaryService dictionary;
+    private final MatchRepository matches;
 
     public ResumeExtrasService(ResumeService resumeService, ResumeRepository resumes, ResumeSkillRepository resumeSkills,
-                               FileStorageService fileStorage, DictionaryService dictionary) {
+                               FileStorageService fileStorage, DictionaryService dictionary, MatchRepository matches) {
         this.resumeService = resumeService;
         this.resumes = resumes;
         this.resumeSkills = resumeSkills;
         this.fileStorage = fileStorage;
         this.dictionary = dictionary;
+        this.matches = matches;
     }
 
     /** PDF ที่อัปโหลดแล้วแต่ยังไม่บันทึกเป็นเรซูเม่: id ไฟล์ ชื่อไฟล์ และข้อความที่สกัดได้ (ให้ผู้ใช้ตรวจก่อน) */
@@ -98,6 +101,25 @@ public class ResumeExtrasService {
         return owned && !linked;
     }
 
+    /**
+     * ลบเรซูเม่ทั้งฉบับ (A04 1.4.1.1.3, UC-14): ผลจับคู่ (matches) → ทักษะ (resume_skills) → แถวเรซูเม่ → ไฟล์ PDF
+     * ใบสมัครที่ส่งไปแล้ว (job_applications) ผูกกับตัวนิสิต ไม่ได้ผูกกับเรซูเม่ จึงยังอยู่ บริษัทยังเห็นใบสมัครแต่ไม่มีคะแนนและทักษะ
+     * คืน false ถ้ายังไม่มีเรซูเม่
+     */
+    @Transactional
+    public boolean deleteResume(User student) {
+        Optional<Resume> found = resumes.findByUserId(student.getId());
+        if (found.isEmpty()) return false;
+        Resume r = found.get();
+        Long fileId = r.getResumeFileId();
+        matches.deleteByResumeId(r.getId());
+        resumeSkills.deleteByResumeId(r.getId());
+        resumes.delete(r);
+        resumes.flush();
+        fileStorage.delete(fileId);
+        return true;
+    }
+
     /** ลบไฟล์ PDF ที่แนบ (ข้อความและทักษะยังอยู่) */
     @Transactional
     public void removePdf(User student) {
@@ -128,7 +150,14 @@ public class ResumeExtrasService {
         boolean exists = resumeSkills.findByResumeId(resume.getId()).stream()
                 .anyMatch(s -> s.getSkillName().equalsIgnoreCase(skill.getName()));
         if (exists) throw new IllegalArgumentException("มีทักษะ " + skill.getName() + " อยู่แล้ว");
-        resumeSkills.save(new ResumeSkill(resume, skill.getName(), skill.getCategory()));
+        ResumeSkill row = new ResumeSkill(resume, skill.getName(), skill.getCategory());
+        row.setManual(true); // เพิ่มเอง: สกัดใหม่ทั้งหมดแล้วยังอยู่
+        resumeSkills.save(row);
+        java.util.Set<String> removed = resume.getRemovedSkillSet();
+        if (removed.removeIf(n -> n.equalsIgnoreCase(skill.getName()))) {
+            resume.setRemovedSkillSet(removed);
+            resumes.save(resume);
+        }
         return resume.getId();
     }
 
@@ -136,9 +165,15 @@ public class ResumeExtrasService {
     @Transactional
     public Long removeSkill(User student, String name) {
         Resume resume = requireResume(student);
+        java.util.Set<String> removed = resume.getRemovedSkillSet();
         resumeSkills.findByResumeId(resume.getId()).stream()
                 .filter(s -> s.getSkillName().equalsIgnoreCase(name == null ? "" : name.trim()))
-                .forEach(resumeSkills::delete);
+                .forEach(s -> {
+                    removed.add(s.getSkillName()); // จำไว้ สกัดใหม่ทั้งหมดแล้วไม่ใส่กลับ
+                    resumeSkills.delete(s);
+                });
+        resume.setRemovedSkillSet(removed);
+        resumes.save(resume);
         return resume.getId();
     }
 

@@ -16,6 +16,7 @@
 <main id="main" class="admin-main">
 <div class="welcome" style="margin-bottom:20px"><div><h1>พจนานุกรมทักษะหลัก (Skill Dictionary)</h1><p>ฐานข้อมูลทักษะวิชาชีพมาตรฐาน (Standard Keywords) สำหรับใช้คำนวณ Cosine Similarity</p></div><a class="button" href="#add-skill">+ เพิ่มทักษะใหม่</a></div>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
+<form method="post" class="card" style="display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:12px" th:action="@{/admin/skills/reextract}" data-busy="กำลังสกัดทักษะใหม่..."><p class="field-note" style="margin:0">แก้พจนานุกรมในหน้านี้แล้ว ระบบสกัดทักษะเรซูเม่ทุกฉบับใหม่ให้อัตโนมัติ ใช้ปุ่มนี้หลังเพิ่มคำใน skill_dictionary.csv ผ่าน git ทักษะที่นักศึกษาเพิ่มเองหรือลบเองจะคงไว้</p><button type="submit" class="secondary sm">สกัดทักษะเรซูเม่ใหม่ทั้งหมด</button></form>
 <form class="card search-bar" style="grid-template-columns:1fr auto" method="get" th:action="@{/admin/skills}" role="search">
   <label for="q" class="visually-hidden">ค้นหาชื่อทักษะหรือหมวด</label>
   <input id="q" name="q" type="search" th:value="${q}" placeholder="ค้นหาชื่อทักษะ..." />

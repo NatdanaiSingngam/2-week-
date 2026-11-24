@@ -73,11 +73,14 @@ public class JobPostingService {
     private final NlpClient nlpClient;
     private final DictionaryService dictionary;
     private final MatchService matchService;
+    private final com.workmatch.repository.JobScreeningCriteriaRepository criteria;
+    private final ScreeningCriteriaService screening;
 
     public JobPostingService(JobRepository jobs, JobSkillRepository jobSkills, MatchRepository matches,
                              ResumeRepository resumes, JobApplicationRepository applications, BookmarkRepository bookmarks,
                              CompanyProfileRepository companyProfiles, NlpClient nlpClient, DictionaryService dictionary,
-                             MatchService matchService) {
+                             MatchService matchService, com.workmatch.repository.JobScreeningCriteriaRepository criteria,
+                             ScreeningCriteriaService screening) {
         this.jobs = jobs;
         this.jobSkills = jobSkills;
         this.matches = matches;
@@ -88,6 +91,8 @@ public class JobPostingService {
         this.nlpClient = nlpClient;
         this.dictionary = dictionary;
         this.matchService = matchService;
+        this.criteria = criteria;
+        this.screening = screening;
     }
 
     // ---------- บริษัท: สร้าง / แก้ไข / ลบ ----------
@@ -100,7 +105,7 @@ public class JobPostingService {
         apply(job, input);
         List<ExtractedSkill> skills = skillsFor(input);
         job = jobs.save(job);
-        saveSkills(job, skills);
+        saveSkills(job, skills, java.util.Set.of());
         return job.getId();
     }
 
@@ -110,8 +115,11 @@ public class JobPostingService {
         apply(job, input);
         List<ExtractedSkill> skills = skillsFor(input);
         jobs.save(job);
+        // แก้ประกาศ = สกัดทักษะใหม่ทั้งชุด แต่คงธงทักษะบังคับ (is_required) ของทักษะที่ยังอยู่ไว้
+        java.util.Set<String> required = new java.util.HashSet<>();
+        jobSkills.findByJobId(job.getId()).stream().filter(JobSkill::isRequired).forEach(s -> required.add(s.getSkillName()));
         jobSkills.deleteByJobId(job.getId());
-        saveSkills(job, skills);
+        saveSkills(job, skills, required);
         if (!job.isOpen()) matches.deleteByJobId(job.getId());
     }
 
@@ -133,6 +141,7 @@ public class JobPostingService {
     public void delete(User company, Long jobId) {
         Job job = owned(company, jobId);
         matches.deleteByJobId(job.getId());
+        criteria.deleteByJobId(job.getId());
         jobSkills.deleteByJobId(job.getId());
         jobs.delete(job);
     }
@@ -230,7 +239,7 @@ public class JobPostingService {
                 app.map(JobApplication::getStatus).orElse(null), app.map(JobApplication::getAppliedAt).orElse(null),
                 resumes.findByUserId(student.getId()).isPresent(), j.getLocation(), j.getWorkMode(), j.getOpenings(),
                 j.getDeadline(), j.isAccepting(), p.map(CompanyProfile::getAbout).orElse(null),
-                p.map(CompanyProfile::getWebsite).orElse(null));
+                p.map(CompanyProfile::getWebsite).orElse(null), screening.forJob(jobId));
     }
 
     // ---------- ภายใน ----------
@@ -289,9 +298,13 @@ public class JobPostingService {
         return ResumeService.dedupe(nlpClient.extractSkills(d)).stream().map(ExtractedSkill::name).toList();
     }
 
-    private void saveSkills(Job job, List<ExtractedSkill> skills) {
+    private void saveSkills(Job job, List<ExtractedSkill> skills, java.util.Set<String> required) {
         List<JobSkill> rows = new ArrayList<>();
-        for (ExtractedSkill s : skills) rows.add(new JobSkill(job, s.name(), s.category()));
+        for (ExtractedSkill s : skills) {
+            JobSkill row = new JobSkill(job, s.name(), s.category());
+            row.setRequired(required.contains(s.name()));
+            rows.add(row);
+        }
         jobSkills.saveAll(rows);
     }
 

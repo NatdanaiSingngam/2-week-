@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@org.springframework.scheduling.annotation.EnableScheduling // ลบไฟล์ PDF ที่ค้างทุกชั่วโมง (StoredFileCleanupService)
 public class WorkmatchApplication {
 
     public static void main(String[] args) {

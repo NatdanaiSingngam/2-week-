@@ -52,7 +52,8 @@ public final class Views {
                                  String accommodation, String transport, List<SkillView> skills, MatchView match,
                                  boolean bookmarked, ApplicationStatus applicationStatus, LocalDateTime appliedAt,
                                  boolean hasResume, String location, String workMode, Integer openings,
-                                 LocalDate deadline, boolean accepting, String companyAbout, String companyWebsite) { }
+                                 LocalDate deadline, boolean accepting, String companyAbout, String companyWebsite,
+                                 com.workmatch.service.ScreeningCriteriaService.CriteriaView criteria) { }
 
     /** งานที่บันทึกไว้ (รูปที่ 41) */
     public record BookmarkItem(Long jobId, String title, String companyName, LocalDateTime savedAt, boolean open,
