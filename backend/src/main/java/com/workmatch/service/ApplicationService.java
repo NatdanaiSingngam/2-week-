@@ -78,7 +78,7 @@ public class ApplicationService {
     @Transactional
     public Long apply(User student, Long jobId, String coverLetter) {
         Job job = jobs.findById(jobId).orElseThrow(JobNotFoundException::new);
-        if (!job.isOpen()) throw new IllegalArgumentException("ตำแหน่งนี้ปิดรับสมัครแล้ว");
+        if (!job.isAccepting()) throw new IllegalArgumentException("ตำแหน่งนี้ปิดรับสมัครแล้ว");
         if (resumes.findByUserId(student.getId()).isEmpty()) {
             throw new IllegalArgumentException("กรุณาบันทึกเรซูเม่ก่อนสมัครงาน เพื่อให้บริษัทเห็นทักษะของคุณ");
         }
@@ -152,7 +152,9 @@ public class ApplicationService {
                 p.map(StudentProfile::getStudentId).orElse(null), p.map(StudentProfile::getFaculty).orElse(null),
                 p.map(StudentProfile::getMajor).orElse(null), a.getAppliedAt(), a.getStatus(), a.getCoverLetter(), score,
                 checks, others, file.map(f -> f.getId()).orElse(null), file.map(f -> f.getFileName()).orElse(null),
-                file.map(f -> f.getSizeBytes()).orElse(null));
+                file.map(f -> f.getSizeBytes()).orElse(null),
+                p.filter(StudentProfile::isGpaVisible).map(StudentProfile::getGpa).orElse(null), // ส่ง GPA เมื่อนักศึกษายินยอมเท่านั้น
+                p.map(StudentProfile::getCoopStart).orElse(null), p.map(StudentProfile::getCoopEnd).orElse(null));
     }
 
     @Transactional

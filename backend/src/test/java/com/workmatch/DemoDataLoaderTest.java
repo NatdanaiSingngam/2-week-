@@ -59,24 +59,27 @@ class DemoDataLoaderTest {
 
         loader.run();
 
-        // 3 นักศึกษา + 2 บริษัท + 1 ผู้ดูแลระบบ (ส่วนเสริมตามเอกสารบทที่ 3)
-        assertThat(users.count()).isEqualTo(6);
-        assertThat(resumes.count()).isEqualTo(3);
-        assertThat(jobs.count()).isEqualTo(6);
-        assertThat(matches.count()).isEqualTo(18); // 3 เรซูเม่ x 6 ตำแหน่ง
+        // 4 นักศึกษา + 3 บริษัท + 1 ผู้ดูแลระบบ (ส่วนเสริมตามเอกสารบทที่ 3)
+        assertThat(users.count()).isEqualTo(8);
+        assertThat(resumes.count()).isEqualTo(4);
+        assertThat(jobs.count()).isEqualTo(7);
+        assertThat(matches.count()).isEqualTo(28); // 4 เรซูเม่ x 7 ตำแหน่ง
         User s1 = users.findByEmail(DemoDataLoader.MARKER_EMAIL).orElseThrow();
         assertThat(s1.getPasswordHash()).startsWith("$2");
         assertThat(encoder.matches(DemoDataLoader.DEMO_PASSWORD, s1.getPasswordHash())).isTrue();
         assertThat(users.findByEmail(DemoDataLoader.ADMIN_EMAIL).orElseThrow().getRole()).isEqualTo(Role.ADMIN);
-        assertThat(studentProfiles.count()).isEqualTo(3);
-        assertThat(companyProfiles.count()).isEqualTo(2);
+        assertThat(studentProfiles.count()).isEqualTo(4);
+        assertThat(companyProfiles.count()).isEqualTo(3);
+        for (String mail : List.of(DemoDataLoader.TEST_STUDENT_EMAIL, DemoDataLoader.TEST_COMPANY_EMAIL)) {
+            assertThat(encoder.matches("Demo1234", users.findByEmail(mail).orElseThrow().getPasswordHash())).isTrue();
+        }
         long applicationsAfterFirstRun = applications.count();
-        assertThat(applicationsAfterFirstRun).isEqualTo(6);
+        assertThat(applicationsAfterFirstRun).isEqualTo(7);
 
         loader.run(); // รันซ้ำต้องไม่สร้างซ้ำ
-        assertThat(users.count()).isEqualTo(6);
-        assertThat(jobs.count()).isEqualTo(6);
-        assertThat(matches.count()).isEqualTo(18);
+        assertThat(users.count()).isEqualTo(8);
+        assertThat(jobs.count()).isEqualTo(7);
+        assertThat(matches.count()).isEqualTo(28);
         assertThat(applications.count()).isEqualTo(applicationsAfterFirstRun);
     }
 }

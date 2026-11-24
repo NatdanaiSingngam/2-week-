@@ -120,10 +120,14 @@ public class StudentController {
     @PostMapping("/student/profile")
     public String saveProfile(@RequestParam(required = false) String fullName, @RequestParam(required = false) String phone,
                               @RequestParam(required = false) String studentId, @RequestParam(required = false) String faculty,
-                              @RequestParam(required = false) String major, Model model, RedirectAttributes redirect) {
+                              @RequestParam(required = false) String major,
+                              @RequestParam(required = false) String gpa,
+                              @RequestParam(defaultValue = "false") boolean gpaVisible,
+                              @RequestParam(required = false) String coopStart,
+                              @RequestParam(required = false) String coopEnd, Model model, RedirectAttributes redirect) {
         User student = currentUserService.getCurrentUser();
         try {
-            profileService.updateStudent(student, fullName, phone, studentId, faculty, major);
+            profileService.updateStudent(student, fullName, phone, studentId, faculty, major, gpa, gpaVisible, coopStart, coopEnd);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("profile", profileService.studentProfile(student));

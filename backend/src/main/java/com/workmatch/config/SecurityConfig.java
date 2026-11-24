@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.csrf.CsrfException;
 
 /**
  * งาน A2: form login + BCrypt + แยกสิทธิ์ STUDENT / COMPANY
@@ -46,6 +48,15 @@ public class SecurityConfig {
                 .successHandler(new RoleRedirectSuccessHandler())
                 .failureUrl("/login?error")
                 .permitAll())
+            // token ในหน้า login เก่าใช้ไม่ได้ (เช่น เซิร์ฟเวอร์รีสตาร์ต): พากลับไปหน้า login ใหม่แทนหน้า 403
+            .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, denied) -> {
+                String path = request.getRequestURI().substring(request.getContextPath().length());
+                if (denied instanceof CsrfException && ("/login".equals(path) || "/logout".equals(path))) {
+                    response.sendRedirect(request.getContextPath() + "/login?expired");
+                } else {
+                    new AccessDeniedHandlerImpl().handle(request, response, denied);
+                }
+            }))
             .logout(logout -> logout
                 .logoutUrl("/logout")               // ต้องเป็น POST พร้อม CSRF token
                 .logoutSuccessUrl("/login?logout")

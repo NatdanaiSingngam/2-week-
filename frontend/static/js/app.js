@@ -99,6 +99,87 @@
     document.querySelectorAll('input[name=role]').forEach(radio => radio.addEventListener('change', syncSections));
     syncSections();
   }
+  // Job form: structured inputs write into the original text field, which stays the submitted value (works without JavaScript)
+  document.querySelectorAll('[data-builder]').forEach(wrap => {
+    const box = wrap.querySelector('.builder');
+    const text = wrap.querySelector('#compensation, #workSchedule');
+    const kind = box.querySelector('[data-kind]');
+    const amount = box.querySelector('[data-amount]');
+    const times = box.querySelector('[data-times]');
+    const start = box.querySelector('[data-start]');
+    const end = box.querySelector('[data-end]');
+    const saved = text.value.trim();
+    let m;
+    if (amount) {
+      if (!saved) kind.value = '';
+      else if (saved === 'ไม่มีค่าตอบแทน') kind.value = 'none';
+      else if ((m = saved.match(/^([1-9][\d,]*) (บาท\/วัน|บาท\/เดือน)$/))) { amount.value = m[1].replace(/,/g, ''); kind.value = m[2]; }
+      else kind.value = 'custom';
+    } else {
+      if (!saved) kind.value = '';
+      else if ((m = saved.match(/^(จันทร์ - ศุกร์|จันทร์ - เสาร์|ทุกวัน)(?: (\d{2}:\d{2})-(\d{2}:\d{2}))?$/))) { kind.value = m[1]; start.value = m[2] || ''; end.value = m[3] || ''; }
+      else kind.value = 'custom';
+    }
+    const sync = () => {
+      const custom = kind.value === 'custom';
+      text.hidden = !custom;
+      if (amount) {
+        const paid = kind.value.startsWith('บาท');
+        amount.hidden = amount.disabled = !paid;
+        amount.required = paid;
+        if (!custom) text.value = paid ? (amount.value ? Number(amount.value).toLocaleString('en-US') + ' ' + kind.value : '') : (kind.value === 'none' ? 'ไม่มีค่าตอบแทน' : '');
+      } else {
+        const days = kind.value && !custom;
+        times.hidden = !days;
+        start.disabled = end.disabled = !days;
+        const half = Boolean(start.value) !== Boolean(end.value);
+        const same = start.value && start.value === end.value;
+        end.setCustomValidity(days && half ? 'กรุณากรอกเวลาเริ่มและเวลาเลิกงานให้ครบ' : days && same ? 'เวลาเลิกงานต้องไม่ตรงกับเวลาเริ่มงาน' : '');
+        if (!custom) text.value = days ? kind.value + (start.value && end.value ? ' ' + start.value + '-' + end.value : '') : '';
+      }
+    };
+    [kind, amount, start, end].forEach(el => el && el.addEventListener('input', sync));
+    kind.setAttribute('id', text.id + '-kind');
+    wrap.querySelector('label').htmlFor = kind.id;
+    text.setAttribute('aria-label', wrap.querySelector('label').textContent + ' (กำหนดเอง)');
+    box.hidden = false;
+    sync();
+  });
+  // Job form: preview the skills NLP finds in the description and tick them below (nothing is saved yet)
+  const extract = document.getElementById('extract-skills');
+  if (extract) {
+    const note = document.getElementById('extract-status');
+    const result = document.getElementById('extract-result');
+    const description = document.getElementById('description');
+    let auto = [];
+    extract.hidden = false;
+    description.addEventListener('input', () => { if (!result.hidden) note.textContent = 'รายละเอียดงานเปลี่ยนแล้ว กดสกัดทักษะอีกครั้ง'; });
+    extract.addEventListener('click', async () => {
+      if (!description.value.trim()) { note.textContent = 'กรุณากรอกรายละเอียดงานก่อน'; description.focus(); return; }
+      extract.disabled = true;
+      note.textContent = 'กำลังสกัดทักษะ...';
+      try {
+        const body = new URLSearchParams({ description: description.value, _csrf: extract.form.querySelector('input[name=_csrf]').value });
+        const response = await fetch(extract.dataset.url, { method: 'POST', body, headers: { Accept: 'application/json' } });
+        const isJson = (response.headers.get('content-type') || '').includes('application/json');
+        const data = isJson ? await response.json() : {};
+        if (!response.ok || !data.skills) throw new Error(data.error || (response.status === 403 || response.redirected ? 'เซสชันหมดอายุ กรุณาคัดลอกข้อความแล้วเข้าสู่ระบบใหม่' : 'สกัดทักษะไม่สำเร็จ ลองใหม่อีกครั้ง'));
+        const found = data.skills.map(name => name.toLowerCase());
+        const boxes = [...extract.form.querySelectorAll('input[name=skills]')];
+        // untick only what this button ticked earlier; skills chosen by the user stay
+        auto.forEach(cb => { if (!found.includes(cb.value.toLowerCase())) cb.checked = false; });
+        auto = boxes.filter(cb => found.includes(cb.value.toLowerCase()) && (!cb.checked || auto.includes(cb)));
+        auto.forEach(cb => { cb.checked = true; });
+        result.replaceChildren(...data.skills.map(name => { const tag = document.createElement('span'); tag.className = 'chip'; tag.textContent = name; return tag; }));
+        result.hidden = !data.skills.length;
+        note.textContent = data.skills.length ? 'พบ ' + data.skills.length + ' ทักษะ (เลือกให้ในรายการด้านล่างแล้ว)' : 'ไม่พบทักษะในรายละเอียดงาน เลือกจากรายการด้านล่างได้';
+      } catch (e) {
+        note.textContent = e instanceof TypeError ? 'เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง' : e.message;
+      } finally {
+        extract.disabled = false;
+      }
+    });
+  }
   // Forms that change or delete data ask for confirmation (data-confirm="ข้อความ")
   document.querySelectorAll('form[data-confirm]').forEach(form => {
     form.addEventListener('submit', event => { if (!window.confirm(form.dataset.confirm)) event.preventDefault(); });

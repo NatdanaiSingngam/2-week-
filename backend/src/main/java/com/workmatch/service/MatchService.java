@@ -123,7 +123,7 @@ public class MatchService {
     public List<MatchView> dashboardFor(User student) {
         return resumes.findByUserId(student.getId())
                 .map(resume -> matches.findByResumeId(resume.getId()).stream()
-                        .filter(m -> m.getJob().isOpen())
+                        .filter(m -> m.getJob().isAccepting())
                         .map(m -> new MatchView(
                                 m.getJob().getId(),
                                 m.getJob().getTitle(),

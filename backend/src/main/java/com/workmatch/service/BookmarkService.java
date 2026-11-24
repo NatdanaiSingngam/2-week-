@@ -62,7 +62,7 @@ public class BookmarkService {
         return bookmarks.findForStudent(student.getId()).stream()
                 .filter(b -> b.getJob().getStatus() != JobStatus.DRAFT)
                 .map(b -> new BookmarkItem(b.getJob().getId(), b.getJob().getTitle(),
-                        b.getJob().getCompany().getDisplayName(), b.getCreatedAt(), b.getJob().isOpen(),
+                        b.getJob().getCompany().getDisplayName(), b.getCreatedAt(), b.getJob().isAccepting(),
                         applications.existsByStudentIdAndJobId(student.getId(), b.getJob().getId())))
                 .toList();
     }

@@ -52,6 +52,12 @@ public class CompanyProfile {
     @Column(name = "selection_method", length = 200)
     private String selectionMethod;
 
+    @Column(columnDefinition = "TEXT")
+    private String about;
+
+    @Column(length = 255)
+    private String website;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "verification_status", length = 10)
     private VerificationStatus verificationStatus;
@@ -83,6 +89,10 @@ public class CompanyProfile {
     public void setBusinessType(String businessType) { this.businessType = businessType; }
     public String getEmployeeCount() { return employeeCount; }
     public void setEmployeeCount(String employeeCount) { this.employeeCount = employeeCount; }
+    public String getAbout() { return about; }
+    public void setAbout(String about) { this.about = about; }
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
     public String getSelectionMethod() { return selectionMethod; }
     public void setSelectionMethod(String selectionMethod) { this.selectionMethod = selectionMethod; }
     public VerificationStatus getVerificationStatus() {

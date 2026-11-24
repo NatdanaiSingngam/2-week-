@@ -99,12 +99,13 @@ public class CompanyController {
                               @RequestParam(required = false) String address, @RequestParam(required = false) String businessType,
                               @RequestParam(required = false) String employeeCount,
                               @RequestParam(required = false) String selectionMethod,
+                              @RequestParam(required = false) String about, @RequestParam(required = false) String website,
                               @RequestParam(name = "document", required = false) MultipartFile document,
                               Model model, RedirectAttributes redirect) {
         User company = currentUserService.getCurrentUser();
         try {
             profileService.updateCompany(company, companyName, taxId, address, businessType, employeeCount,
-                    selectionMethod, document);
+                    selectionMethod, about, website, document);
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
             return "redirect:/company/profile";

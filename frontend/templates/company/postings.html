@@ -28,7 +28,7 @@
           <td th:text="${@fmt.date(r.createdAt())}">15 ส.ค. 2569</td>
           <td th:text="${r.skillCount()}">5</td>
           <td class="num" th:text="${r.applicationCount() + ' คน'}">0 คน</td>
-          <td><span class="status" th:classappend="${r.status().name()}" th:text="${r.status().label}">เปิดรับสมัคร</span></td>
+          <td><span class="status" th:classappend="${r.status().name()}" th:text="${r.status().label}">เปิดรับสมัคร</span><small class="muted" style="display:block" th:if="${r.deadline() != null}" th:text="${(r.expired() ? 'หมดเขตแล้ว ' : 'ปิดรับ ') + @fmt.date(r.deadline())}">ปิดรับ</small></td>
           <td>
             <div class="actions" style="gap:2px;flex-wrap:nowrap">
               <a class="link-button" th:href="@{/company/jobs/{id}/edit(id=${r.id()})}" th:aria-label="${'แก้ไข ' + r.title()}">แก้ไข</a>

@@ -8,6 +8,9 @@
  */
 package com.workmatch.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -44,6 +47,19 @@ public class StudentProfile {
     @Column(length = 150)
     private String major;
 
+    // ข้อมูลที่เว็บหางานนักศึกษาทั่วไปเก็บ ทุกช่องไม่บังคับ; GPA แสดงให้บริษัทเห็นเมื่อนักศึกษายินยอมเท่านั้น
+    @Column(precision = 3, scale = 2)
+    private BigDecimal gpa;
+
+    @Column(name = "gpa_visible")
+    private Boolean gpaVisible;
+
+    @Column(name = "coop_start")
+    private LocalDate coopStart;
+
+    @Column(name = "coop_end")
+    private LocalDate coopEnd;
+
     public Long getId() { return id; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
@@ -57,6 +73,14 @@ public class StudentProfile {
     public void setPhone(String phone) { this.phone = phone; }
     public String getFaculty() { return faculty; }
     public void setFaculty(String faculty) { this.faculty = faculty; }
+    public BigDecimal getGpa() { return gpa; }
+    public void setGpa(BigDecimal gpa) { this.gpa = gpa; }
+    public boolean isGpaVisible() { return Boolean.TRUE.equals(gpaVisible); }
+    public void setGpaVisible(boolean v) { this.gpaVisible = v; }
+    public LocalDate getCoopStart() { return coopStart; }
+    public void setCoopStart(LocalDate coopStart) { this.coopStart = coopStart; }
+    public LocalDate getCoopEnd() { return coopEnd; }
+    public void setCoopEnd(LocalDate coopEnd) { this.coopEnd = coopEnd; }
     public String getMajor() { return major; }
     public void setMajor(String major) { this.major = major; }
 }

@@ -4,7 +4,7 @@
   แสดงโดย: JobController (GET /company/jobs/new), JobController (POST /company/jobs),
       JobController (GET /company/jobs/{id}/edit), JobController (POST /company/jobs/{id})
   ข้อมูลที่ได้รับจาก Controller: editingId, form, error, dictionarySkills
-  ส่งฟอร์มไปที่: POST /company/jobs, POST /company/jobs/{id}
+  ส่งฟอร์มไปที่: POST /company/jobs, POST /company/jobs/{id}, POST /company/jobs/extract-skills (ปุ่มสกัดทักษะ)
   ใช้ชิ้นส่วนร่วมจาก: fragments/layout.html, สไตล์จาก static/css/style.css
 */-->
 <!DOCTYPE html>
@@ -21,10 +21,26 @@
   <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
   <form method="post" th:action="${editingId == null} ? @{/company/jobs} : @{/company/jobs/{id}(id=${editingId})}" data-busy="กำลังบันทึก...">
     <div class="field"><label for="title">ชื่อตำแหน่งงาน <span class="req" aria-hidden="true">*</span></label><input id="title" name="title" maxlength="200" required="required" th:value="${f?.title()}" placeholder="เช่น Software Engineer (Intern)" /></div>
-    <div class="field"><label for="description">รายละเอียดงาน (Job Description) <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบจะสกัดทักษะจากข้อความนี้ด้วย NLP อัตโนมัติ และรวมกับทักษะที่เลือกด้านล่าง</p></div>
+    <div class="field"><label for="description">รายละเอียดงาน (Job Description) <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบจะสกัดทักษะจากข้อความนี้ด้วย NLP อัตโนมัติ และรวมกับทักษะที่เลือกด้านล่าง</p>
+      <div class="extract-row"><button type="button" class="secondary sm" id="extract-skills" hidden="hidden" th:data-url="@{/company/jobs/extract-skills}">สกัดทักษะจากรายละเอียดงาน</button><span id="extract-status" class="field-note" role="status" aria-live="polite"></span></div>
+      <div id="extract-result" class="tags" hidden="hidden"></div></div>
     <div class="form-grid">
-      <div class="field"><label for="compensation">ค่าตอบแทน / เบี้ยเลี้ยง (บาท/วัน หรือ บาท/เดือน)</label><input id="compensation" name="compensation" maxlength="255" th:value="${f?.compensation()}" placeholder="เช่น WFH 300 บาท/วัน, Onsite 400 บาท/วัน" /></div>
-      <div class="field"><label for="workSchedule">วันและเวลาทำงาน</label><input id="workSchedule" name="workSchedule" maxlength="255" th:value="${f?.workSchedule()}" placeholder="เช่น 5 วัน / สัปดาห์ (จันทร์ - ศุกร์)" /></div>
+      <div class="field" data-builder="compensation"><label for="compensation">ค่าตอบแทน / เบี้ยเลี้ยง</label>
+        <div class="builder" hidden="hidden">
+          <select class="select" data-kind="" aria-label="รูปแบบค่าตอบแทน"><option value="">ไม่ระบุ</option><option value="none">ไม่มีค่าตอบแทน</option><option value="บาท/วัน">บาท/วัน</option><option value="บาท/เดือน">บาท/เดือน</option><option value="custom">กำหนดเอง</option></select>
+          <input type="number" data-amount="" min="1" max="999999" step="1" inputmode="numeric" placeholder="จำนวนเงิน เช่น 400" aria-label="จำนวนเงิน (บาท)" />
+        </div>
+        <input id="compensation" name="compensation" maxlength="255" th:value="${f?.compensation()}" placeholder="เช่น WFH 300 บาท/วัน, Onsite 400 บาท/วัน" /></div>
+      <div class="field" data-builder="schedule"><label for="workSchedule">วันและเวลาทำงาน</label>
+        <div class="builder" hidden="hidden">
+          <select class="select" data-kind="" aria-label="วันทำงาน"><option value="">ไม่ระบุ</option><option value="จันทร์ - ศุกร์">จันทร์ - ศุกร์</option><option value="จันทร์ - เสาร์">จันทร์ - เสาร์</option><option value="ทุกวัน">ทุกวัน</option><option value="custom">กำหนดเอง</option></select>
+          <span class="times" data-times=""><input type="time" data-start="" aria-label="เวลาเริ่มงาน" /><span aria-hidden="true">ถึง</span><input type="time" data-end="" aria-label="เวลาเลิกงาน" /></span>
+        </div>
+        <input id="workSchedule" name="workSchedule" maxlength="255" th:value="${f?.workSchedule()}" placeholder="เช่น 5 วัน / สัปดาห์ (จันทร์ - ศุกร์)" /></div>
+      <div class="field"><label for="location">สถานที่ปฏิบัติงาน</label><input id="location" name="location" maxlength="255" th:value="${f?.location()}" placeholder="เช่น เมืองพะเยา" /></div>
+      <div class="field"><label for="workMode">รูปแบบการทำงาน</label><select id="workMode" name="workMode" class="select" style="width:100%"><option value="">ไม่ระบุ</option><option th:each="w : ${ {'Onsite','Hybrid','Remote'} }" th:value="${w}" th:text="${w}" th:selected="${f != null and f.workMode() == w}">Onsite</option></select></div>
+      <div class="field"><label for="openings">จำนวนที่รับ (คน)</label><input id="openings" name="openings" type="number" min="1" max="999" th:value="${f?.openings()}" placeholder="เช่น 2" /></div>
+      <div class="field"><label for="deadline">วันปิดรับสมัคร</label><input id="deadline" name="deadline" type="date" th:value="${f?.deadline()}" aria-describedby="deadline-note" /><p id="deadline-note" class="field-note">เลยวันนี้แล้วระบบหยุดรับสมัครให้เอง เว้นว่างได้</p></div>
       <div class="field"><label for="accommodation">สวัสดิการที่พัก</label><input id="accommodation" name="accommodation" maxlength="255" th:value="${f?.accommodation()}" placeholder="เช่น ไม่มีสวัสดิการที่พัก" /></div>
       <div class="field"><label for="transport">สวัสดิการรถรับส่ง</label><input id="transport" name="transport" maxlength="255" th:value="${f?.transport()}" placeholder="เช่น ไม่มีรถรับส่งพนักงาน" /></div>
     </div>

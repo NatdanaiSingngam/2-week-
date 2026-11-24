@@ -11,6 +11,8 @@ cd /d "%~dp0"
 
 if "%DB_USER%"=="" echo [!] ยังไม่ได้ตั้ง DB_USER / DB_PASSWORD ดู backend\README.md ขั้นตอนที่ 3 & pause & exit /b 1
 
+if "%DEMO_PROFILES%"=="" set "DEMO_PROFILES=demo"
+
 rem ---- 1) NLP service (Python) ----
 set "PY=%NLP_VENV%\Scripts\python.exe"
 if "%NLP_VENV%"=="" set "PY=%~dp0nlp-service\venv\Scripts\python.exe"
@@ -40,5 +42,5 @@ echo [3/3] เปิด Spring Boot (profile demo) ... รอจนเห็น 
 rem บังคับ locale อังกฤษให้ Maven (Windows ภาษาไทยใช้ปี พ.ศ. ทำให้ Maven บางคำสั่งล้ม)
 set "MAVEN_OPTS=-Duser.language=en -Duser.country=US -Duser.region=US"
 cd /d "%~dp0backend"
-call mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=demo
+call mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=%DEMO_PROFILES%"
 endlocal

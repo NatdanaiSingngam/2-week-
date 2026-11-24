@@ -8,6 +8,8 @@
  */
 package com.workmatch.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -46,6 +48,17 @@ public class Job {
     @Column(length = 255)
     private String transport;
 
+    @Column(length = 255)
+    private String location;
+
+    @Column(name = "work_mode", length = 20)
+    private String workMode;
+
+    private Integer openings;
+
+    // วันสุดท้ายที่รับสมัคร (รวมวันนั้น); null = ไม่กำหนด
+    private LocalDate deadline;
+
     // OPEN = เปิดรับสมัคร, DRAFT = แบบร่าง (ยังไม่จับคู่/ไม่แสดงให้นักศึกษา), CLOSED = ปิดรับ; null (ข้อมูลเดิม) ถือว่า OPEN
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
@@ -67,6 +80,17 @@ public class Job {
     public void setTransport(String transport) { this.transport = transport; }
     public JobStatus getStatus() { return status == null ? JobStatus.OPEN : status; }
     public void setStatus(JobStatus status) { this.status = status; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getWorkMode() { return workMode; }
+    public void setWorkMode(String workMode) { this.workMode = workMode; }
+    public Integer getOpenings() { return openings; }
+    public void setOpenings(Integer openings) { this.openings = openings; }
+    public LocalDate getDeadline() { return deadline; }
+    public void setDeadline(LocalDate deadline) { this.deadline = deadline; }
+    public boolean isExpired() { return deadline != null && deadline.isBefore(LocalDate.now()); }
+    /** เปิดรับและยังไม่เลยวันปิดรับสมัคร */
+    public boolean isAccepting() { return isOpen() && !isExpired(); }
     public boolean isOpen() { return getStatus() == JobStatus.OPEN; }
 
     public Long getId() { return id; }

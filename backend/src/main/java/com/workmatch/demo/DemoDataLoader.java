@@ -22,6 +22,7 @@ import com.workmatch.repository.BookmarkRepository;
 import com.workmatch.repository.CompanyProfileRepository;
 import com.workmatch.repository.JobApplicationRepository;
 import com.workmatch.repository.JobRepository;
+import com.workmatch.repository.ResumeRepository;
 import com.workmatch.repository.StoredFileRepository;
 import com.workmatch.repository.StudentProfileRepository;
 import com.workmatch.repository.UserRepository;
@@ -44,6 +45,8 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +102,11 @@ public class DemoDataLoader implements CommandLineRunner {
             new DemoJob(1, "UX/UI Designer (สหกิจศึกษา)",
                     "ออกแบบหน้าจอด้วย Figma เข้าใจ HTML และ CSS มีทักษะการสื่อสารกับทีมพัฒนา"));
 
+    // บัญชีทดสอบแยกต่างหาก รหัสผ่าน Demo1234 (D ตัวใหญ่) มีข้อมูลครบทุกช่อง
+    public static final String TEST_PASSWORD = "Demo1234";
+    public static final String TEST_STUDENT_EMAIL = "student4@demo.workmatch.test";
+    public static final String TEST_COMPANY_EMAIL = "company3@demo.workmatch.test";
+
     private final UserRepository users;
     private final RegistrationService registrationService;
     private final ResumeService resumeService;
@@ -108,13 +116,15 @@ public class DemoDataLoader implements CommandLineRunner {
     private final CompanyProfileRepository companyProfiles;
     private final JobRepository jobs;
     private final JobApplicationRepository applications;
+    private final ResumeRepository resumes;
     private final BookmarkRepository bookmarks;
     private final StoredFileRepository files;
 
     public DemoDataLoader(UserRepository users, RegistrationService registrationService, ResumeService resumeService,
                           JobService jobService, MatchService matchService, StudentProfileRepository studentProfiles,
                           CompanyProfileRepository companyProfiles, JobRepository jobs,
-                          JobApplicationRepository applications, BookmarkRepository bookmarks, StoredFileRepository files) {
+                          JobApplicationRepository applications, BookmarkRepository bookmarks, StoredFileRepository files,
+                          ResumeRepository resumes) {
         this.users = users;
         this.registrationService = registrationService;
         this.resumeService = resumeService;
@@ -126,6 +136,7 @@ public class DemoDataLoader implements CommandLineRunner {
         this.applications = applications;
         this.bookmarks = bookmarks;
         this.files = files;
+        this.resumes = resumes;
     }
 
     @Override
@@ -145,6 +156,7 @@ public class DemoDataLoader implements CommandLineRunner {
         }
         try {
             loadExtras();
+            loadTestAccounts();
         } catch (RuntimeException e) {
             log.warn("[demo] เติมข้อมูลตัวอย่างส่วนเสริมไม่สำเร็จ: {}", e.getMessage());
         }
@@ -220,6 +232,53 @@ public class DemoDataLoader implements CommandLineRunner {
         bookmark(s1, "Mobile App Developer");
     }
 
+    /** บัญชีทดสอบฝั่งละ 1 บัญชี ทุกขั้นข้ามถ้ามีอยู่แล้ว จึงเติมให้ฐานข้อมูลเดิมได้ */
+    public void loadTestAccounts() {
+        User company = users.findByEmail(TEST_COMPANY_EMAIL).orElseGet(() -> registrationService.register(
+                "บริษัท ทดสอบระบบ จำกัด", TEST_COMPANY_EMAIL, TEST_PASSWORD, "COMPANY"));
+        if (companyProfiles.findByUserId(company.getId()).isEmpty()) {
+            companyProfile(company, "0105500000003", "9 ถนนตัวอย่าง อำเภอเมือง จังหวัดเชียงใหม่ 50000 (ที่อยู่สมมติ)",
+                    "ไอที / เทคโนโลยีสารสนเทศ", "60", "สัมภาษณ์ออนไลน์", VerificationStatus.APPROVED);
+            CompanyProfile p = companyProfiles.findByUserId(company.getId()).orElseThrow();
+            p.setAbout("บริษัทสมมติสำหรับทดสอบระบบ พัฒนาเว็บแอปพลิเคชันให้องค์กร");
+            p.setWebsite("https://example.com");
+            companyProfiles.save(p);
+        }
+        if (jobs.findByCompanyId(company.getId()).isEmpty()) {
+            Long id = jobService.createJob(company, "Full Stack Developer (สหกิจศึกษา)",
+                    "พัฒนาเว็บด้วย Java Spring Boot และ React เชื่อมต่อ MySQL ใช้ Git ทำงานเป็นทีม");
+            jobs.findById(id).ifPresent(j -> {
+                j.setLocation("เชียงใหม่");
+                j.setWorkMode("Hybrid");
+                j.setOpenings(2);
+                j.setDeadline(LocalDate.now().plusDays(60));
+                jobExtras(j, "400 บาท/วัน", "จันทร์ - ศุกร์ 09:00-18:00", "ไม่มีสวัสดิการที่พัก", "ไม่มีรถรับส่งพนักงาน");
+            });
+            matchService.recalculateForJob(id);
+        }
+        User student = users.findByEmail(TEST_STUDENT_EMAIL).orElseGet(() -> registrationService.register(
+                "ทดสอบ ระบบดี", TEST_STUDENT_EMAIL, TEST_PASSWORD, "STUDENT"));
+        if (studentProfiles.findByUserId(student.getId()).isEmpty()) {
+            StudentProfile p = new StudentProfile();
+            p.setUser(student);
+            p.setFirstName("ทดสอบ");
+            p.setLastName("ระบบดี");
+            p.setStudentId("66000004");
+            p.setFaculty("คณะเทคโนโลยีสารสนเทศและการสื่อสาร");
+            p.setMajor("วิทยาการคอมพิวเตอร์");
+            p.setGpa(new BigDecimal("3.25"));
+            p.setGpaVisible(true);
+            p.setCoopStart(LocalDate.now().plusMonths(3));
+            p.setCoopEnd(LocalDate.now().plusMonths(7));
+            studentProfiles.save(p);
+        }
+        if (resumes.findByUserId(student.getId()).isEmpty()) {
+            Resume resume = resumeService.saveResume(student, readText("demo/resume-backend.txt"));
+            matchService.recalculateForResume(resume.getId());
+        }
+        apply(Optional.of(student), "Full Stack Developer", ApplicationStatus.PENDING, "สนใจงานพัฒนาเว็บครับ (ข้อความตัวอย่าง)");
+    }
+
     private void companyProfile(User u, String taxId, String address, String type, String employees, String selection,
                                 VerificationStatus status) {
         if (companyProfiles.findByUserId(u.getId()).isPresent()) return;
@@ -236,7 +295,7 @@ public class DemoDataLoader implements CommandLineRunner {
         doc.setOwner(u);
         doc.setFileName("DBD_Certificate_DEMO.pdf");
         doc.setContentType("application/pdf");
-        byte[] pdf = demoPdf(u.getDisplayName().contains("เทคโนโลยี") ? "Demo company 1" : "Demo company 2", taxId);
+        byte[] pdf = demoPdf("Demo company " + taxId.substring(taxId.length() - 1), taxId);
         doc.setData(pdf);
         doc.setSizeBytes(pdf.length);
         p.setDocumentFileId(files.save(doc).getId());

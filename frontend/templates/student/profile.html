@@ -32,6 +32,14 @@
         <div class="field"><label for="faculty">คณะ</label><input id="faculty" name="faculty" maxlength="150" placeholder="เช่น เทคโนโลยีสารสนเทศและการสื่อสาร" th:value="${profile.faculty}" /></div>
         <div class="field span-2"><label for="major">สาขาวิชา</label><input id="major" name="major" maxlength="150" placeholder="เช่น วิทยาการคอมพิวเตอร์" th:value="${profile.major}" /></div>
       </div>
+      <h2 class="form-section-title">ข้อมูลสำหรับสหกิจศึกษา <span class="muted" style="font-weight:400">ไม่บังคับ</span></h2>
+      <div class="form-grid">
+        <div class="field"><label for="coopStart">วันเริ่มสหกิจ</label><input id="coopStart" name="coopStart" type="date" th:value="${profile.coopStart}" /></div>
+        <div class="field"><label for="coopEnd">วันสิ้นสุดสหกิจ</label><input id="coopEnd" name="coopEnd" type="date" th:value="${profile.coopEnd}" /></div>
+        <div class="field"><label for="gpa">เกรดเฉลี่ยสะสม (GPA)</label><input id="gpa" name="gpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 3.25" th:value="${profile.gpa}" aria-describedby="gpa-note" /><p id="gpa-note" class="field-note">ซ่อนไว้จนกว่าคุณจะเลือกแสดง</p></div>
+        <div class="field" style="align-self:center"><label><input type="checkbox" name="gpaVisible" value="true" th:checked="${profile.gpaVisible}" /> ยินยอมแสดง GPA ให้บริษัทที่ฉันสมัคร</label></div>
+      </div>
+      <p class="field-note">บริษัทเห็นข้อมูลส่วนนี้เฉพาะเมื่อคุณสมัครงานกับบริษัทนั้น</p>
       <div class="form-actions"><a class="button secondary" th:href="@{/student/dashboard}">ยกเลิก</a><button type="submit">บันทึกข้อมูล</button></div>
     </form>
   </section>

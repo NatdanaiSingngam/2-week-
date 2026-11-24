@@ -10,6 +10,8 @@ import com.workmatch.entity.ApplicationStatus;
 import com.workmatch.entity.JobStatus;
 import com.workmatch.entity.VerificationStatus;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,15 +25,16 @@ public final class Views {
 
     /** ข้อมูลที่บริษัทกรอกในแบบฟอร์มประกาศงาน (รูปที่ 44) */
     public record JobInput(String title, String description, String compensation, String workSchedule,
-                           String accommodation, String transport, List<String> selectedSkills, boolean draft) {
+                           String accommodation, String transport, List<String> selectedSkills, boolean draft,
+                           String location, String workMode, String openings, String deadline) {
         public static JobInput empty() {
-            return new JobInput("", "", "", "", "", "", List.of(), false);
+            return new JobInput("", "", "", "", "", "", List.of(), false, "", "", "", "");
         }
     }
 
     /** หนึ่งแถวประกาศงานของบริษัท (รูปที่ 44, 47) */
     public record CompanyJobRow(Long id, String title, LocalDateTime createdAt, JobStatus status, long skillCount,
-                                long applicationCount) { }
+                                long applicationCount, LocalDate deadline, boolean expired) { }
 
     /** ภาพรวมบริษัท (รูปที่ 47) */
     public record CompanyOverview(long openJobs, long totalApplications, long pending, long hired,
@@ -40,7 +43,7 @@ public final class Views {
     /** หนึ่งรายการในหน้าค้นหางาน (รูปที่ 38) */
     public record ExploreItem(Long jobId, String title, String companyName, String location, String businessType,
                               boolean companyVerified, List<String> skills, LocalDateTime createdAt, long daysAgo,
-                              Double score, boolean bookmarked) { }
+                              Double score, boolean bookmarked, String workMode, LocalDate deadline) { }
 
     /** รายละเอียดงานสำหรับนักศึกษา (รูปที่ 39) */
     public record StudentJobView(Long jobId, String title, String description, JobStatus status, String companyName,
@@ -48,7 +51,8 @@ public final class Views {
                                  String employeeCount, String workSchedule, String selectionMethod, String compensation,
                                  String accommodation, String transport, List<SkillView> skills, MatchView match,
                                  boolean bookmarked, ApplicationStatus applicationStatus, LocalDateTime appliedAt,
-                                 boolean hasResume) { }
+                                 boolean hasResume, String location, String workMode, Integer openings,
+                                 LocalDate deadline, boolean accepting, String companyAbout, String companyWebsite) { }
 
     /** งานที่บันทึกไว้ (รูปที่ 41) */
     public record BookmarkItem(Long jobId, String title, String companyName, LocalDateTime savedAt, boolean open,
@@ -71,7 +75,8 @@ public final class Views {
                                   String studentInitials, String email, String phone, String studentId, String faculty,
                                   String major, LocalDateTime appliedAt, ApplicationStatus status, String coverLetter,
                                   Double score, List<SkillCheck> skills, List<String> otherSkills, Long resumeFileId,
-                                  String resumeFileName, Long resumeFileSize) { }
+                                  String resumeFileName, Long resumeFileSize, BigDecimal gpa,
+                                  LocalDate coopStart, LocalDate coopEnd) { }
 
     /** สถิติผู้ดูแลระบบ (รูปที่ 48) */
     public record AdminOverview(long students, long approvedCompanies, long openJobs, long hired, long companies,

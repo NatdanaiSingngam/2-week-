@@ -66,11 +66,11 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- ใช้เฉพาะตอนรัน mvn test (ฐานข้อมูลจำลองในหน่วยความจำ ไม่ต้องเปิด MySQL) -->
+        <!-- H2: ใช้ตอนรัน mvn test (ในหน่วยความจำ) และ profile h2 (เก็บลงไฟล์ ไม่ต้องติดตั้ง MySQL) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

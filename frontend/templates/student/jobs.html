@@ -38,7 +38,7 @@
   <span class="mono" aria-hidden="true" th:text="${@fmt.initial(j.companyName())}">B</span>
   <div class="grow">
     <h3><a th:href="@{/student/jobs/{id}(id=${j.jobId()})}" th:text="${j.title()}">Software Engineer (Intern)</a></h3>
-    <div class="meta"><span th:text="${j.companyName()}">บริษัท</span><th:block th:if="${j.location() != null}"> · <span th:text="${j.location()}">กรุงเทพมหานคร</span></th:block> <span class="verified" th:if="${j.companyVerified()}">ยืนยันแล้ว</span></div>
+    <div class="meta"><span th:text="${j.companyName()}">บริษัท</span><th:block th:if="${j.location() != null}"> · <span th:text="${j.location()}">กรุงเทพมหานคร</span></th:block> <th:block th:if="${j.workMode() != null}"> · <span th:text="${j.workMode()}">Hybrid</span></th:block><th:block th:if="${j.deadline() != null}"> · <span th:text="${'ปิดรับ ' + @fmt.date(j.deadline())}">ปิดรับ</span></th:block> <span class="verified" th:if="${j.companyVerified()}">ยืนยันแล้ว</span></div>
     <div class="tags"><span class="tag" th:each="s : ${j.skills()}" th:text="${s}">Java</span></div>
   </div>
   <div class="side">
