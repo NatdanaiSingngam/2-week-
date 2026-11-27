@@ -39,6 +39,23 @@ public class ThaiFormat {
         return t == null ? "-" : DATE.format(ThaiBuddhistDate.from(t)) + " " + String.format("%02d:%02d", t.getHour(), t.getMinute());
     }
 
+    private static final DateTimeFormatter LONG_DAY = DateTimeFormatter.ofPattern("EEEEที่ d MMMM yyyy", TH);
+
+    /** หัวกลุ่มวันแบบประวัติเบราว์เซอร์: "วันนี้ · วันศุกร์ที่ 27 พฤศจิกายน 2569" */
+    public String dayHeading(LocalDate d) {
+        if (d == null) return "-";
+        String full = LONG_DAY.format(ThaiBuddhistDate.from(d));
+        LocalDate today = LocalDate.now();
+        if (d.equals(today)) return "วันนี้ · " + full;
+        if (d.equals(today.minusDays(1))) return "เมื่อวาน · " + full;
+        return full;
+    }
+
+    /** เวลา "08:54 น." */
+    public String time(LocalDateTime t) {
+        return t == null ? "-" : String.format("%02d:%02d น.", t.getHour(), t.getMinute());
+    }
+
     /** "วันนี้" / "เมื่อวาน" / "3 วันที่แล้ว" */
     public String ago(LocalDateTime t) {
         if (t == null) return "-";

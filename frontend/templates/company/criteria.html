@@ -1,6 +1,6 @@
 <!--/*
   ==== Workmatch · Frontend · หน้า company/criteria.html ====
-  หน้าที่: ฟอร์มกำหนด/แก้ไขเกณฑ์คัดกรองผู้สมัครของประกาศงาน 5 ข้อ (A04 UC-32, 1.4.2.3.3, รูป 56)
+  หน้าที่: ฟอร์มกำหนด/แก้ไขเกณฑ์คัดกรองผู้สมัครของประกาศงาน 4 ข้อ (A04 UC-32, 1.4.2.3.3, รูป 56)
   แสดงโดย: JobController (GET /company/jobs/{id}/criteria), JobController (POST /company/jobs/{id}/criteria เมื่อค่าไม่ถูกต้อง)
   ข้อมูลที่ได้รับจาก Controller: job (CriteriaView: jobId, jobTitle, jobSkills, requiredSkills), f (CriteriaInput ค่าในฟอร์ม), majors, error
   ส่งฟอร์มไปที่: POST /company/jobs/{id}/criteria
@@ -20,15 +20,13 @@
   <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
   <form method="post" th:action="@{/company/jobs/{id}/criteria(id=${job.jobId()})}">
     <div class="form-grid">
-      <div class="field"><label for="minMatchScore">1. คะแนนความสอดคล้องขั้นต่ำ (%)</label><input id="minMatchScore" name="minMatchScore" type="number" min="0" max="100" step="0.01" placeholder="เช่น 50" th:value="${f.minMatchScore()}" aria-describedby="score-note" /><p id="score-note" class="field-note">0–100</p></div>
-      <div class="field"><label for="minGpa">2. GPA ขั้นต่ำ</label><input id="minGpa" name="minGpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 2.50" th:value="${f.minGpa()}" aria-describedby="gpa-note" /><p id="gpa-note" class="field-note">0.00–4.00</p></div>
-      <div class="field span-2"><label for="requiredMajor">3. สาขาวิชา</label><select id="requiredMajor" name="requiredMajor" class="select"><option value="">ทุกสาขา</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == f.requiredMajor()}">วิทยาการคอมพิวเตอร์</option></select></div>
-      <div class="field"><label for="availableStart">4. ช่วงสหกิจที่ต้องการ: วันเริ่ม</label><input id="availableStart" name="availableStart" type="date" th:value="${f.availableStart()}" /></div>
-      <div class="field"><label for="availableEnd">วันสิ้นสุด</label><input id="availableEnd" name="availableEnd" type="date" th:value="${f.availableEnd()}" aria-describedby="date-note" /><p id="date-note" class="field-note">ระบุทั้งสองวัน หรือเว้นว่างทั้งคู่</p></div>
+      <div class="field"><label for="minMatchScore">คะแนนความสอดคล้องขั้นต่ำ (%)</label><input id="minMatchScore" name="minMatchScore" type="number" min="0" max="100" step="0.01" placeholder="เช่น 50" th:value="${f.minMatchScore()}" aria-describedby="score-note" /><p id="score-note" class="field-note">0–100</p></div>
+      <div class="field"><label for="minGpa">GPA ขั้นต่ำ</label><input id="minGpa" name="minGpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 2.50" th:value="${f.minGpa()}" aria-describedby="gpa-note" /><p id="gpa-note" class="field-note">0.00–4.00</p></div>
+      <div class="field span-2"><label for="requiredMajor">สาขาวิชาที่รับ</label><select id="requiredMajor" name="requiredMajor" class="select"><option value="">ทุกสาขา</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == f.requiredMajor()}">วิทยาการคอมพิวเตอร์</option></select></div>
     </div>
     <fieldset class="field" style="border:0;padding:0;margin:8px 0 0">
-      <legend style="font-weight:600;margin-bottom:6px">5. ทักษะบังคับ (Required Skills)</legend>
-      <p class="field-note" style="margin-top:0">เลือกจากทักษะของประกาศนี้ ทักษะที่ไม่ได้เลือกยังใช้คำนวณคะแนนตามเดิม</p>
+      <legend style="font-weight:600;margin-bottom:6px">ทักษะที่ผู้สมัครต้องมี</legend>
+      <p class="field-note" style="margin-top:0">เลือกจากทักษะของประกาศนี้ ทักษะที่ไม่ได้เลือกยังใช้คำนวณความสอดคล้องตามปกติ</p>
       <p class="muted" th:if="${#lists.isEmpty(job.jobSkills())}">ประกาศนี้ยังไม่มีทักษะ <a th:href="@{/company/jobs/{id}/edit(id=${job.jobId()})}">แก้ไขประกาศ</a> เพื่อเพิ่มทักษะก่อน</p>
       <div class="skill-toggles"><label class="skill-toggle" th:each="s : ${job.jobSkills()}"><input type="checkbox" name="requiredSkills" th:value="${s}" th:checked="${f.requiredSkills() != null and f.requiredSkills().contains(s)}" /><span th:text="${s}">Java</span></label></div>
     </fieldset>

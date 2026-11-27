@@ -91,10 +91,10 @@ public class AdminController {
     private String reextractSummary() {
         try {
             SkillReextractService.Result r = reextract.reextractAll();
-            return "สกัดทักษะเรซูเม่ใหม่ " + r.resumes() + " ฉบับ (ทักษะเปลี่ยน " + r.changed() + " ฉบับ"
+            return "อ่านทักษะเรซูเม่ใหม่ " + r.resumes() + " ฉบับ (ทักษะเปลี่ยน " + r.changed() + " ฉบับ"
                     + (r.pairs() > 0 ? ", คำนวณคะแนนใหม่ " + r.pairs() + " คู่" : "") + ")";
         } catch (NlpUnavailableException e) {
-            return "ยังไม่ได้สกัดทักษะเรซูเม่ใหม่ เพราะเชื่อมต่อ NLP ไม่ได้ (กดปุ่มสกัดใหม่ทั้งหมดในหน้าพจนานุกรมภายหลัง)";
+            return "ยังไม่ได้อ่านทักษะเรซูเม่ใหม่ เพราะเชื่อมต่อระบบอ่านทักษะ (NLP) ไม่ได้ กดปุ่มอ่านทักษะเรซูเม่ใหม่ทั้งหมดในหน้าพจนานุกรมภายหลัง";
         }
     }
 

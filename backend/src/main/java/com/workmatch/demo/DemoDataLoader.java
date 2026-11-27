@@ -213,9 +213,9 @@ public class DemoDataLoader implements CommandLineRunner {
                 "ซอฟต์แวร์และดิจิทัลเอเจนซี", "40", "ทดสอบปฏิบัติ + สัมภาษณ์", VerificationStatus.PENDING));
 
         c1.ifPresent(u -> jobs.findByCompanyId(u.getId()).forEach(j -> jobExtras(j,
-                "WFH 300 บาท/วัน, Onsite 400 บาท/วัน", "5 วัน / สัปดาห์ (จันทร์ - ศุกร์)", "ไม่มีสวัสดิการที่พัก", "ไม่มีรถรับส่งพนักงาน")));
+                "WFH 300 บาท/วัน, Onsite 400 บาท/วัน", "5 วัน / สัปดาห์ (จันทร์ - ศุกร์)", "ไม่มี", "ไม่มี")));
         c2.ifPresent(u -> jobs.findByCompanyId(u.getId()).forEach(j -> jobExtras(j,
-                "เบี้ยเลี้ยง 6,000 บาท/เดือน", "5 วัน / สัปดาห์ (จันทร์ - ศุกร์) 09:00-17:00", "มีหอพักให้ (สมมติ)", "ไม่มีรถรับส่งพนักงาน")));
+                "เบี้ยเลี้ยง 6,000 บาท/เดือน", "5 วัน / สัปดาห์ (จันทร์ - ศุกร์) 09:00-17:00", "มี", "ไม่มี")));
 
         Optional<User> s1 = users.findByEmail(STUDENTS.get(0).email());
         Optional<User> s2 = users.findByEmail(STUDENTS.get(1).email());
@@ -252,7 +252,7 @@ public class DemoDataLoader implements CommandLineRunner {
                 j.setWorkMode("Hybrid");
                 j.setOpenings(2);
                 j.setDeadline(LocalDate.now().plusDays(60));
-                jobExtras(j, "400 บาท/วัน", "จันทร์ - ศุกร์ 09:00-18:00", "ไม่มีสวัสดิการที่พัก", "ไม่มีรถรับส่งพนักงาน");
+                jobExtras(j, "400 บาท/วัน", "จันทร์ - ศุกร์ 09:00-18:00", "ไม่มี", "ไม่มี");
             });
             matchService.recalculateForJob(id);
         }

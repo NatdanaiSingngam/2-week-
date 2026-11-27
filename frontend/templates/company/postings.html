@@ -1,6 +1,6 @@
 <!--/*
   ==== Workmatch · Frontend · หน้า company/postings.html ====
-  หน้าที่: จัดการประกาศงาน (แก้ไข / เกณฑ์คัดกรอง / เปลี่ยนสถานะ / ลบ)
+  หน้าที่: จัดการประกาศงาน (แก้ไขประกาศและเกณฑ์คัดกรอง / เปลี่ยนสถานะ / ลบ)
   แสดงโดย: JobController (GET /company/postings)
   ข้อมูลที่ได้รับจาก Controller: rows
   ส่งฟอร์มไปที่: POST /company/jobs/{id}/status, POST /company/jobs/{id}/delete
@@ -30,9 +30,8 @@
           <td class="num" th:text="${r.applicationCount() + ' คน'}">0 คน</td>
           <td><span class="status" th:classappend="${r.status().name()}" th:text="${r.status().label}">เปิดรับสมัคร</span><small class="muted" style="display:block" th:if="${r.deadline() != null}" th:text="${(r.expired() ? 'หมดเขตแล้ว ' : 'ปิดรับ ') + @fmt.date(r.deadline())}">ปิดรับ</small></td>
           <td>
-            <div class="actions" style="gap:2px;flex-wrap:nowrap">
+            <div class="actions row-actions">
               <a class="link-button" th:href="@{/company/jobs/{id}/edit(id=${r.id()})}" th:aria-label="${'แก้ไข ' + r.title()}">แก้ไข</a>
-              <a class="link-button" th:href="@{/company/jobs/{id}/criteria(id=${r.id()})}" th:aria-label="${'เกณฑ์คัดกรอง ' + r.title()}">เกณฑ์</a>
               <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/status(id=${r.id()})}" th:if="${r.status().name() == 'OPEN'}"><input type="hidden" name="status" value="CLOSED" /><button type="submit" class="link-button" th:aria-label="${'ปิดรับสมัคร ' + r.title()}">ปิดรับ</button></form>
               <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/status(id=${r.id()})}" th:unless="${r.status().name() == 'OPEN'}"><input type="hidden" name="status" value="OPEN" /><button type="submit" class="link-button" th:aria-label="${'เปิดรับสมัคร ' + r.title()}" th:text="${r.status().name() == 'DRAFT'} ? 'เผยแพร่' : 'เปิดรับ'">เปิดรับ</button></form>
               <form method="post" class="inline-form" th:action="@{/company/jobs/{id}/delete(id=${r.id()})}" th:attr="data-confirm=${'ลบประกาศ ' + r.title() + '? ใบสมัครทั้งหมดของตำแหน่งนี้จะถูกลบด้วย'}"><button type="submit" class="link-button danger" th:aria-label="${'ลบ ' + r.title()}">ลบ</button></form>

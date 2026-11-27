@@ -116,7 +116,7 @@ class ProfileDataCollectionTest {
                 .param("fullName", "นิสิต ทดสอบ").param("gpa", "3.5").param("gpaVisible", "true").param("coopStart", "2027-01-04"))
                 .andExpect(redirectedUrl("/student/profile"));
         assertThat(mvc.perform(get("/student/profile").with(asStudent)).andReturn().getResponse().getContentAsString())
-                .contains("value=\"3.50\"").contains("value=\"2027-01-04\"");
+                .contains("value=\"3.50\"").doesNotContain("name=\"coopStart\"");
         mvc.perform(post("/company/profile").with(csrf()).with(asCompany)
                 .param("companyName", "บริษัท พีดีซี").param("website", "https://example.com").param("about", "เกี่ยวกับเรา"))
                 .andExpect(redirectedUrl("/company/profile"));

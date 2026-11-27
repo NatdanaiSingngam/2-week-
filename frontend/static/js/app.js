@@ -145,41 +145,164 @@
     box.hidden = false;
     sync();
   });
-  // Job form: preview the skills NLP finds in the description and tick them below (nothing is saved yet)
-  const extract = document.getElementById('extract-skills');
-  if (extract) {
-    const note = document.getElementById('extract-status');
-    const result = document.getElementById('extract-result');
-    const description = document.getElementById('description');
-    let auto = [];
-    extract.hidden = false;
-    description.addEventListener('input', () => { if (!result.hidden) note.textContent = 'รายละเอียดงานเปลี่ยนแล้ว กดสกัดทักษะอีกครั้ง'; });
-    extract.addEventListener('click', async () => {
-      if (!description.value.trim()) { note.textContent = 'กรุณากรอกรายละเอียดงานก่อน'; description.focus(); return; }
+  // ฟอร์มประกาศงาน: ช่องทักษะแบบป้าย (ทักษะที่เลือก กด × ลบได้ + พิมพ์ค้นหาเพิ่มจากพจนานุกรม)
+  // checkbox name=skills ในรายการเดิมยังเป็นค่าที่ส่งไปกับฟอร์ม ป้ายแค่ติ๊ก/เอาติ๊กออกให้
+  document.querySelectorAll('[data-skill-picker]').forEach(picker => {
+    const form = picker.closest('form');
+    const fallback = picker.querySelector('.skill-fallback');
+    const list = picker.querySelector('.skill-toggles');
+    const description = form.querySelector('#description');
+    const extract = picker.querySelector('#extract-skills');
+    const note = picker.querySelector('#extract-status');
+    if (!fallback || !list) return;
+    const boxes = () => [...list.querySelectorAll('input[name=skills]')];
+    const find = name => boxes().find(cb => cb.value.toLowerCase() === name.toLowerCase());
+    const removed = new Set(); // ทักษะที่ผู้ใช้ลบเอง ดึงจากรายละเอียดงานอีกรอบก็ไม่ใส่กลับ
+
+    fallback.hidden = true;
+    const flag = document.createElement('input');
+    flag.type = 'hidden'; flag.name = 'skillsEdited'; flag.value = 'true';
+    form.appendChild(flag);
+
+    const box = document.createElement('div');
+    box.className = 'skill-picker';
+    box.innerHTML = '<div class="skill-chips" aria-live="polite"></div>'
+      + '<p class="skill-empty field-note">ยังไม่มีทักษะ ดึงจากรายละเอียดงาน หรือพิมพ์ค้นหาด้านล่าง</p>'
+      + '<div class="skill-search"><label for="skill-search" class="visually-hidden">ค้นหาทักษะเพื่อเพิ่ม</label>'
+      + '<input id="skill-search" type="search" autocomplete="off" placeholder="พิมพ์เพื่อค้นหาและเพิ่มทักษะ เช่น Java, Figma" role="combobox" aria-expanded="false" aria-controls="skill-suggest" aria-autocomplete="list" />'
+      + '<ul id="skill-suggest" class="skill-suggest" role="listbox" hidden></ul></div>';
+    fallback.after(box);
+    const chips = box.querySelector('.skill-chips');
+    const empty = box.querySelector('.skill-empty');
+    const search = box.querySelector('#skill-search');
+    const suggest = box.querySelector('#skill-suggest');
+    let active = -1;
+
+    // ทักษะสำคัญ (★ = ทักษะที่ผู้สมัครต้องมี): ค่าตั้งต้นจาก hidden input ที่เซิร์ฟเวอร์ส่งมา
+    const reqBox = form.querySelector('[data-required-skills]');
+    const important = new Set(reqBox ? [...reqBox.querySelectorAll('input')].map(i => i.value) : []);
+    const importantNote = form.querySelector('[data-important-note]');
+    if (importantNote) importantNote.hidden = false;
+
+    const render = () => {
+      const selected = boxes().filter(cb => cb.checked);
+      const names = selected.map(cb => cb.value);
+      [...important].forEach(n => { if (!names.includes(n)) important.delete(n); }); // ลบทักษะ = ไม่สำคัญแล้ว
+      chips.replaceChildren(...selected.map(cb => {
+        const name = cb.value;
+        const on = important.has(name);
+        const chip = document.createElement('span');
+        chip.className = 'skill-chip' + (on ? ' is-important' : '');
+        // กดที่ชื่อทักษะ = สลับเป็นทักษะสำคัญ / ทักษะทั่วไป
+        const label = document.createElement('button');
+        label.type = 'button'; label.className = 'skill-chip-label';
+        label.textContent = (on ? '★ ' : '') + name;
+        label.setAttribute('aria-pressed', on ? 'true' : 'false');
+        label.title = on ? 'ทักษะสำคัญ (กดเพื่อยกเลิก)' : 'กดเพื่อตั้งเป็นทักษะสำคัญ';
+        label.addEventListener('click', () => {
+          if (important.has(name)) important.delete(name); else important.add(name);
+          render();
+          chips.querySelectorAll('.skill-chip-label').forEach(b => { if (b.textContent.replace('★ ', '') === name) b.focus(); });
+        });
+        const x = document.createElement('button');
+        x.type = 'button'; x.className = 'skill-chip-x'; x.textContent = '×';
+        x.setAttribute('aria-label', 'ลบทักษะ ' + name);
+        x.addEventListener('click', () => { cb.checked = false; removed.add(name.toLowerCase()); render(); search.focus(); });
+        chip.append(label, x);
+        return chip;
+      }));
+      empty.hidden = selected.length > 0;
+      if (reqBox) reqBox.replaceChildren(...names.filter(n => important.has(n)).map(n => {
+        const i = document.createElement('input'); i.type = 'hidden'; i.name = 'requiredSkills'; i.value = n; return i;
+      }));
+    };
+    const add = name => {
+      let cb = find(name);
+      if (!cb) { // ทักษะที่ NLP พบแต่ไม่อยู่ในรายการ: เพิ่ม checkbox ซ่อนไว้ให้ส่งไปด้วย
+        cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.name = 'skills'; cb.value = name;
+        const label = document.createElement('label'); label.className = 'skill-toggle'; label.appendChild(cb);
+        list.appendChild(label);
+      }
+      cb.checked = true;
+      removed.delete(cb.value.toLowerCase());
+    };
+    const closeSuggest = () => { suggest.hidden = true; search.setAttribute('aria-expanded', 'false'); active = -1; };
+    const showSuggest = () => {
+      const q = search.value.trim().toLowerCase();
+      if (!q) { closeSuggest(); return; }
+      const hits = boxes().filter(cb => !cb.checked && cb.value.toLowerCase().includes(q))
+        .sort((a, b) => a.value.toLowerCase().indexOf(q) - b.value.toLowerCase().indexOf(q)).slice(0, 8);
+      suggest.replaceChildren(...(hits.length ? hits.map((cb, i) => {
+        const li = document.createElement('li');
+        li.id = 'skill-opt-' + i; li.setAttribute('role', 'option'); li.textContent = cb.value;
+        li.addEventListener('mousedown', e => { e.preventDefault(); pick(cb.value); });
+        return li;
+      }) : [Object.assign(document.createElement('li'), { className: 'skill-suggest-none', textContent: 'ไม่พบทักษะนี้ในพจนานุกรม' })]));
+      suggest.hidden = false;
+      search.setAttribute('aria-expanded', 'true');
+      active = hits.length ? 0 : -1;
+      mark();
+    };
+    const options = () => [...suggest.querySelectorAll('[role=option]')];
+    const mark = () => {
+      options().forEach((li, i) => li.classList.toggle('active', i === active));
+      if (active >= 0) search.setAttribute('aria-activedescendant', 'skill-opt-' + active); else search.removeAttribute('aria-activedescendant');
+    };
+    const pick = name => { add(name); render(); search.value = ''; closeSuggest(); search.focus(); };
+    search.addEventListener('input', showSuggest);
+    search.addEventListener('blur', closeSuggest);
+    search.addEventListener('keydown', e => {
+      const opts = options();
+      if (e.key === 'ArrowDown' && opts.length) { e.preventDefault(); active = (active + 1) % opts.length; mark(); }
+      else if (e.key === 'ArrowUp' && opts.length) { e.preventDefault(); active = (active - 1 + opts.length) % opts.length; mark(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (active >= 0 && opts[active]) pick(opts[active].textContent); }
+      else if (e.key === 'Escape') closeSuggest();
+    });
+
+    // ดึงทักษะจากรายละเอียดงาน: ใส่ป้ายให้ (ยกเว้นที่ผู้ใช้ลบเอง) ทำเองตอนออกจากช่องรายละเอียด หรือกดปุ่ม
+    let extractedFor = description ? description.value.trim() : '';
+    const run = async manual => {
+      const text = description.value.trim();
+      if (!text) { if (manual) { note.textContent = 'กรุณากรอกรายละเอียดงานก่อน'; description.focus(); } return; }
       extract.disabled = true;
-      note.textContent = 'กำลังสกัดทักษะ...';
+      note.textContent = 'กำลังดึงทักษะ...';
       try {
-        const body = new URLSearchParams({ description: description.value, _csrf: extract.form.querySelector('input[name=_csrf]').value });
+        const body = new URLSearchParams({ description: description.value, _csrf: form.querySelector('input[name=_csrf]').value });
         const response = await fetch(extract.dataset.url, { method: 'POST', body, headers: { Accept: 'application/json' } });
         const isJson = (response.headers.get('content-type') || '').includes('application/json');
         const data = isJson ? await response.json() : {};
-        if (!response.ok || !data.skills) throw new Error(data.error || (response.status === 403 || response.redirected ? 'เซสชันหมดอายุ กรุณาคัดลอกข้อความแล้วเข้าสู่ระบบใหม่' : 'สกัดทักษะไม่สำเร็จ ลองใหม่อีกครั้ง'));
-        const found = data.skills.map(name => name.toLowerCase());
-        const boxes = [...extract.form.querySelectorAll('input[name=skills]')];
-        // untick only what this button ticked earlier; skills chosen by the user stay
-        auto.forEach(cb => { if (!found.includes(cb.value.toLowerCase())) cb.checked = false; });
-        auto = boxes.filter(cb => found.includes(cb.value.toLowerCase()) && (!cb.checked || auto.includes(cb)));
-        auto.forEach(cb => { cb.checked = true; });
-        result.replaceChildren(...data.skills.map(name => { const tag = document.createElement('span'); tag.className = 'chip'; tag.textContent = name; return tag; }));
-        result.hidden = !data.skills.length;
-        note.textContent = data.skills.length ? 'พบ ' + data.skills.length + ' ทักษะ (เลือกให้ในรายการด้านล่างแล้ว)' : 'ไม่พบทักษะในรายละเอียดงาน เลือกจากรายการด้านล่างได้';
+        if (!response.ok || !data.skills) throw new Error(data.error || (response.status === 403 || response.redirected ? 'เซสชันหมดอายุ กรุณาคัดลอกข้อความแล้วเข้าสู่ระบบใหม่' : 'ดึงทักษะไม่สำเร็จ ลองใหม่อีกครั้ง'));
+        const fresh = manual ? data.skills : data.skills.filter(name => !removed.has(name.toLowerCase()));
+        fresh.forEach(add);
+        render();
+        extractedFor = text;
+        note.textContent = data.skills.length ? 'พบ ' + data.skills.length + ' ทักษะในรายละเอียดงาน' : 'ไม่พบทักษะในรายละเอียดงาน พิมพ์ค้นหาเพิ่มได้';
       } catch (e) {
         note.textContent = e instanceof TypeError ? 'เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง' : e.message;
       } finally {
         extract.disabled = false;
       }
-    });
-  }
+    };
+    if (extract && description) {
+      extract.hidden = false;
+      extract.addEventListener('click', () => run(true));
+      description.addEventListener('change', () => { if (description.value.trim() !== extractedFor) run(false); });
+    }
+    // ส่งฟอร์มก่อนดึงทักษะจากข้อความล่าสุด: ให้เซิร์ฟเวอร์อ่านทักษะจากรายละเอียดงานรวมเข้าไปด้วยเหมือนเดิม
+    form.addEventListener('submit', () => { if (description && description.value.trim() !== extractedFor) flag.remove(); });
+    render();
+  });
+
+  // ปุ่มที่เปิดกล่องยืนยัน (data-open-dialog="id ของ dialog") / ปุ่มปิดกล่อง (data-close-dialog)
+  document.querySelectorAll('[data-open-dialog]').forEach(btn => {
+    const dialog = document.getElementById(btn.dataset.openDialog);
+    if (!dialog || typeof dialog.showModal !== 'function') return;
+    btn.addEventListener('click', () => dialog.showModal());
+    dialog.querySelectorAll('[data-close-dialog]').forEach(c => c.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); }); // คลิกนอกกล่อง = ยกเลิก
+  });
+
   // Forms that change or delete data ask for confirmation (data-confirm="ข้อความ")
   document.querySelectorAll('form[data-confirm]').forEach(form => {
     form.addEventListener('submit', event => { if (!window.confirm(form.dataset.confirm)) event.preventDefault(); });

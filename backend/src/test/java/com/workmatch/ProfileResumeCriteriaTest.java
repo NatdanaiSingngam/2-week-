@@ -2,7 +2,7 @@
  * ==== Workmatch · Backend · ทดสอบ (JUnit) ====
  * ทดสอบ: แผนวันที่ 23–27 พ.ย. (โมดูล 1–2)
  *   23 พ.ย. สาขาแบบเลือกจากรายการ (ค่าเดิมที่พิมพ์ไว้ไม่หาย)
- *   24 พ.ย. ลบเรซูเม่ทั้งฉบับ (ทักษะ ผลจับคู่ และไฟล์ PDF หายตาม ใบสมัครยังอยู่)
+ *   24 พ.ย. ลบเรซูเม่ทั้งฉบับ (ทักษะ ผลจับคู่ ไฟล์ PDF และใบสมัครหายตาม)
  *   25–26 พ.ย. เกณฑ์คัดกรอง 5 ข้อ + ทักษะบังคับ (JobScreeningCriteria, JobSkill.is_required) และฟอร์มของบริษัท
  *   27 พ.ย. หน้ารายละเอียดงานแสดงเกณฑ์ให้นักศึกษา
  * รัน: cd backend แล้ว mvnw test (H2 + NLP จำลอง ไม่ต้องเปิด MySQL/NLP)
@@ -37,7 +37,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -138,7 +137,7 @@ class ProfileResumeCriteriaTest {
     // ---------- 24 พ.ย. ลบเรซูเม่ทั้งฉบับ ----------
 
     @Test
-    void deletingWholeResumeRemovesSkillsMatchesAndPdfButKeepsApplications() throws Exception {
+    void deletingWholeResumeRemovesSkillsMatchesPdfAndApplications() throws Exception {
         registration.register("บริษัท ก", "a@co.com", "password123", "COMPANY");
         registration.registerStudent("นิสิต", "ลบเรซูเม่", "66000102", "del@test.com", "password123");
         Long jobId = createJob("a@co.com", "Java Intern", "Java SQL");
@@ -164,16 +163,16 @@ class ProfileResumeCriteriaTest {
         // หน้าเรซูเม่มีปุ่มลบทั้งฉบับพร้อมกล่องยืนยัน
         assertThat(mvc.perform(get("/student/resume").with(user("del@test.com").roles("STUDENT")))
                 .andReturn().getResponse().getContentAsString())
-                .contains("action=\"/student/resume/delete\"").contains("data-confirm=\"ลบเรซูเม่ทั้งฉบับ?");
+                .contains("action=\"/student/resume/delete\"").contains("id=\"delete-resume-dialog\"").contains("ยืนยัน ลบเรซูเม่");
 
         mvc.perform(post("/student/resume/delete").with(csrf()).with(user("del@test.com").roles("STUDENT")))
                 .andExpect(redirectedUrl("/student/resume"))
-                .andExpect(flash().attribute("message", "ลบเรซูเม่ทั้งฉบับแล้ว (ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF)"));
+                .andExpect(flash().attribute("message", "ลบเรซูเม่ทั้งฉบับแล้ว (ข้อความ ทักษะ ผลจับคู่ ไฟล์ PDF และใบสมัครที่ส่งไป)"));
         assertThat(resumes.findById(r.getId())).isEmpty();
         assertThat(resumeSkills.findByResumeId(r.getId())).isEmpty();
         assertThat(matches.findByResumeId(r.getId())).isEmpty();
         assertThat(storedFiles.findById(fileId)).isEmpty();
-        assertThat(applications.count()).isEqualTo(1); // ใบสมัครที่ส่งไปแล้วยังอยู่
+        assertThat(applications.count()).isZero(); // ใบสมัครที่ส่งไปแล้วถูกลบด้วย
 
         // ลบซ้ำตอนไม่มีเรซูเม่ ไม่พัง
         mvc.perform(post("/student/resume/delete").with(csrf()).with(user("del@test.com").roles("STUDENT")))
@@ -195,21 +194,18 @@ class ProfileResumeCriteriaTest {
 
         mvc.perform(post("/company/jobs/" + jobId + "/criteria").with(csrf()).with(user("a@co.com").roles("COMPANY"))
                         .param("minMatchScore", "50").param("minGpa", "2.5").param("requiredMajor", "วิทยาการคอมพิวเตอร์")
-                        .param("availableStart", "2027-06-01").param("availableEnd", "2027-09-30")
                         .param("requiredSkills", "Java", "SQL"))
                 .andExpect(redirectedUrl("/company/jobs/" + jobId + "/criteria"));
         JobScreeningCriteria c = criteria.findByJobId(jobId).orElseThrow();
         assertThat(c.getMinMatchScore()).isEqualByComparingTo("50");
         assertThat(c.getMinGpa()).isEqualByComparingTo("2.50");
         assertThat(c.getRequiredMajor()).isEqualTo("วิทยาการคอมพิวเตอร์");
-        assertThat(c.getAvailableStartDate()).isEqualTo(LocalDate.of(2027, 6, 1));
-        assertThat(c.getAvailableEndDate()).isEqualTo(LocalDate.of(2027, 9, 30));
         assertThat(requiredSkills(jobId)).containsExactlyInAnyOrder("Java", "SQL");
 
         // อ่านกลับ: ฟอร์มแสดงค่าที่บันทึก และติ๊กทักษะบังคับไว้
         form = mvc.perform(get("/company/jobs/" + jobId + "/criteria").with(user("a@co.com").roles("COMPANY")))
                 .andReturn().getResponse().getContentAsString();
-        assertThat(form).contains("value=\"50\"").contains("value=\"2.50\"").contains("value=\"2027-06-01\"")
+        assertThat(form).contains("value=\"50\"").contains("value=\"2.50\"").doesNotContain("availableStart")
                 .contains("value=\"Java\" checked=\"checked\"").doesNotContain("value=\"Docker\" checked");
 
         // แก้ประกาศ (สกัดทักษะใหม่) -> ธงบังคับของทักษะที่ยังอยู่คงเดิม
@@ -247,7 +243,6 @@ class ProfileResumeCriteriaTest {
                 {"minGpa", "4.5", "GPA ขั้นต่ำต้องอยู่ระหว่าง 0.00–4.00 (ทศนิยมไม่เกิน 2 ตำแหน่ง)"},
                 {"minGpa", "abc", "GPA ขั้นต่ำต้องอยู่ระหว่าง 0.00–4.00 (ทศนิยมไม่เกิน 2 ตำแหน่ง)"},
                 {"requiredMajor", "ดาราศาสตร์", "กรุณาเลือกสาขาจากรายการ"},
-                {"availableStart", "2027-06-01", "ช่วงสหกิจที่ต้องการต้องระบุทั้งวันเริ่มและวันสิ้นสุด"},
         };
         for (String[] b : bad) {
             mvc.perform(post("/company/jobs/" + jobId + "/criteria").with(csrf()).with(user("a@co.com").roles("COMPANY"))
@@ -255,9 +250,6 @@ class ProfileResumeCriteriaTest {
                     .andExpect(view().name("company/criteria"))
                     .andExpect(model().attribute("error", b[2]));
         }
-        mvc.perform(post("/company/jobs/" + jobId + "/criteria").with(csrf()).with(user("a@co.com").roles("COMPANY"))
-                        .param("availableStart", "2027-09-30").param("availableEnd", "2027-06-01"))
-                .andExpect(model().attribute("error", "วันสิ้นสุดช่วงสหกิจต้องไม่ก่อนวันเริ่ม"));
         mvc.perform(post("/company/jobs/" + jobId + "/criteria").with(csrf()).with(user("a@co.com").roles("COMPANY"))
                         .param("requiredSkills", "Python"))
                 .andExpect(model().attribute("error", "ทักษะบังคับต้องเป็นทักษะของประกาศนี้: Python"));
@@ -280,7 +272,6 @@ class ProfileResumeCriteriaTest {
 
         mvc.perform(post("/company/jobs/" + jobId + "/criteria").with(csrf()).with(user("a@co.com").roles("COMPANY"))
                         .param("minMatchScore", "60").param("minGpa", "2.75").param("requiredMajor", "วิศวกรรมซอฟต์แวร์")
-                        .param("availableStart", "2027-06-01").param("availableEnd", "2027-09-30")
                         .param("requiredSkills", "Docker"))
                 .andExpect(status().is3xxRedirection());
         String after = mvc.perform(get("/student/jobs/" + jobId).with(user("view@test.com").roles("STUDENT")))
@@ -288,13 +279,63 @@ class ProfileResumeCriteriaTest {
         assertThat(after).contains("คะแนนความสอดคล้องขั้นต่ำ").contains("60.0%")
                 .contains("GPA ขั้นต่ำ").contains("2.75")
                 .contains("วิศวกรรมซอฟต์แวร์")
-                .contains("ช่วงสหกิจที่ต้องการ")
+                .doesNotContain("ช่วงสหกิจที่ต้องการ")
                 .contains("ทักษะบังคับ").contains("badge badge-required\">Docker<")
                 .doesNotContain("บริษัทยังไม่ได้กำหนดเกณฑ์");
     }
 
     private List<String> requiredSkills(Long jobId) {
         return jobSkills.findByJobId(jobId).stream().filter(JobSkill::isRequired).map(JobSkill::getSkillName).toList();
+    }
+
+    // ---------- ช่องทักษะแบบป้าย: ทักษะที่กด × ลบไม่ถูกอ่านกลับจากรายละเอียดงาน ----------
+
+    @Test
+    void skillsEditedKeepsOnlyTheChipsTheCompanyLeft() throws Exception {
+        registration.register("บริษัท ก", "a@co.com", "password123", "COMPANY");
+        // แบบเดิม (ไม่มี skillsEdited): อ่าน Java + SQL จากรายละเอียดงานเอง
+        Long jobId = createJob("a@co.com", "Backend Intern", "Java SQL");
+        assertThat(jobSkills.findByJobId(jobId).stream().map(s -> s.getSkillName()).toList()).containsExactlyInAnyOrder("Java", "SQL");
+
+        // ลบป้าย SQL แล้วบันทึก: เหลือ Java อย่างเดียวแม้รายละเอียดงานยังมีคำว่า SQL
+        mvc.perform(post("/company/jobs/" + jobId).with(csrf()).with(user("a@co.com").roles("COMPANY"))
+                        .param("title", "Backend Intern").param("description", "Java SQL").param("action", "publish")
+                        .param("skills", "Java").param("skillsEdited", "true"))
+                .andExpect(status().is3xxRedirection());
+        assertThat(jobSkills.findByJobId(jobId).stream().map(s -> s.getSkillName()).toList()).containsExactly("Java");
+    }
+
+    // ---------- เกณฑ์คัดกรองอยู่ในฟอร์มประกาศงาน: บันทึกพร้อมกัน ----------
+
+    @Test
+    void criteriaSaveTogetherWithTheJobForm() throws Exception {
+        registration.register("บริษัท ก", "a@co.com", "password123", "COMPANY");
+        var co = user("a@co.com").roles("COMPANY");
+        String location = mvc.perform(post("/company/jobs").with(csrf()).with(co)
+                        .param("title", "Backend Intern").param("description", "Java SQL").param("action", "publish")
+                        .param("criteriaIncluded", "true").param("minGpa", "2.5")
+                        .param("requiredMajor", "วิทยาการคอมพิวเตอร์").param("requiredSkills", "Java"))
+                .andExpect(status().is3xxRedirection()).andReturn().getResponse().getRedirectedUrl();
+        Long jobId = Long.valueOf(location.substring(location.lastIndexOf('/') + 1));
+        JobScreeningCriteria c = criteria.findByJobId(jobId).orElseThrow();
+        assertThat(c.getMinMatchScore()).isNull();
+        assertThat(c.getMinGpa()).isEqualByComparingTo("2.50");
+        assertThat(requiredSkills(jobId)).containsExactly("Java");
+
+        // หน้าแก้ไขแสดงเกณฑ์เดิมในส่วนเกณฑ์คัดกรอง
+        String form = mvc.perform(get("/company/jobs/" + jobId + "/edit").with(co)).andReturn().getResponse().getContentAsString();
+        assertThat(form).contains("id=\"criteria\"").contains("value=\"2.50\"").doesNotContain("name=\"minMatchScore\"")
+                .contains("name=\"requiredSkills\" value=\"Java\"").contains("data-important-note");
+
+        // เกณฑ์ผิด = ไม่บันทึกทั้งประกาศและเกณฑ์ (ชื่อตำแหน่งยังเป็นค่าเดิม)
+        mvc.perform(post("/company/jobs/" + jobId).with(csrf()).with(co)
+                        .param("title", "ชื่อใหม่").param("description", "Java SQL").param("action", "publish")
+                        .param("criteriaIncluded", "true").param("minGpa", "5"))
+                .andExpect(view().name("company/job-form"))
+                .andExpect(model().attribute("error", "GPA ขั้นต่ำต้องอยู่ระหว่าง 0.00–4.00 (ทศนิยมไม่เกิน 2 ตำแหน่ง)"));
+        assertThat(criteria.findByJobId(jobId).orElseThrow().getMinGpa()).isEqualByComparingTo("2.50");
+        String detail = mvc.perform(get("/company/jobs/" + jobId + "/edit").with(co)).andReturn().getResponse().getContentAsString();
+        assertThat(detail).contains("value=\"Backend Intern\"");
     }
 
     private Long createJob(String company, String title, String description) throws Exception {

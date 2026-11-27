@@ -134,7 +134,7 @@ class ReextractAndCleanupTest {
         mvc.perform(post("/admin/skills/" + dockerId).with(csrf()).with(user("admin@test.com").roles("ADMIN"))
                         .param("name", "Docker").param("category", "tools"))
                 .andExpect(redirectedUrl("/admin/skills"))
-                .andExpect(flash().attribute("message", org.hamcrest.Matchers.containsString("สกัดทักษะเรซูเม่ใหม่ 1 ฉบับ (ทักษะเปลี่ยน 1 ฉบับ")));
+                .andExpect(flash().attribute("message", org.hamcrest.Matchers.containsString("อ่านทักษะเรซูเม่ใหม่ 1 ฉบับ (ทักษะเปลี่ยน 1 ฉบับ")));
         assertThat(skills(r)).containsExactlyInAnyOrder("Java", "Docker", "SQL"); // Excel ไม่กลับมา, SQL ที่เพิ่มเองยังอยู่
         assertThat(resumeSkills.findByResumeId(r.getId()).stream().filter(ResumeSkill::isManual).map(ResumeSkill::getSkillName))
                 .containsExactly("SQL");
@@ -142,7 +142,7 @@ class ReextractAndCleanupTest {
 
         // ปุ่มสกัดใหม่ทั้งหมด: ไม่มีอะไรเปลี่ยน
         mvc.perform(post("/admin/skills/reextract").with(csrf()).with(user("admin@test.com").roles("ADMIN")))
-                .andExpect(flash().attribute("message", "สกัดทักษะเรซูเม่ใหม่ 1 ฉบับ (ทักษะเปลี่ยน 0 ฉบับ)"));
+                .andExpect(flash().attribute("message", "อ่านทักษะเรซูเม่ใหม่ 1 ฉบับ (ทักษะเปลี่ยน 0 ฉบับ)"));
 
         // นักศึกษาบันทึกข้อความใหม่ = เริ่มชุดทักษะใหม่ (รายการที่เคยลบถูกล้าง)
         mvc.perform(post("/student/resume").with(csrf()).with(user("old@test.com").roles("STUDENT"))
@@ -159,7 +159,7 @@ class ReextractAndCleanupTest {
         Resume r = resumeOf("down@test.com");
         when(nlpClient.extractSkills(anyString())).thenThrow(new NlpUnavailableException());
         mvc.perform(post("/admin/skills/reextract").with(csrf()).with(user("admin@test.com").roles("ADMIN")))
-                .andExpect(flash().attribute("message", org.hamcrest.Matchers.startsWith("ยังไม่ได้สกัดทักษะเรซูเม่ใหม่")));
+                .andExpect(flash().attribute("message", org.hamcrest.Matchers.startsWith("ยังไม่ได้อ่านทักษะเรซูเม่ใหม่")));
         assertThat(skills(r)).containsExactlyInAnyOrder("Java", "Excel");
     }
 

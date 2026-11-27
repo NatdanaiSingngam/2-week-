@@ -100,17 +100,32 @@ public class JobPostingService {
     /** สร้างประกาศ: ทักษะ = ที่ NLP สกัดจากรายละเอียด + ที่เลือกจากพจนานุกรม แล้วจับคู่ใหม่ถ้าเผยแพร่ */
     @Transactional
     public Long create(User company, JobInput input) {
+        return create(company, input, null);
+    }
+
+    /**
+     * สร้างประกาศพร้อมเกณฑ์คัดกรองจากฟอร์มเดียวกัน (criteria = null คือไม่ได้ส่งส่วนเกณฑ์มา)
+     * เกณฑ์ผิดข้อใด = โยน IllegalArgumentException แล้ว transaction ย้อนกลับ ประกาศก็ไม่ถูกบันทึก
+     */
+    @Transactional
+    public Long create(User company, JobInput input, ScreeningCriteriaService.CriteriaInput criteria) {
         Job job = new Job();
         job.setCompany(company);
         apply(job, input);
         List<ExtractedSkill> skills = skillsFor(input);
         job = jobs.save(job);
         saveSkills(job, skills, java.util.Set.of());
+        if (criteria != null) screening.save(company, job.getId(), criteria);
         return job.getId();
     }
 
     @Transactional
     public void update(User company, Long jobId, JobInput input) {
+        update(company, jobId, input, null);
+    }
+
+    @Transactional
+    public void update(User company, Long jobId, JobInput input, ScreeningCriteriaService.CriteriaInput criteria) {
         Job job = owned(company, jobId);
         apply(job, input);
         List<ExtractedSkill> skills = skillsFor(input);
@@ -120,6 +135,7 @@ public class JobPostingService {
         jobSkills.findByJobId(job.getId()).stream().filter(JobSkill::isRequired).forEach(s -> required.add(s.getSkillName()));
         jobSkills.deleteByJobId(job.getId());
         saveSkills(job, skills, required);
+        if (criteria != null) screening.save(company, job.getId(), criteria);
         if (!job.isOpen()) matches.deleteByJobId(job.getId());
     }
 
@@ -152,7 +168,7 @@ public class JobPostingService {
         Job job = owned(company, jobId);
         List<String> selected = jobSkills.findByJobId(job.getId()).stream().map(JobSkill::getSkillName).toList();
         return new JobInput(job.getTitle(), job.getDescription(), nz(job.getCompensation()), nz(job.getWorkSchedule()),
-                nz(job.getAccommodation()), nz(job.getTransport()), selected, job.getStatus() == JobStatus.DRAFT,
+                yesNo(job.getAccommodation()), yesNo(job.getTransport()), selected, job.getStatus() == JobStatus.DRAFT,
                 nz(job.getLocation()), nz(job.getWorkMode()), job.getOpenings() == null ? "" : job.getOpenings().toString(),
                 job.getDeadline() == null ? "" : job.getDeadline().toString());
     }
@@ -261,8 +277,8 @@ public class JobPostingService {
         job.setDescription(d);
         job.setCompensation(extra(in.compensation(), "ค่าตอบแทน"));
         job.setWorkSchedule(extra(in.workSchedule(), "วันและเวลาทำงาน"));
-        job.setAccommodation(extra(in.accommodation(), "สวัสดิการที่พัก"));
-        job.setTransport(extra(in.transport(), "สวัสดิการรถรับส่ง"));
+        job.setAccommodation(choice(in.accommodation(), "สวัสดิการที่พัก"));
+        job.setTransport(choice(in.transport(), "สวัสดิการรถรับส่ง"));
         job.setLocation(extra(in.location(), "สถานที่ปฏิบัติงาน"));
         String mode = nz(in.workMode()).trim();
         if (!mode.isEmpty() && !WORK_MODES.contains(mode)) throw new IllegalArgumentException("รูปแบบการทำงานไม่ถูกต้อง");
@@ -277,9 +293,14 @@ public class JobPostingService {
         job.setStatus(in.draft() ? JobStatus.DRAFT : JobStatus.OPEN);
     }
 
-    /** ทักษะของประกาศ: NLP สกัดจากรายละเอียด (ล้มเหลวจะโยน NlpUnavailableException ก่อนบันทึก) + ที่เลือกจากพจนานุกรม */
+    /**
+     * ทักษะของประกาศ: NLP สกัดจากรายละเอียด (ล้มเหลวจะโยน NlpUnavailableException ก่อนบันทึก) + ที่เลือกจากพจนานุกรม
+     * ถ้า skillsFinal (ช่องทักษะแบบป้ายในหน้าเว็บดึงทักษะจากรายละเอียดล่าสุดให้แล้ว) ใช้ชุดที่ผู้ใช้เลือกตามนั้น
+     * ทักษะที่ผู้ใช้กด × ลบจะไม่ถูกอ่านกลับมาจากรายละเอียดงาน
+     */
     private List<ExtractedSkill> skillsFor(JobInput in) {
-        List<ExtractedSkill> all = new ArrayList<>(nlpClient.extractSkills(in.description().trim()));
+        List<ExtractedSkill> all = in.skillsFinal() ? new ArrayList<>()
+                : new ArrayList<>(nlpClient.extractSkills(in.description().trim()));
         if (in.selectedSkills() != null) {
             for (String name : in.selectedSkills()) {
                 dictionary.resolve(name).map(SkillEntry.class::cast)
@@ -324,6 +345,23 @@ public class JobPostingService {
     }
 
     private static String nz(String s) { return s == null ? "" : s; }
+
+    /** สวัสดิการที่พัก / รถรับส่ง: เลือกได้แค่ "มี" หรือ "ไม่มี" (ว่าง = ไม่ระบุ) */
+    static final List<String> YES_NO = List.of("มี", "ไม่มี");
+
+    private static String choice(String value, String label) {
+        String v = value == null ? "" : value.trim();
+        if (v.isEmpty()) return null;
+        if (!YES_NO.contains(v)) throw new IllegalArgumentException("กรุณาเลือก" + label + "เป็น มี หรือ ไม่มี");
+        return v;
+    }
+
+    /** ค่าเดิมที่เคยพิมพ์เป็นข้อความ แปลงเป็นตัวเลือก: ขึ้นต้นด้วย "ไม่มี" = ไม่มี, อย่างอื่น = มี */
+    static String yesNo(String stored) {
+        if (stored == null || stored.isBlank()) return "";
+        String v = stored.trim();
+        return v.startsWith("ไม่มี") ? "ไม่มี" : "มี";
+    }
 
     static String shortAddress(String address) {
         if (address == null || address.isBlank()) return null;

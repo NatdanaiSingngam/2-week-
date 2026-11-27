@@ -99,8 +99,9 @@ public class ProfileService {
         p.setMajor(blankToNull(limit(m, 150)));
         p.setGpa(grade);
         p.setGpaVisible(grade != null && gpaVisible);
-        p.setCoopStart(start);
-        p.setCoopEnd(end);
+        // หน้าโปรไฟล์ไม่มีช่องวันสหกิจแล้ว: ถ้าไม่ได้ส่งค่ามา (null) ให้คงค่าเดิมไว้ ไม่ล้างทิ้ง
+        if (coopStart != null) p.setCoopStart(start);
+        if (coopEnd != null) p.setCoopEnd(end);
         studentProfiles.save(p);
 
         User u = users.findById(student.getId()).orElseThrow();

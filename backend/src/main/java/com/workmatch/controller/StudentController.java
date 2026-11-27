@@ -79,7 +79,7 @@ public class StudentController {
                         RedirectAttributes redirect) {
         try {
             applicationService.apply(currentUserService.getCurrentUser(), id, coverLetter);
-            redirect.addFlashAttribute("message", "ส่งใบสมัครแล้ว ติดตามสถานะได้ที่ \"ประวัติการสมัครงาน\"");
+            redirect.addFlashAttribute("message", "ส่งใบสมัครแล้ว ติดตามสถานะได้ที่ \"ใบสมัครของฉัน\"");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("error", e.getMessage());
             redirect.addFlashAttribute("coverLetter", coverLetter);
@@ -89,7 +89,13 @@ public class StudentController {
 
     @GetMapping("/student/bookmarks")
     public String bookmarks(Model model) {
-        model.addAttribute("bookmarks", bookmarkService.list(currentUserService.getCurrentUser()));
+        var items = bookmarkService.list(currentUserService.getCurrentUser());
+        model.addAttribute("bookmarks", items);
+        // จัดกลุ่มตามวันที่บันทึก (รายการเรียงใหม่สุดก่อนอยู่แล้ว LinkedHashMap จึงคงลำดับวัน)
+        var byDay = new java.util.LinkedHashMap<java.time.LocalDate, java.util.List<com.workmatch.dto.Views.BookmarkItem>>();
+        items.forEach(b -> byDay.computeIfAbsent(b.savedAt().toLocalDate(), d -> new java.util.ArrayList<>()).add(b));
+        model.addAttribute("bookmarkDays", byDay.entrySet().stream()
+                .map(e -> new com.workmatch.dto.Views.BookmarkDay(e.getKey(), e.getValue())).toList());
         model.addAttribute("section", "bookmarks");
         return "student/bookmarks";
     }

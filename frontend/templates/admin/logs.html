@@ -12,7 +12,7 @@
 <body class="admin-body">
 <aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
 <main id="main" class="admin-main">
-<div class="page-title"><h1>บันทึกข้อผิดพลาดของระบบ (System Error Logs)</h1><p>รายงานข้อผิดพลาดที่เกิดขึ้น 200 รายการล่าสุด เพื่อใช้วิเคราะห์และแก้ไขปัญหา</p></div>
+<div class="page-title"><h1>บันทึกข้อผิดพลาดของระบบ</h1><p>รายงานข้อผิดพลาดที่เกิดขึ้น 200 รายการล่าสุด เพื่อใช้วิเคราะห์และแก้ไขปัญหา</p></div>
 <div class="card empty" th:if="${#lists.isEmpty(logs)}"><p>ยังไม่มีข้อผิดพลาด</p></div>
 <section class="card table-card" th:if="${not #lists.isEmpty(logs)}" aria-label="ข้อผิดพลาดล่าสุด">
   <div class="table-wrap">

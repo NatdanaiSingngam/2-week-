@@ -19,24 +19,24 @@
   <div class="job-hero">
     <span class="mono lg" aria-hidden="true" th:text="${job.companyInitial()}">ส</span>
     <div style="flex:1;min-width:0">
-      <h1 style="font-size:1.3rem;margin:0" th:text="${job.companyName()}">บริษัท</h1>
-      <div class="meta muted" style="font-size:.9rem"><span th:text="${job.title()}">ตำแหน่ง</span> <span class="verified" th:if="${job.companyVerified()}">ยืนยันตัวตนแล้ว</span> <span class="status" th:classappend="${job.status().name()}" th:if="${job.status().name() != 'OPEN'}" th:text="${job.status().label}">ปิดรับ</span></div>
+      <h1 style="font-size:1.3rem;margin:0" th:text="${job.title()}">ตำแหน่ง</h1>
+      <div class="meta muted" style="font-size:.9rem"><span th:text="${job.companyName()}">บริษัท</span> <span class="verified" th:if="${job.companyVerified()}">ยืนยันตัวตนแล้ว</span> <span class="status" th:classappend="${job.status().name()}" th:if="${job.status().name() != 'OPEN'}" th:text="${job.status().label}">ปิดรับ</span></div>
     </div>
   </div>
 
   <dl class="info-grid">
-    <div class="info"><dt>ที่อยู่</dt><dd th:text="${job.address() != null ? job.address() : '-'}">-</dd></div>
-    <div class="info"><dt>ประเภทกิจการ</dt><dd th:text="${job.businessType() != null ? job.businessType() : '-'}">-</dd></div>
-    <div class="info"><dt>จำนวนพนักงาน</dt><dd th:text="${job.employeeCount() != null ? job.employeeCount() + ' คน' : '-'}">-</dd></div>
-    <div class="info"><dt>วันและเวลาทำงาน</dt><dd th:text="${job.workSchedule() != null ? job.workSchedule() : '-'}">-</dd></div>
-    <div class="info"><dt>รูปแบบการคัดเลือก</dt><dd th:text="${job.selectionMethod() != null ? job.selectionMethod() : '-'}">-</dd></div>
-    <div class="info"><dt>ค่าตอบแทน (เบี้ยเลี้ยง)</dt><dd class="accent" th:text="${job.compensation() != null ? job.compensation() : '-'}">-</dd></div>
-    <div class="info"><dt>สถานที่ปฏิบัติงาน</dt><dd th:text="${job.location() != null ? job.location() : '-'}">-</dd></div>
-    <div class="info"><dt>รูปแบบการทำงาน</dt><dd th:text="${job.workMode() != null ? job.workMode() : '-'}">-</dd></div>
-    <div class="info"><dt>จำนวนที่รับ</dt><dd th:text="${job.openings() != null ? job.openings() + ' คน' : '-'}">-</dd></div>
+    <div class="info"><dt>ค่าตอบแทน (เบี้ยเลี้ยง)</dt><dd class="accent" th:text="${job.compensation() != null ? job.compensation() : 'ไม่ระบุ'}">-</dd></div>
     <div class="info"><dt>วันปิดรับสมัคร</dt><dd th:text="${job.deadline() != null ? @fmt.date(job.deadline()) : 'ไม่กำหนด'}">-</dd></div>
-    <div class="info"><dt>สวัสดิการที่พัก</dt><dd th:text="${job.accommodation() != null ? job.accommodation() : '-'}">-</dd></div>
-    <div class="info"><dt>สวัสดิการรถรับส่ง</dt><dd th:text="${job.transport() != null ? job.transport() : '-'}">-</dd></div>
+    <div class="info" th:if="${job.location() != null}"><dt>สถานที่ปฏิบัติงาน</dt><dd th:text="${job.location()}">-</dd></div>
+    <div class="info" th:if="${job.workMode() != null}"><dt>รูปแบบการทำงาน</dt><dd th:text="${job.workMode()}">-</dd></div>
+    <div class="info" th:if="${job.workSchedule() != null}"><dt>วันและเวลาทำงาน</dt><dd th:text="${job.workSchedule()}">-</dd></div>
+    <div class="info" th:if="${job.openings() != null}"><dt>จำนวนที่รับ</dt><dd th:text="${job.openings() + ' คน'}">-</dd></div>
+    <div class="info" th:if="${job.selectionMethod() != null}"><dt>รูปแบบการคัดเลือก</dt><dd th:text="${job.selectionMethod()}">-</dd></div>
+    <div class="info" th:if="${job.accommodation() != null}"><dt>สวัสดิการที่พัก</dt><dd th:text="${job.accommodation()}">-</dd></div>
+    <div class="info" th:if="${job.transport() != null}"><dt>สวัสดิการรถรับส่ง</dt><dd th:text="${job.transport()}">-</dd></div>
+    <div class="info" th:if="${job.businessType() != null}"><dt>ประเภทกิจการ</dt><dd th:text="${job.businessType()}">-</dd></div>
+    <div class="info" th:if="${job.employeeCount() != null}"><dt>จำนวนพนักงาน</dt><dd th:text="${job.employeeCount() + ' คน'}">-</dd></div>
+    <div class="info wide" th:if="${job.address() != null}"><dt>ที่อยู่บริษัท</dt><dd th:text="${job.address()}">-</dd></div>
   </dl>
 
   <div th:if="${job.companyAbout() != null or job.companyWebsite() != null}">
@@ -45,12 +45,12 @@
     <p th:if="${job.companyWebsite() != null}"><a th:href="${job.companyWebsite()}" target="_blank" rel="noopener noreferrer" th:text="${job.companyWebsite()}">เว็บไซต์</a></p>
   </div>
   <div class="alert info" role="status" th:if="${job.status().name() == 'OPEN' and !job.accepting()}">เลยวันปิดรับสมัครแล้ว</div>
-  <h2 style="font-size:1rem">รายละเอียดงาน (Job Description)</h2>
+  <h2 style="font-size:1rem">รายละเอียดงาน</h2>
   <p class="pre-line" th:text="${job.description()}">รายละเอียด</p>
 
   <div class="match-summary" th:if="${m != null}">
     <div class="ring" th:classappend="${lv}" th:style="${'--p:' + s}" role="img" th:aria-label="${'คะแนนความสอดคล้อง ' + #numbers.formatDecimal(s, 1, 1) + '%'}"><strong th:text="${#numbers.formatDecimal(s, 1, 1) + '%'}">0.0%</strong></div>
-    <div><strong>ค่าร้อยละความสอดคล้องกับทักษะของคุณ</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(m.matched) + ' จาก ' + (#lists.size(m.matched) + #lists.size(m.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div></div>
+    <div><strong>ทักษะของคุณตรงกับตำแหน่งนี้</strong><div class="match-meta" style="margin-top:4px"><span class="level" th:classappend="${lv}" th:text="${@fmt.levelLabel(lv)}">ระดับ</span><span th:text="${'ทักษะตรง ' + #lists.size(m.matched) + ' จาก ' + (#lists.size(m.matched) + #lists.size(m.missing)) + ' ทักษะ'}">ทักษะตรง 0 จาก 0 ทักษะ</span></div></div>
   </div>
   <div class="skill-cols" th:if="${m != null}">
     <section><h4>ทักษะที่คุณมี</h4><div><span class="badge badge-ok" th:each="sk : ${m.matched}" th:text="${sk}">Java</span><span class="muted" th:if="${#lists.isEmpty(m.matched)}">ยังไม่มีทักษะที่ตรง</span></div></section>
@@ -70,22 +70,21 @@
       <div th:if="${c.minMatchScore() != null}"><dt>คะแนนความสอดคล้องขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minMatchScore(), 1, 1) + '%'}">50.0%</dd></div>
       <div th:if="${c.minGpa() != null}"><dt>GPA ขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minGpa(), 1, 2)}">2.50</dd></div>
       <div th:if="${c.requiredMajor() != null}"><dt>สาขาวิชา</dt><dd th:text="${c.requiredMajor()}">วิทยาการคอมพิวเตอร์</dd></div>
-      <div th:if="${c.availableStart() != null}"><dt>ช่วงสหกิจที่ต้องการ</dt><dd th:text="${@fmt.date(c.availableStart()) + ' – ' + @fmt.date(c.availableEnd())}">1 มิ.ย. 2570 – 30 ก.ย. 2570</dd></div>
       <div th:if="${not #lists.isEmpty(c.requiredSkills())}"><dt>ทักษะบังคับ</dt><dd><span class="badge badge-required" th:each="sk : ${c.requiredSkills()}" th:text="${sk}">Java</span></dd></div>
     </dl>
   </section>
 
   <div class="apply-box">
     <div th:if="${job.applicationStatus() != null}" class="alert success" role="status">
-      <span>สมัครตำแหน่งนี้แล้วเมื่อ <span th:text="${@fmt.date(job.appliedAt())}">31 ส.ค. 2569</span> · สถานะ: <strong th:text="${job.applicationStatus().label}">รอพิจารณา</strong> · <a th:href="@{/student/applications}">ดูประวัติการสมัครงาน</a></span>
+      <span>สมัครตำแหน่งนี้แล้วเมื่อ <span th:text="${@fmt.date(job.appliedAt())}">31 ส.ค. 2569</span> · สถานะ: <strong th:text="${job.applicationStatus().label}">รอพิจารณา</strong> · <a th:href="@{/student/applications}">ดูใบสมัครของฉัน</a></span>
     </div>
     <form method="post" id="apply-form" th:if="${job.applicationStatus() == null and job.accepting()}" th:action="@{/student/jobs/{id}/apply(id=${job.jobId()})}" data-busy="กำลังส่งใบสมัคร...">
-      <div class="field"><label for="cover">ข้อความแนะนำตัว (Cover Letter) <span class="muted" style="font-weight:400">ไม่บังคับ</span></label><textarea id="cover" name="coverLetter" rows="4" maxlength="3000" style="min-height:110px" placeholder="แนะนำตัวสั้น ๆ ว่าทำไมสนใจตำแหน่งนี้" th:text="${coverLetter}"></textarea></div>
+      <div class="field"><label for="cover">ข้อความแนะนำตัว (Cover Letter)</label><textarea id="cover" name="coverLetter" rows="4" maxlength="3000" style="min-height:110px" placeholder="แนะนำตัวสั้น ๆ ว่าทำไมสนใจตำแหน่งนี้" th:text="${coverLetter}"></textarea></div>
       <p class="field-note" th:if="${!job.hasResume()}">ต้องมีเรซูเม่ก่อนสมัครงาน <a th:href="@{/student/resume}">อัปโหลดเรซูเม่</a></p>
     </form>
     <div class="actions end">
       <form method="post" class="inline-form" th:action="@{/student/jobs/{id}/bookmark(id=${job.jobId()})}"><button type="submit" class="secondary" th:attr="aria-pressed=${job.bookmarked()}" th:text="${job.bookmarked()} ? '★ บันทึกแล้ว' : 'บันทึกงานนี้'">บันทึกงานนี้</button></form>
-      <button type="submit" form="apply-form" th:if="${job.applicationStatus() == null and job.accepting()}" th:disabled="${!job.hasResume()}">สมัครงาน</button>
+      <button type="submit" class="lg" form="apply-form" th:if="${job.applicationStatus() == null and job.accepting()}" th:disabled="${!job.hasResume()}">สมัครงาน</button>
     </div>
   </div>
 </article>

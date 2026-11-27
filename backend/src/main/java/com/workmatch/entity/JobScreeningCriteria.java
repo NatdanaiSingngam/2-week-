@@ -12,7 +12,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  * ทุกคอลัมน์เกณฑ์เป็น NULL ได้ = ไม่ใช้เกณฑ์ข้อนั้น (เว้นว่างได้ทุกข้อ)
@@ -46,13 +45,6 @@ public class JobScreeningCriteria {
     @Column(name = "required_major", length = 100)
     private String requiredMajor;
 
-    /** ช่วงเวลาที่บริษัทต้องการ ต้องระบุเป็นคู่ และวันสิ้นสุดต้องไม่ก่อนวันเริ่ม */
-    @Column(name = "available_start_date")
-    private LocalDate availableStartDate;
-
-    @Column(name = "available_end_date")
-    private LocalDate availableEndDate;
-
     public Long getId() { return id; }
     public Job getJob() { return job; }
     public void setJob(Job job) { this.job = job; }
@@ -62,14 +54,9 @@ public class JobScreeningCriteria {
     public void setMinGpa(BigDecimal minGpa) { this.minGpa = minGpa; }
     public String getRequiredMajor() { return requiredMajor; }
     public void setRequiredMajor(String requiredMajor) { this.requiredMajor = requiredMajor; }
-    public LocalDate getAvailableStartDate() { return availableStartDate; }
-    public void setAvailableStartDate(LocalDate availableStartDate) { this.availableStartDate = availableStartDate; }
-    public LocalDate getAvailableEndDate() { return availableEndDate; }
-    public void setAvailableEndDate(LocalDate availableEndDate) { this.availableEndDate = availableEndDate; }
 
     /** ยังไม่ได้ตั้งเกณฑ์ข้อใดเลย */
     public boolean isEmpty() {
-        return minMatchScore == null && minGpa == null && requiredMajor == null
-                && availableStartDate == null && availableEndDate == null;
+        return minMatchScore == null && minGpa == null && requiredMajor == null;
     }
 }

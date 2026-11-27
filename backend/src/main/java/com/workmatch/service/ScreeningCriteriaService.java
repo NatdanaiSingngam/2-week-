@@ -2,9 +2,10 @@
  * ==== Workmatch · Backend · Service (ตรรกะหลักของระบบ) ====
  * ไฟล์: backend/src/main/java/com/workmatch/service/ScreeningCriteriaService.java
  * หน้าที่: กำหนด/อ่านเกณฑ์คัดกรองผู้สมัครของประกาศงาน (A04 UC-32, 1.4.2.3.3, ตาราง 47 และ 52)
- *          เกณฑ์ 5 ข้อ: Minimum Match Score, Required Skills, Minimum GPA, Major, Coop Availability Period
+ *          เกณฑ์ 4 ข้อ: Minimum Match Score, Required Skills, Minimum GPA, Major
+ *          (ตัดเกณฑ์ Coop Availability Period ออกแล้ว เพราะโปรไฟล์นิสิตไม่มีช่องวันสหกิจ)
  * ถูกเรียกโดย: JobController (ฟอร์มเกณฑ์ของบริษัท), JobPostingService (หน้ารายละเอียดงานของนิสิต)
- * เรียกใช้: JobRepository, JobSkillRepository, JobScreeningCriteriaRepository, Majors, ProfileService.parseDate
+ * เรียกใช้: JobRepository, JobSkillRepository, JobScreeningCriteriaRepository, Majors
  */
 package com.workmatch.service;
 
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -35,28 +35,25 @@ public class ScreeningCriteriaService {
 
     /** ค่าที่ผู้ใช้กรอกในฟอร์ม (ข้อความดิบ ยังไม่ตรวจ) ช่องว่าง = ไม่ใช้เกณฑ์ข้อนั้น */
     public record CriteriaInput(String minMatchScore, String minGpa, String requiredMajor,
-                                String availableStart, String availableEnd, List<String> requiredSkills) {
+                                List<String> requiredSkills) {
         public static CriteriaInput empty() {
-            return new CriteriaInput("", "", "", "", "", List.of());
+            return new CriteriaInput("", "", "", List.of());
         }
     }
 
     /** เกณฑ์ที่บันทึกแล้ว + ทักษะทั้งหมดของประกาศ (ให้ติ๊กบังคับ) */
     public record CriteriaView(Long jobId, String jobTitle, BigDecimal minMatchScore, BigDecimal minGpa,
-                               String requiredMajor, LocalDate availableStart, LocalDate availableEnd,
-                               List<String> jobSkills, List<String> requiredSkills) {
+                               String requiredMajor, List<String> jobSkills, List<String> requiredSkills) {
         /** ยังไม่ได้ตั้งเกณฑ์ข้อใดเลย (รวมทักษะบังคับ) */
         public boolean isEmpty() {
-            return minMatchScore == null && minGpa == null && requiredMajor == null
-                    && availableStart == null && availableEnd == null && requiredSkills.isEmpty();
+            return minMatchScore == null && minGpa == null && requiredMajor == null && requiredSkills.isEmpty();
         }
 
         /** ค่าตั้งต้นของฟอร์ม */
         public CriteriaInput toInput() {
             return new CriteriaInput(minMatchScore == null ? "" : minMatchScore.stripTrailingZeros().toPlainString(),
                     minGpa == null ? "" : minGpa.toPlainString(), requiredMajor == null ? "" : requiredMajor,
-                    availableStart == null ? "" : availableStart.toString(),
-                    availableEnd == null ? "" : availableEnd.toString(), requiredSkills);
+                    requiredSkills);
         }
     }
 
@@ -94,10 +91,6 @@ public class ScreeningCriteriaService {
         BigDecimal gpa = decimal(in.minGpa(), "4", 2, "GPA ขั้นต่ำต้องอยู่ระหว่าง 0.00–4.00 (ทศนิยมไม่เกิน 2 ตำแหน่ง)");
         String major = ProfileService.trim(in.requiredMajor());
         if (!major.isEmpty() && !Majors.isStandard(major)) throw new IllegalArgumentException("กรุณาเลือกสาขาจากรายการ");
-        LocalDate start = ProfileService.parseDate(in.availableStart(), "วันเริ่มช่วงสหกิจที่ต้องการ");
-        LocalDate end = ProfileService.parseDate(in.availableEnd(), "วันสิ้นสุดช่วงสหกิจที่ต้องการ");
-        if ((start == null) != (end == null)) throw new IllegalArgumentException("ช่วงสหกิจที่ต้องการต้องระบุทั้งวันเริ่มและวันสิ้นสุด");
-        if (start != null && end.isBefore(start)) throw new IllegalArgumentException("วันสิ้นสุดช่วงสหกิจต้องไม่ก่อนวันเริ่ม");
 
         List<JobSkill> skills = jobSkills.findByJobId(job.getId());
         Set<String> names = new HashSet<>();
@@ -115,8 +108,6 @@ public class ScreeningCriteriaService {
         c.setMinMatchScore(score);
         c.setMinGpa(gpa);
         c.setRequiredMajor(major.isEmpty() ? null : major);
-        c.setAvailableStartDate(start);
-        c.setAvailableEndDate(end);
         criteria.save(c);
         for (JobSkill s : skills) s.setRequired(required.contains(s.getSkillName()));
         jobSkills.saveAll(skills);
@@ -129,8 +120,6 @@ public class ScreeningCriteriaService {
                 c.map(JobScreeningCriteria::getMinMatchScore).orElse(null),
                 c.map(JobScreeningCriteria::getMinGpa).orElse(null),
                 c.map(JobScreeningCriteria::getRequiredMajor).orElse(null),
-                c.map(JobScreeningCriteria::getAvailableStartDate).orElse(null),
-                c.map(JobScreeningCriteria::getAvailableEndDate).orElse(null),
                 skills.stream().map(JobSkill::getSkillName).toList(),
                 skills.stream().filter(JobSkill::isRequired).map(JobSkill::getSkillName).toList());
     }

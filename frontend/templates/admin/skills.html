@@ -14,9 +14,9 @@
 <body class="admin-body">
 <aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
 <main id="main" class="admin-main">
-<div class="welcome" style="margin-bottom:20px"><div><h1>พจนานุกรมทักษะหลัก (Skill Dictionary)</h1><p>ฐานข้อมูลทักษะวิชาชีพมาตรฐาน (Standard Keywords) สำหรับใช้คำนวณ Cosine Similarity</p></div><a class="button" href="#add-skill">+ เพิ่มทักษะใหม่</a></div>
+<div class="welcome" style="margin-bottom:20px"><div><h1>พจนานุกรมทักษะ</h1><p>รายชื่อทักษะที่ระบบใช้อ่านเรซูเม่และประกาศงาน ทักษะที่ปิดใช้งานจะไม่ถูกนับและไม่แสดงในแบบฟอร์ม</p></div><a class="button" href="#add-skill">+ เพิ่มทักษะใหม่</a></div>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
-<form method="post" class="card" style="display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:12px" th:action="@{/admin/skills/reextract}" data-busy="กำลังสกัดทักษะใหม่..."><p class="field-note" style="margin:0">แก้พจนานุกรมในหน้านี้แล้ว ระบบสกัดทักษะเรซูเม่ทุกฉบับใหม่ให้อัตโนมัติ ใช้ปุ่มนี้หลังเพิ่มคำใน skill_dictionary.csv ผ่าน git ทักษะที่นักศึกษาเพิ่มเองหรือลบเองจะคงไว้</p><button type="submit" class="secondary sm">สกัดทักษะเรซูเม่ใหม่ทั้งหมด</button></form>
+<form method="post" class="card" style="display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:12px" th:action="@{/admin/skills/reextract}" data-busy="กำลังสกัดทักษะใหม่..."><p class="field-note" style="margin:0">เมื่อแก้พจนานุกรมในหน้านี้ ระบบอ่านทักษะของเรซูเม่ทุกฉบับใหม่ให้อัตโนมัติ ใช้ปุ่มนี้หลังทีมพัฒนาเพิ่มคำในไฟล์พจนานุกรม ทักษะที่นักศึกษาเพิ่มหรือลบเองยังคงไว้</p><button type="submit" class="secondary sm">อ่านทักษะเรซูเม่ใหม่ทั้งหมด</button></form>
 <form class="card search-bar" style="grid-template-columns:1fr auto" method="get" th:action="@{/admin/skills}" role="search">
   <label for="q" class="visually-hidden">ค้นหาชื่อทักษะหรือหมวด</label>
   <input id="q" name="q" type="search" th:value="${q}" placeholder="ค้นหาชื่อทักษะ..." />
@@ -25,7 +25,7 @@
 <section class="card table-card" style="margin-top:16px" aria-label="รายการทักษะ">
   <div class="table-wrap">
     <table>
-      <thead><tr><th scope="col">รหัส (ID)</th><th scope="col">ชื่อทักษะหลัก (Skill name)</th><th scope="col">หมวด</th><th scope="col">สถานะ</th><th scope="col" style="text-align:right">การจัดการ</th></tr></thead>
+      <thead><tr><th scope="col">รหัส</th><th scope="col">ชื่อทักษะ</th><th scope="col">หมวด</th><th scope="col">สถานะ</th><th scope="col" style="text-align:right">การจัดการ</th></tr></thead>
       <tbody>
         <tr th:if="${#lists.isEmpty(skills)}"><td colspan="5" class="muted">ไม่พบทักษะ (ถ้าเพิ่งเปิดระบบ ให้เปิด NLP แล้วรีสตาร์ตเพื่อนำเข้าพจนานุกรม)</td></tr>
         <tr th:each="s : ${skills}">
@@ -46,7 +46,7 @@
             <td><span class="status" th:classappend="${s.active} ? 'OPEN' : 'DRAFT'" th:text="${s.active} ? 'เปิดใช้งาน' : 'ปิดใช้งาน'">เปิดใช้งาน</span></td>
             <td style="text-align:right">
               <a class="link-button" th:href="@{/admin/skills(edit=${s.id},q=${q})}" th:aria-label="${'แก้ไข ' + s.name}">แก้ไข</a>
-              <form method="post" class="inline-form" th:action="@{/admin/skills/{id}/toggle(id=${s.id})}"><button type="submit" class="link-button" th:classappend="${s.active} ? 'danger'" th:aria-label="${(s.active ? 'ปิดสถานะ ' : 'เปิดสถานะ ') + s.name}" th:text="${s.active} ? 'ปิดสถานะ' : 'เปิดสถานะ'">ปิดสถานะ</button></form>
+              <form method="post" class="inline-form" th:action="@{/admin/skills/{id}/toggle(id=${s.id})}"><button type="submit" class="link-button" th:classappend="${s.active} ? 'danger'" th:aria-label="${(s.active ? 'ปิดใช้งาน ' : 'เปิดใช้งาน ') + s.name}" th:text="${s.active} ? 'ปิดใช้งาน' : 'เปิดใช้งาน'">ปิดใช้งาน</button></form>
             </td>
           </th:block>
         </tr>
@@ -57,8 +57,8 @@
 <section class="card" id="add-skill" style="margin-top:16px" aria-labelledby="add-title">
   <h2 id="add-title">เพิ่มทักษะใหม่</h2>
   <form method="post" class="form-grid" style="grid-template-columns:1fr 220px auto;align-items:end" th:action="@{/admin/skills}">
-    <div class="field" style="margin:0"><label for="new-name">ชื่อทักษะ (มาตรฐาน)</label><input id="new-name" name="name" required="required" maxlength="100" placeholder="เช่น Kotlin" /></div>
-    <div class="field" style="margin:0"><label for="new-cat">หมวด</label><select id="new-cat" name="category" class="select" required="required" style="width:100%"><option value="">เลือกหมวด</option><option th:each="c : ${categories}" th:value="${c}" th:text="${@fmt.category(c)}">programming</option></select></div>
+    <div class="field" style="margin:0"><label for="new-name">ชื่อทักษะ (มาตรฐาน) <span class="req" aria-hidden="true">*</span></label><input id="new-name" name="name" required="required" maxlength="100" placeholder="เช่น Kotlin" /></div>
+    <div class="field" style="margin:0"><label for="new-cat">หมวด <span class="req" aria-hidden="true">*</span></label><select id="new-cat" name="category" class="select" required="required" style="width:100%"><option value="">เลือกหมวด</option><option th:each="c : ${categories}" th:value="${c}" th:text="${@fmt.category(c)}">programming</option></select></div>
     <button type="submit">เพิ่มทักษะ</button>
   </form>
 </section>

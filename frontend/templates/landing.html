@@ -8,30 +8,45 @@
 <html lang="th" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('หาที่ฝึกงานที่ใช่')}"><title>หาที่ฝึกงานที่ใช่ | Workmatch</title></head>
 <!--/* หน้าแรกของระบบ (Landing Page) ตามเอกสาร รูปที่ 32
-     แถวตัวเลขใต้ปุ่มใช้ข้อเท็จจริงของระบบแทนตัวเลขตัวอย่างในรูป (เช่น "100+ สถานประกอบการ") เพื่อไม่อ้างข้อมูลที่ไม่มีจริง */-->
+     ใช้คำที่ผู้ใช้เข้าใจ (ไม่ใส่ชื่อเทคนิค เช่น NLP, TF-IDF) และไม่อ้างตัวเลขที่ไม่มีจริง (เช่น "100+ สถานประกอบการ") */-->
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="landing">
   <section class="hero container">
-    <span class="pill blue">แพลตฟอร์มจับคู่นักศึกษาสหกิจศึกษา</span>
-    <h1>หาที่ฝึกงานที่ใช่ ด้วยเทคโนโลยี <span class="accent">AI สกัดทักษะ</span></h1>
-    <p>เชื่อมโยงนักศึกษากับสถานประกอบการอย่างแม่นยำ เพียงกรอกเรซูเม่ ระบบ NLP จะวิเคราะห์ทักษะของคุณ และแนะนำตำแหน่งงานที่เหมาะสมที่สุดโดยอัตโนมัติ</p>
-    <div class="actions">
-      <a class="button" th:href="@{/register(role='STUDENT')}">เริ่มต้นหางานเลย<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a class="button secondary" th:href="@{/register(role='COMPANY')}">สำหรับสถานประกอบการ</a>
+    <div class="hero-copy">
+      <h1>หาที่ฝึกงานสหกิจที่ตรงกับทักษะของคุณ</h1>
+      <p>บันทึกเรซูเม่ครั้งเดียว ระบบจะอ่านทักษะจากเรซูเม่ แล้วเรียงตำแหน่งงานที่ตรงกับคุณที่สุดให้ก่อน พร้อมบอกว่าแต่ละตำแหน่งยังขาดทักษะอะไร</p>
+      <div class="actions">
+        <a class="button" th:href="@{/register(role='STUDENT')}">สมัครใช้งานสำหรับนักศึกษา</a>
+        <a class="button secondary" th:href="@{/register(role='COMPANY')}">ลงประกาศรับนักศึกษาสหกิจ</a>
+      </div>
     </div>
+    <!--/* ตัวอย่างผลจับคู่ (ข้อมูลตัวอย่าง ไม่ใช่ข้อมูลจริงในระบบ) ให้เห็นว่าจะได้อะไรหลังบันทึกเรซูเม่ */-->
+    <figure class="slip" aria-label="ตัวอย่างผลการจับคู่ที่นักศึกษาจะเห็น">
+      <div class="slip-head">
+        <div><h3>Backend Developer (สหกิจศึกษา)</h3><span>ตัวอย่างบริษัท · กรุงเทพมหานคร</span></div>
+        <div class="slip-score">72.4%<small>ทักษะตรงกับคุณ</small></div>
+      </div>
+      <div class="slip-bar" aria-hidden="true"></div>
+      <h4>ทักษะที่คุณมี</h4>
+      <div><span class="badge badge-ok">Java</span><span class="badge badge-ok">Spring Boot</span><span class="badge badge-ok">MySQL</span><span class="badge badge-ok">Git</span></div>
+      <h4>ควรเตรียมเพิ่ม</h4>
+      <div><span class="badge badge-missing">Docker</span><span class="badge badge-missing">REST API</span></div>
+      <div class="slip-foot"><span>ทักษะตรง 4 จาก 6 ทักษะ</span><span class="level medium">ปานกลาง</span></div>
+    </figure>
     <div class="hero-facts">
-      <div><strong>PyThaiNLP</strong><span>ตัดคำและสกัดทักษะจากเรซูเม่ภาษาไทย</span></div>
-      <div><strong class="blue">TF-IDF + Cosine</strong><span>คำนวณค่าร้อยละความสอดคล้อง</span></div>
-      <div><strong>เรียงตามคะแนน</strong><span>แนะนำตำแหน่งที่ตรงกับคุณที่สุดก่อน</span></div>
+      <div><strong>รู้ว่าตรงแค่ไหน</strong><span>เห็นค่าร้อยละความสอดคล้องกับทุกตำแหน่ง</span></div>
+      <div><strong>รู้ว่าต้องเตรียมอะไร</strong><span>เห็นทักษะที่ยังขาดของแต่ละตำแหน่ง</span></div>
+      <div><strong>สมัครและติดตามในที่เดียว</strong><span>ดูสถานะใบสมัครได้ตลอด ไม่ต้องติดต่อหลายช่องทาง</span></div>
     </div>
   </section>
   <section class="how container" aria-labelledby="how-title">
-    <h2 id="how-title">ใช้งานง่ายใน 3 ขั้นตอน</h2>
+    <h2 id="how-title">เริ่มใช้งานสำหรับนักศึกษา</h2>
     <div class="how-grid">
-      <div class="how-step"><span class="how-num" aria-hidden="true">1</span><h3>กรอกเรซูเม่</h3><p>เล่าประสบการณ์และทักษะของคุณ เป็นภาษาไทยหรืออังกฤษก็ได้</p></div>
-      <div class="how-step"><span class="how-num" aria-hidden="true">2</span><h3>ระบบสกัดทักษะ</h3><p>NLP ดึงทักษะจากข้อความ แล้วแปลงคำพ้องความหมายเป็นคำมาตรฐาน</p></div>
-      <div class="how-step"><span class="how-num" aria-hidden="true">3</span><h3>ดูตำแหน่งที่เหมาะ</h3><p>เห็นค่าร้อยละความสอดคล้อง ทักษะที่ตรง และทักษะที่ควรเตรียมเพิ่ม</p></div>
+      <div class="how-step"><span class="how-num" aria-hidden="true">1</span><h3>บันทึกเรซูเม่</h3><p>อัปโหลดไฟล์ PDF หรือพิมพ์ประสบการณ์และทักษะ เป็นภาษาไทยหรืออังกฤษก็ได้</p></div>
+      <div class="how-step"><span class="how-num" aria-hidden="true">2</span><h3>ตรวจทักษะที่ระบบพบ</h3><p>ระบบเข้าใจคำที่เขียนต่างกัน เช่น ReactJS กับ React เพิ่มหรือลบทักษะเองได้</p></div>
+      <div class="how-step"><span class="how-num" aria-hidden="true">3</span><h3>สมัครงานที่สนใจ</h3><p>ดูทักษะที่ตรงและที่ขาด แล้วสมัครได้ทันที ติดตามผลได้ในหน้าใบสมัครของฉัน</p></div>
     </div>
+    <div class="how-company"><span>สถานประกอบการ: ลงประกาศ กำหนดเกณฑ์คัดกรอง และดูผู้สมัครเรียงตามความสอดคล้องของทักษะ</span><a th:href="@{/register(role='COMPANY')}">สมัครใช้งานสำหรับสถานประกอบการ</a></div>
   </section>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

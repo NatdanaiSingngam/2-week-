@@ -34,9 +34,12 @@ public class ResumeExtrasService {
     private final FileStorageService fileStorage;
     private final DictionaryService dictionary;
     private final MatchRepository matches;
+    private final com.workmatch.repository.JobApplicationRepository applications;
 
     public ResumeExtrasService(ResumeService resumeService, ResumeRepository resumes, ResumeSkillRepository resumeSkills,
-                               FileStorageService fileStorage, DictionaryService dictionary, MatchRepository matches) {
+                               FileStorageService fileStorage, DictionaryService dictionary, MatchRepository matches,
+                               com.workmatch.repository.JobApplicationRepository applications) {
+        this.applications = applications;
         this.resumeService = resumeService;
         this.resumes = resumes;
         this.resumeSkills = resumeSkills;
@@ -102,8 +105,8 @@ public class ResumeExtrasService {
     }
 
     /**
-     * ลบเรซูเม่ทั้งฉบับ (A04 1.4.1.1.3, UC-14): ผลจับคู่ (matches) → ทักษะ (resume_skills) → แถวเรซูเม่ → ไฟล์ PDF
-     * ใบสมัครที่ส่งไปแล้ว (job_applications) ผูกกับตัวนิสิต ไม่ได้ผูกกับเรซูเม่ จึงยังอยู่ บริษัทยังเห็นใบสมัครแต่ไม่มีคะแนนและทักษะ
+     * ลบเรซูเม่ทั้งฉบับ (A04 1.4.1.1.3, UC-14): ใบสมัครที่ส่งไปแล้ว (job_applications) → ผลจับคู่ (matches)
+     * → ทักษะ (resume_skills) → แถวเรซูเม่ → ไฟล์ PDF  ใบสมัครถูกลบด้วย บริษัทจะไม่เห็นผู้สมัครคนนี้อีก
      * คืน false ถ้ายังไม่มีเรซูเม่
      */
     @Transactional
@@ -112,6 +115,7 @@ public class ResumeExtrasService {
         if (found.isEmpty()) return false;
         Resume r = found.get();
         Long fileId = r.getResumeFileId();
+        applications.deleteByStudentId(student.getId());
         matches.deleteByResumeId(r.getId());
         resumeSkills.deleteByResumeId(r.getId());
         resumes.delete(r);

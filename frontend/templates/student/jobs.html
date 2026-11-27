@@ -43,7 +43,7 @@
   </div>
   <div class="side">
     <small th:text="${'ประกาศเมื่อ ' + @fmt.ago(j.createdAt())}">ประกาศเมื่อ 2 วันที่แล้ว</small>
-    <span class="score-pill" th:if="${j.score() != null}" th:classappend="${lv}" th:text="${'Match ' + #numbers.formatDecimal(j.score(), 1, 1) + '%'}">Match 95%</span>
+    <span class="score-pill" th:if="${j.score() != null}" th:classappend="${lv}" th:text="${'ตรง ' + #numbers.formatDecimal(j.score(), 1, 1) + '%'}" th:title="${'ทักษะตรงกับเรซูเม่ของคุณ ' + #numbers.formatDecimal(j.score(), 1, 1) + '%'}">ตรง 95%</span>
     <div class="actions">
       <form method="post" class="inline-form" th:action="@{/student/jobs/{id}/bookmark(id=${j.jobId()})}"><input type="hidden" name="back" th:value="${'/student/jobs' + (#strings.isEmpty(q) ? '' : '?q=' + #uris.escapeQueryParam(q))}" /><button type="submit" class="secondary sm" th:attr="aria-pressed=${j.bookmarked()}" th:aria-label="${(j.bookmarked() ? 'นำออกจากรายการที่บันทึก: ' : 'บันทึกงาน: ') + j.title()}" th:text="${j.bookmarked()} ? '★' : '☆'">☆</button></form>
       <a class="button secondary sm" th:href="@{/student/jobs/{id}(id=${j.jobId()})}">ดูรายละเอียด</a>

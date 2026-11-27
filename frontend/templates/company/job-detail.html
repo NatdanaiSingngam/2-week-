@@ -25,7 +25,7 @@
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 <div class="welcome" style="margin-bottom:6px">
   <div><span class="overline">ตำแหน่งงาน</span><h1><span th:text="${job.title}">ชื่อตำแหน่ง</span> <span class="status" th:if="${jobStatus != null}" th:classappend="${jobStatus.name()}" th:text="${jobStatus.label}">เปิดรับสมัคร</span></h1></div>
-  <div class="actions"><a class="button secondary sm" th:href="@{/company/jobs/{id}/edit(id=${job.id})}">แก้ไขประกาศ</a><a class="button secondary sm" th:href="@{/company/jobs/{id}/criteria(id=${job.id})}">เกณฑ์คัดกรอง</a><a class="button secondary sm" th:href="@{/company/jobs/{id}/applicants.csv(id=${job.id})}">ส่งออกข้อมูล (CSV)</a></div>
+  <div class="actions"><a class="button secondary sm" th:href="@{/company/jobs/{id}/edit(id=${job.id})}">แก้ไขประกาศ</a><a class="button secondary sm" th:href="@{/company/jobs/{id}/applicants.csv(id=${job.id})}">ส่งออกข้อมูล (CSV)</a></div>
 </div>
 
 <nav class="tabs" aria-label="สถานะผู้สมัคร">

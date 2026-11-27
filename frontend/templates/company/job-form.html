@@ -21,10 +21,40 @@
   <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
   <form method="post" th:action="${editingId == null} ? @{/company/jobs} : @{/company/jobs/{id}(id=${editingId})}" data-busy="กำลังบันทึก...">
     <div class="field"><label for="title">ชื่อตำแหน่งงาน <span class="req" aria-hidden="true">*</span></label><input id="title" name="title" maxlength="200" required="required" th:value="${f?.title()}" placeholder="เช่น Software Engineer (Intern)" /></div>
-    <div class="field"><label for="description">รายละเอียดงาน (Job Description) <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบจะสกัดทักษะจากข้อความนี้ด้วย NLP อัตโนมัติ และรวมกับทักษะที่เลือกด้านล่าง</p>
-      <div class="extract-row"><button type="button" class="secondary sm" id="extract-skills" hidden="hidden" th:data-url="@{/company/jobs/extract-skills}">สกัดทักษะจากรายละเอียดงาน</button><span id="extract-status" class="field-note" role="status" aria-live="polite"></span></div>
-      <div id="extract-result" class="tags" hidden="hidden"></div></div>
-    <div class="form-grid">
+    <div class="field"><label for="description">รายละเอียดงาน <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบอ่านทักษะจากข้อความนี้ให้อัตโนมัติ แล้วแสดงในช่องทักษะด้านล่าง</p></div>
+    <!--/* ช่องทักษะ: app.js ซ่อนรายการติ๊กทั้งหมด แล้วแสดงเป็นป้ายทักษะที่เลือก (กด × ลบได้) + ช่องพิมพ์ค้นหาเพิ่ม
+         ทักษะที่สกัดจากรายละเอียดงานขึ้นเป็นป้ายให้เอง ส่ง skillsEdited=true = ใช้ชุดทักษะในช่องนี้ตามที่เห็น
+         ถ้าปิด JavaScript จะเห็นรายการติ๊กแบบเดิม */-->
+    <fieldset style="padding-top:6px" data-skill-picker="">
+      <legend>ทักษะที่ต้องการ</legend>
+      <div class="extract-row"><button type="button" class="secondary sm" id="extract-skills" hidden="hidden" th:data-url="@{/company/jobs/extract-skills}">ดึงทักษะจากรายละเอียดงาน</button><span id="extract-status" class="field-note" role="status" aria-live="polite"></span></div>
+      <div class="skill-fallback">
+      <p class="field-note" style="margin:0 0 8px">เลือกจากพจนานุกรมทักษะของระบบ (ถ้าระบุในรายละเอียดงานแล้วไม่ต้องเลือกซ้ำ)</p>
+      <label for="skill-filter" class="visually-hidden">ค้นหาทักษะ</label><input id="skill-filter" type="search" class="skill-filter" placeholder="พิมพ์เพื่อค้นหาทักษะ เช่น Java, Figma" autocomplete="off" data-skill-filter="" />
+      <div class="skill-toggles">
+        <label class="skill-toggle" th:each="s : ${dictionarySkills}"><input type="checkbox" name="skills" th:value="${s.name}" th:checked="${f != null and f.selectedSkills() != null and f.selectedSkills().contains(s.name)}" /><span th:text="${s.name}">Java</span></label>
+      </div>
+      </div>
+      <p class="field-note" th:if="${#lists.isEmpty(dictionarySkills)}">ยังไม่มีพจนานุกรมทักษะในระบบ (ผู้ดูแลระบบนำเข้าเมื่อเปิด NLP)</p>
+      <!--/* ทักษะสำคัญที่บันทึกไว้ (app.js อ่านค่าตั้งต้นจากที่นี่ แล้วเขียนใหม่ตามป้ายที่กด) */-->
+      <div data-required-skills="" hidden="hidden"><input type="hidden" name="requiredSkills" th:each="s : ${criteria.requiredSkills()}" th:value="${s}" /></div>
+      <div class="important-note" data-important-note="" hidden="hidden">
+        <p><strong>กดที่ป้ายทักษะอีกครั้งเพื่อตั้งเป็น ★ ทักษะสำคัญ</strong> (ป้ายเปลี่ยนเป็นสีทอง กดซ้ำเพื่อยกเลิก กด × เพื่อลบทักษะ)</p>
+      </div>
+    </fieldset>
+    <!--/* เกณฑ์คัดกรองผู้สมัคร (UC-32) อยู่ในฟอร์มเดียวกับประกาศ บันทึกพร้อมกันเมื่อกดบันทึก/เผยแพร่
+         criteriaIncluded=true บอกเซิร์ฟเวอร์ว่าส่วนนี้ถูกส่งมาด้วย
+         ทักษะที่ผู้สมัครต้องมี = ทักษะสำคัญ (★) ที่กดเลือกบนป้ายในช่องทักษะด้านบน ส่งเป็น requiredSkills */-->
+    <section id="criteria" class="criteria-section" aria-labelledby="criteria-title" th:with="c=${criteria}">
+      <input type="hidden" name="criteriaIncluded" value="true" />
+      <h2 id="criteria-title" class="form-section-title">เกณฑ์คัดกรองผู้สมัคร</h2>
+      <p class="field-note" style="margin-top:0">เว้นว่างข้อที่ไม่ใช้ นักศึกษาจะเห็นเกณฑ์นี้ในหน้ารายละเอียดงานก่อนสมัคร</p>
+      <div class="form-grid">
+        <div class="field"><label for="minGpa">GPA ขั้นต่ำ</label><input id="minGpa" name="minGpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 2.50" th:value="${c.minGpa()}" /></div>
+        <div class="field"><label for="requiredMajor">สาขาวิชาที่รับ</label><select id="requiredMajor" name="requiredMajor" class="select"><option value="">ทุกสาขา</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == c.requiredMajor()}">วิทยาการคอมพิวเตอร์</option></select></div>
+      </div>
+    </section>
+    <div class="form-grid" style="border-top:1px solid var(--border);padding-top:14px;margin-top:6px">
       <div class="field" data-builder="compensation"><label for="compensation">ค่าตอบแทน / เบี้ยเลี้ยง</label>
         <div class="builder" hidden="hidden">
           <select class="select" data-kind="" aria-label="รูปแบบค่าตอบแทน"><option value="">ไม่ระบุ</option><option value="none">ไม่มีค่าตอบแทน</option><option value="บาท/วัน">บาท/วัน</option><option value="บาท/เดือน">บาท/เดือน</option><option value="custom">กำหนดเอง</option></select>
@@ -41,18 +71,10 @@
       <div class="field"><label for="workMode">รูปแบบการทำงาน</label><select id="workMode" name="workMode" class="select" style="width:100%"><option value="">ไม่ระบุ</option><option th:each="w : ${ {'Onsite','Hybrid','Remote'} }" th:value="${w}" th:text="${w}" th:selected="${f != null and f.workMode() == w}">Onsite</option></select></div>
       <div class="field"><label for="openings">จำนวนที่รับ (คน)</label><input id="openings" name="openings" type="number" min="1" max="999" th:value="${f?.openings()}" placeholder="เช่น 2" /></div>
       <div class="field"><label for="deadline">วันปิดรับสมัคร</label><input id="deadline" name="deadline" type="date" th:value="${f?.deadline()}" aria-describedby="deadline-note" /><p id="deadline-note" class="field-note">เลยวันนี้แล้วระบบหยุดรับสมัครให้เอง เว้นว่างได้</p></div>
-      <div class="field"><label for="accommodation">สวัสดิการที่พัก</label><input id="accommodation" name="accommodation" maxlength="255" th:value="${f?.accommodation()}" placeholder="เช่น ไม่มีสวัสดิการที่พัก" /></div>
-      <div class="field"><label for="transport">สวัสดิการรถรับส่ง</label><input id="transport" name="transport" maxlength="255" th:value="${f?.transport()}" placeholder="เช่น ไม่มีรถรับส่งพนักงาน" /></div>
+      <div class="field"><label for="accommodation">สวัสดิการที่พัก</label><select id="accommodation" name="accommodation" class="select"><option value="มี" th:selected="${f?.accommodation() == 'มี'}">มี</option><option value="ไม่มี" th:selected="${f?.accommodation() != 'มี'}">ไม่มี</option></select></div>
+      <div class="field"><label for="transport">สวัสดิการรถรับส่ง</label><select id="transport" name="transport" class="select"><option value="มี" th:selected="${f?.transport() == 'มี'}">มี</option><option value="ไม่มี" th:selected="${f?.transport() != 'มี'}">ไม่มี</option></select></div>
     </div>
-    <fieldset style="border-top:1px solid var(--border);padding-top:14px">
-      <legend>ทักษะวิชาชีพที่ต้องการ (ใช้คำนวณ TF-IDF + Cosine Similarity)</legend>
-      <p class="field-note" style="margin:0 0 8px">เลือกจากพจนานุกรมทักษะของระบบ (ไม่บังคับ ถ้าระบุในรายละเอียดงานแล้ว)</p>
-      <div class="skill-toggles">
-        <label class="skill-toggle" th:each="s : ${dictionarySkills}"><input type="checkbox" name="skills" th:value="${s.name}" th:checked="${f != null and f.selectedSkills() != null and f.selectedSkills().contains(s.name)}" /><span th:text="${s.name}">Java</span></label>
-      </div>
-      <p class="field-note" th:if="${#lists.isEmpty(dictionarySkills)}">ยังไม่มีพจนานุกรมทักษะในระบบ (ผู้ดูแลระบบนำเข้าเมื่อเปิด NLP)</p>
-    </fieldset>
-    <div class="form-actions"><a class="button secondary" th:href="@{/company/postings}">ยกเลิก</a><button type="submit" name="action" value="draft" class="secondary">บันทึกแบบร่าง</button><button type="submit" name="action" value="publish">เผยแพร่ประกาศงาน</button></div>
+    <div class="form-actions"><a class="button secondary" th:href="@{/company/postings}">ยกเลิก</a><button type="submit" name="action" value="draft" class="secondary">บันทึกแบบร่าง</button><button type="submit" name="action" value="publish" class="lg">เผยแพร่ประกาศงาน</button></div>
   </form>
 </section>
 </main>

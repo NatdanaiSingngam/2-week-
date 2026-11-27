@@ -27,7 +27,7 @@
     <div class="meta"><a th:href="${'mailto:' + c.email()}" th:text="${c.email()}">email</a><th:block th:if="${c.phone() != null}"> · <span th:text="${c.phone()}">โทร</span></th:block></div>
   </div>
   <div class="right">
-    <span class="match-score" th:classappend="${lv}" th:text="${c.score() == null ? 'ยังไม่มีคะแนน' : 'Match Score ' + #numbers.formatDecimal(s, 1, 1) + '%'}">Match Score 95%</span>
+    <span class="match-score" th:classappend="${lv}" th:text="${c.score() == null ? 'ยังไม่มีคะแนน' : 'ทักษะตรงกับตำแหน่ง ' + #numbers.formatDecimal(s, 1, 1) + '%'}">ทักษะตรงกับตำแหน่ง 95%</span>
     <span class="status" th:classappend="${c.status().name()}" th:text="${'สถานะ: ' + c.status().label}">สถานะ: รอพิจารณา</span>
   </div>
 </section>

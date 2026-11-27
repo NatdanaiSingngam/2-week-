@@ -13,14 +13,14 @@
 <body class="admin-body">
 <aside th:replace="~{fragments/layout :: adminSidebar(${section})}"></aside>
 <main id="main" class="admin-main">
-<div class="page-title"><h1>จัดการคำพ้องความหมาย (Synonyms Mapping)</h1><p>จับคู่คำศัพท์ที่ผู้ใช้มักพิมพ์ผิดหรือย่อ เข้ากับทักษะหลัก เพื่อเพิ่มความแม่นยำในการจับคู่ (Match Score)</p></div>
+<div class="page-title"><h1>คำพ้องความหมาย</h1><p>คำที่เขียนต่างกันแต่หมายถึงทักษะเดียวกัน เช่น ReactJS กับ React ระบบจะนับเป็นทักษะหลักที่เชื่อมไว้</p></div>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 <div class="admin-grid">
   <section class="card" aria-labelledby="add-title">
     <h2 id="add-title">เพิ่มคำพ้องความหมายใหม่</h2>
     <form method="post" th:action="@{/admin/synonyms}">
-      <div class="field"><label for="alias">คำศัพท์ที่ต้องการแมพ (เช่น JS, ReactJS)</label><input id="alias" name="alias" required="required" maxlength="100" /></div>
-      <div class="field"><label for="target">เชื่อมโยงไปยังทักษะหลัก (Target Skill)</label><input id="target" name="target" required="required" list="skill-list" maxlength="100" placeholder="เช่น JavaScript" /><datalist id="skill-list"><option th:each="s : ${skills}" th:value="${s.name}"></option></datalist></div>
+      <div class="field"><label for="alias">คำที่พบในเรซูเม่หรือประกาศ (เช่น JS, ReactJS) <span class="req" aria-hidden="true">*</span></label><input id="alias" name="alias" required="required" maxlength="100" /></div>
+      <div class="field"><label for="target">นับเป็นทักษะ <span class="req" aria-hidden="true">*</span></label><input id="target" name="target" required="required" list="skill-list" maxlength="100" placeholder="เช่น JavaScript" /><datalist id="skill-list"><option th:each="s : ${skills}" th:value="${s.name}"></option></datalist></div>
       <button type="submit" class="full">บันทึกการเชื่อมโยง</button>
     </form>
   </section>

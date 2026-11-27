@@ -17,8 +17,8 @@
 <body><header th:replace="~{fragments/layout :: navbar}"></header>
 <main id="main" class="narrow main">
 <div class="page-title">
-  <h1>อัปโหลดประวัติย่อ (Resume)</h1>
-  <p>ระบบจะใช้ NLP อ่านไฟล์ของคุณและสกัดทักษะวิชาชีพออกมาโดยอัตโนมัติ เพื่อนำไปจับคู่กับงานที่เหมาะสม</p>
+  <h1>เรซูเม่ของฉัน</h1>
+  <p>อัปโหลดไฟล์ PDF หรือพิมพ์ประสบการณ์และทักษะ ระบบจะอ่านทักษะจากเรซูเม่และใช้จับคู่กับตำแหน่งงาน ตรวจและแก้ทักษะที่ระบบพบได้ด้านล่าง</p>
 </div>
 <th:block th:replace="~{fragments/layout :: flash}"></th:block>
 
@@ -44,7 +44,7 @@
   <details class="text-entry" th:open="${pdfName == null or pendingPdfName != null or previewSkills != null or error != null}">
     <summary>หรือกรอก/แก้ไขเป็นข้อความ</summary>
     <form method="post" th:action="@{/student/resume}" data-busy="กำลังวิเคราะห์...">
-      <div class="field"><label for="resume-text">ข้อความ resume</label><textarea id="resume-text" class="resume-input" name="text" rows="10" maxlength="20000" required="required" data-counter="resume-count" aria-describedby="resume-help resume-count" th:text="${resumeText}" placeholder="เช่น เคยทำโปรเจกต์เว็บด้วย HTML, CSS และ JavaScript ใช้ Git ในการทำงานร่วมกับทีม"></textarea><div class="field-meta"><p id="resume-help" class="field-note">วางเฉพาะประสบการณ์และทักษะ ไม่จำเป็นต้องใส่ข้อมูลติดต่อ</p><p id="resume-count" class="field-note" aria-live="off">0 / 20,000</p></div></div>
+      <div class="field"><label for="resume-text">ข้อความเรซูเม่ <span class="req" aria-hidden="true">*</span></label><textarea id="resume-text" class="resume-input" name="text" rows="10" maxlength="20000" required="required" data-counter="resume-count" aria-describedby="resume-help resume-count" th:text="${resumeText}" placeholder="เช่น เคยทำโปรเจกต์เว็บด้วย HTML, CSS และ JavaScript ใช้ Git ในการทำงานร่วมกับทีม"></textarea><div class="field-meta"><p id="resume-help" class="field-note">วางเฉพาะประสบการณ์และทักษะ ไม่จำเป็นต้องใส่ข้อมูลติดต่อ</p><p id="resume-count" class="field-note" aria-live="off">0 / 20,000</p></div></div>
       <div class="actions end"><button type="submit" class="secondary sm" name="action" value="preview">คำนวณทักษะ</button><button type="submit" class="sm" name="action" value="save">บันทึก</button></div>
     </form>
   </details>
@@ -59,7 +59,7 @@
 <section class="card" aria-labelledby="skills-title">
   <div class="card-head">
     <div><h2 id="skills-title">ทักษะที่ระบบตรวจพบ</h2><p class="field-note" style="margin:0" th:text="${'พบ ' + (skills == null ? 0 : #lists.size(skills)) + ' ทักษะ · กรุณาตรวจสอบ ลบ หรือเพิ่มทักษะให้ครบถ้วน'}">พบ 0 ทักษะ</p></div>
-    <span class="pill green nlp-ok" th:if="${skills != null and not #lists.isEmpty(skills)}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg>NLP Processing Complete</span>
+    <span class="pill green nlp-ok" th:if="${skills != null and not #lists.isEmpty(skills)}">อ่านทักษะแล้ว</span>
   </div>
   <div id="skill-results" class="skill-box"><div class="empty" style="padding:18px" th:if="${#lists.isEmpty(skills)}"><p style="margin:0">ยังไม่พบทักษะ อัปโหลดไฟล์หรือกรอกข้อความเรซูเม่ก่อน</p></div>
 <!--/* หัวข้อหมวดทักษะ: เรียงหมวดและแปลงคีย์อังกฤษเป็นชื่อไทยด้วย SkillCategories (ผ่าน @fmt)
@@ -75,11 +75,29 @@
   <p class="field-note">ผลลัพธ์ขึ้นอยู่กับคำทักษะในพจนานุกรมของระบบ เพิ่มได้เฉพาะทักษะที่อยู่ในพจนานุกรม</p>
 </section>
 
-<section class="card danger-zone" aria-labelledby="delete-resume-title" th:if="${hasResume}" style="margin-top:20px">
-  <div class="card-head"><div><h2 id="delete-resume-title">ลบเรซูเม่ทั้งฉบับ</h2><p class="field-note" style="margin:0">ลบข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF ทั้งหมด ใบสมัครที่ส่งไปแล้วยังอยู่ แต่บริษัทจะไม่เห็นคะแนนและทักษะ และสมัครงานใหม่ไม่ได้จนกว่าจะบันทึกเรซูเม่อีกครั้ง</p></div>
-  <form method="post" class="inline-form" th:action="@{/student/resume/delete}" data-confirm="ลบเรซูเม่ทั้งฉบับ? ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF จะหายทั้งหมด และกู้คืนไม่ได้"><button type="submit" class="danger sm">ลบเรซูเม่ทั้งฉบับ</button></form></div>
-</section>
-
-<div class="actions end" style="margin-top:20px"><a class="button secondary" th:href="@{/student/dashboard}">ยกเลิก</a><a class="button" th:href="@{/student/jobs}">บันทึกและค้นหางาน</a></div>
+<div class="actions end" style="margin-top:20px">
+  <!--/* ปุ่มลบเรซูเม่เปิดกล่องยืนยัน (app.js: data-open-dialog) คำอธิบายผลของการลบอยู่ในกล่องยืนยัน */-->
+  <form method="post" class="inline-form" th:action="@{/student/resume/delete}" th:if="${hasResume}">
+    <button type="button" class="danger" data-open-dialog="delete-resume-dialog">ลบเรซูเม่ทั้งฉบับ</button>
+    <dialog id="delete-resume-dialog" class="confirm-dialog" aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-desc">
+      <h2 id="delete-dialog-title">ลบเรซูเม่ทั้งฉบับ?</h2>
+      <div id="delete-dialog-desc">
+        <p>สิ่งที่จะถูกลบและกู้คืนไม่ได้:</p>
+        <ul>
+          <li>ข้อความเรซูเม่และไฟล์ PDF</li>
+          <li>ทักษะทั้งหมด รวมทั้งที่คุณเพิ่มเอง</li>
+          <li>คะแนนความตรงกับทุกประกาศงาน</li>
+          <li><strong>ใบสมัครทั้งหมดที่ส่งไปแล้ว</strong> บริษัทจะไม่เห็นใบสมัครของคุณอีก</li>
+        </ul>
+        <p>คุณจะสมัครงานใหม่ได้เมื่อบันทึกเรซูเม่อีกครั้ง</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="secondary" data-close-dialog="">ยกเลิก</button>
+        <button type="submit" class="danger">ยืนยัน ลบเรซูเม่</button>
+      </div>
+    </dialog>
+  </form>
+  <a class="button secondary" th:href="@{/student/dashboard}">กลับหน้าหลัก</a><a class="button" th:href="@{/student/jobs}">ไปค้นหางาน</a>
+</div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer></body></html>

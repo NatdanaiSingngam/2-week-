@@ -14,14 +14,14 @@
 <main id="main" class="narrow main" th:with="p=${profile}, vs=${profile.verificationStatus}">
 <section class="card">
   <div class="card-head" style="align-items:flex-start">
-    <div><h1>ข้อมูลสถานประกอบการ</h1><p class="muted" style="margin:0">กรอกข้อมูลและแนบเอกสารเพื่อให้ผู้ประกอบการพิจารณาตรวจสอบความถูกต้อง</p></div>
+    <div><h1>ข้อมูลสถานประกอบการ</h1><p class="muted" style="margin:0">กรอกข้อมูลบริษัทและแนบเอกสาร ผู้ดูแลระบบจะตรวจสอบก่อนยืนยันตัวตน</p></div>
     <span class="status" th:classappend="${vs.name() == 'REJECTED' ? 'CLOSED' : vs.name()}" th:text="${vs.label}">ยังไม่ส่งเอกสาร</span>
   </div>
   <th:block th:replace="~{fragments/layout :: flash}"></th:block>
   <div class="alert error" role="status" th:if="${vs.name() == 'REJECTED'}">ผู้ดูแลระบบไม่อนุมัติเอกสาร กรุณาตรวจสอบข้อมูลและแนบเอกสารใหม่</div>
   <form method="post" enctype="multipart/form-data" th:action="@{/company/profile}" data-busy="กำลังบันทึก...">
     <div class="form-grid">
-      <div class="field"><label for="companyName">ชื่อสถานประกอบการ (ภาษาไทย)</label><input id="companyName" name="companyName" required="required" maxlength="150" autocomplete="organization" th:value="${displayName}" /></div>
+      <div class="field"><label for="companyName">ชื่อสถานประกอบการ (ภาษาไทย) <span class="req" aria-hidden="true">*</span></label><input id="companyName" name="companyName" required="required" maxlength="150" autocomplete="organization" th:value="${displayName}" /></div>
       <div class="field"><label for="taxId">เลขประจำตัวผู้เสียภาษี (13 หลัก)</label><input id="taxId" name="taxId" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" th:value="${p.taxId}" placeholder="0105XXXXXXXXX" /></div>
       <div class="field span-2"><label for="address">ที่ตั้งสำนักงาน</label><textarea id="address" name="address" rows="2" maxlength="2000" style="min-height:80px" th:text="${p.address}" placeholder="เลขที่ อาคาร ถนน แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์"></textarea></div>
     </div>

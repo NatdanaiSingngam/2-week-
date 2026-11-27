@@ -26,7 +26,16 @@ public final class Views {
     /** ข้อมูลที่บริษัทกรอกในแบบฟอร์มประกาศงาน (รูปที่ 44) */
     public record JobInput(String title, String description, String compensation, String workSchedule,
                            String accommodation, String transport, List<String> selectedSkills, boolean draft,
-                           String location, String workMode, String openings, String deadline) {
+                           String location, String workMode, String openings, String deadline,
+                           boolean skillsFinal) {
+        /** skillsFinal = false: ทักษะ = ที่ NLP อ่านจากรายละเอียดงาน + ที่เลือก (แบบเดิม) */
+        public JobInput(String title, String description, String compensation, String workSchedule,
+                        String accommodation, String transport, List<String> selectedSkills, boolean draft,
+                        String location, String workMode, String openings, String deadline) {
+            this(title, description, compensation, workSchedule, accommodation, transport, selectedSkills, draft,
+                    location, workMode, openings, deadline, false);
+        }
+
         public static JobInput empty() {
             return new JobInput("", "", "", "", "", "", List.of(), false, "", "", "", "");
         }
@@ -58,6 +67,9 @@ public final class Views {
     /** งานที่บันทึกไว้ (รูปที่ 41) */
     public record BookmarkItem(Long jobId, String title, String companyName, LocalDateTime savedAt, boolean open,
                                boolean applied) { }
+
+    /** งานที่บันทึกไว้จัดกลุ่มตามวันที่บันทึก (ใหม่สุดก่อน) แบบหน้าประวัติของเบราว์เซอร์ */
+    public record BookmarkDay(java.time.LocalDate day, List<BookmarkItem> items) { }
 
     /** ประวัติการสมัครงาน (รูปที่ 42) */
     public record StudentApplicationItem(Long applicationId, Long jobId, String jobTitle, String companyName,

@@ -91,12 +91,10 @@ public class JobController {
                                @RequestParam(required = false) String minMatchScore,
                                @RequestParam(required = false) String minGpa,
                                @RequestParam(required = false) String requiredMajor,
-                               @RequestParam(required = false) String availableStart,
-                               @RequestParam(required = false) String availableEnd,
                                @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
                                Model model, RedirectAttributes redirect) {
         User company = currentUserService.getCurrentUser();
-        CriteriaInput input = new CriteriaInput(minMatchScore, minGpa, requiredMajor, availableStart, availableEnd,
+        CriteriaInput input = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
                 requiredSkills == null ? List.of() : requiredSkills);
         try {
             screening.save(company, id, input);
@@ -133,7 +131,7 @@ public class JobController {
 
     @GetMapping("/company/jobs/new")
     public String newForm(Model model) {
-        return form(model, JobInput.empty(), null);
+        return form(model, JobInput.empty(), null, CriteriaInput.empty());
     }
 
     @PostMapping("/company/jobs")
@@ -148,18 +146,26 @@ public class JobController {
                          @RequestParam(required = false) String openings,
                          @RequestParam(required = false) String deadline,
                          @RequestParam(name = "skills", required = false) List<String> skills,
+                         @RequestParam(defaultValue = "false") boolean skillsEdited,
                          @RequestParam(required = false) String action,
+                         @RequestParam(required = false) String minMatchScore,
+                         @RequestParam(required = false) String minGpa,
+                         @RequestParam(required = false) String requiredMajor,
+                         @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
+                         @RequestParam(defaultValue = "false") boolean criteriaIncluded,
                          Model model, RedirectAttributes redirect) {
         User company = currentUserService.getCurrentUser();
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
                 skills == null ? List.of() : skills, "draft".equals(action),
-                location, workMode, openings, deadline);
+                location, workMode, openings, deadline, skillsEdited);
+        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
+                requiredSkills == null ? List.of() : requiredSkills);
         Long id;
         try {
-            id = jobPostingService.create(company, input);
+            id = jobPostingService.create(company, input, criteriaIncluded ? crit : null);
         } catch (NlpUnavailableException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return form(model, input, null);
+            return form(model, input, null, crit);
         }
         afterSave(id, input, redirect, input.draft() ? "บันทึกแบบร่างแล้ว" : "เผยแพร่ประกาศงานแล้ว");
         return "redirect:/company/jobs/" + id;
@@ -180,7 +186,8 @@ public class JobController {
 
     @GetMapping("/company/jobs/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        return form(model, jobPostingService.inputFor(currentUserService.getCurrentUser(), id), id);
+        User company = currentUserService.getCurrentUser();
+        return form(model, jobPostingService.inputFor(company, id), id, screening.forCompany(company, id).toInput());
     }
 
     @PostMapping("/company/jobs/{id}")
@@ -196,16 +203,24 @@ public class JobController {
                          @RequestParam(required = false) String openings,
                          @RequestParam(required = false) String deadline,
                          @RequestParam(name = "skills", required = false) List<String> skills,
+                         @RequestParam(defaultValue = "false") boolean skillsEdited,
                          @RequestParam(required = false) String action,
+                         @RequestParam(required = false) String minMatchScore,
+                         @RequestParam(required = false) String minGpa,
+                         @RequestParam(required = false) String requiredMajor,
+                         @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
+                         @RequestParam(defaultValue = "false") boolean criteriaIncluded,
                          Model model, RedirectAttributes redirect) {
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
                 skills == null ? List.of() : skills, "draft".equals(action),
-                location, workMode, openings, deadline);
+                location, workMode, openings, deadline, skillsEdited);
+        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
+                requiredSkills == null ? List.of() : requiredSkills);
         try {
-            jobPostingService.update(currentUserService.getCurrentUser(), id, input);
+            jobPostingService.update(currentUserService.getCurrentUser(), id, input, criteriaIncluded ? crit : null);
         } catch (NlpUnavailableException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return form(model, input, id);
+            return form(model, input, id, crit);
         }
         afterSave(id, input, redirect, input.draft() ? "บันทึกแบบร่างแล้ว" : "บันทึกการแก้ไขแล้ว");
         return "redirect:/company/jobs/" + id;
@@ -267,8 +282,11 @@ public class JobController {
                 .body(csv.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String form(Model model, JobInput input, Long editingId) {
+    /** ฟอร์มประกาศงาน + ส่วนเกณฑ์คัดกรองในหน้าเดียวกัน (criteria = ค่าตั้งต้นของส่วนเกณฑ์) */
+    private String form(Model model, JobInput input, Long editingId, CriteriaInput criteria) {
         model.addAttribute("form", input);
+        model.addAttribute("criteria", criteria);
+        model.addAttribute("majors", Majors.optionsWith(criteria.requiredMajor()));
         model.addAttribute("editingId", editingId);
         model.addAttribute("dictionarySkills", dictionary.activeSkills());
         return "company/job-form";

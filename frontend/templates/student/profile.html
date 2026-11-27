@@ -20,7 +20,7 @@
     <form method="post" th:action="@{/student/profile}">
       <h2 class="form-section-title">ข้อมูลพื้นฐาน</h2>
       <div class="form-grid">
-        <div class="field"><label for="fullName">ชื่อ-นามสกุล</label><input id="fullName" name="fullName" required="required" maxlength="150" autocomplete="name" th:value="${displayName}" /></div>
+        <div class="field"><label for="fullName">ชื่อ-นามสกุล <span class="req" aria-hidden="true">*</span></label><input id="fullName" name="fullName" required="required" maxlength="150" autocomplete="name" th:value="${displayName}" /></div>
         <div class="field"><label for="phone">เบอร์โทรศัพท์</label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="08X-XXX-XXXX" th:value="${profile.phone}" /></div>
       </div>
       <h2 class="form-section-title">ข้อมูลการศึกษา</h2>
@@ -32,10 +32,8 @@
         <div class="field"><label for="faculty">คณะ</label><input id="faculty" name="faculty" maxlength="150" placeholder="เช่น เทคโนโลยีสารสนเทศและการสื่อสาร" th:value="${profile.faculty}" /></div>
         <div class="field span-2"><label for="major">สาขาวิชา</label><select id="major" name="major" class="select"><option value="">— ไม่ระบุ —</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == profile.major}">วิทยาการคอมพิวเตอร์</option></select><p class="field-note">บริษัทใช้สาขานี้คัดกรองผู้สมัคร</p></div>
       </div>
-      <h2 class="form-section-title">ข้อมูลสำหรับสหกิจศึกษา <span class="muted" style="font-weight:400">ไม่บังคับ</span></h2>
+      <h2 class="form-section-title">ข้อมูลสำหรับสหกิจศึกษา</h2>
       <div class="form-grid">
-        <div class="field"><label for="coopStart">วันเริ่มสหกิจ</label><input id="coopStart" name="coopStart" type="date" th:value="${profile.coopStart}" /></div>
-        <div class="field"><label for="coopEnd">วันสิ้นสุดสหกิจ</label><input id="coopEnd" name="coopEnd" type="date" th:value="${profile.coopEnd}" /></div>
         <div class="field"><label for="gpa">เกรดเฉลี่ยสะสม (GPA)</label><input id="gpa" name="gpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 3.25" th:value="${profile.gpa}" aria-describedby="gpa-note" /><p id="gpa-note" class="field-note">ซ่อนไว้จนกว่าคุณจะเลือกแสดง</p></div>
         <div class="field" style="align-self:center"><label><input type="checkbox" name="gpaVisible" value="true" th:checked="${profile.gpaVisible}" /> ยินยอมแสดง GPA ให้บริษัทที่ฉันสมัคร</label></div>
       </div>

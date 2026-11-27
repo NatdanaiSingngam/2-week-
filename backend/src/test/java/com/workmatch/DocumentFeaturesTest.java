@@ -154,7 +154,7 @@ class DocumentFeaturesTest {
         // ค้นหางาน: เห็นเฉพาะที่เผยแพร่ ไม่เห็นแบบร่าง
         String explore = mvc.perform(get("/student/jobs").with(user("s1@test.com").roles("STUDENT")))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(explore).contains("Backend Intern").contains("Match 66.7%").doesNotContain("Draft Intern");
+        assertThat(explore).contains("Backend Intern").contains("ตรง 66.7%").doesNotContain("Draft Intern");
         assertThat(mvc.perform(get("/student/jobs").param("q", "python").with(user("s1@test.com").roles("STUDENT")))
                 .andReturn().getResponse().getContentAsString()).doesNotContain("Backend Intern");
         mvc.perform(get("/student/jobs/" + draftId).with(user("s1@test.com").roles("STUDENT"))).andExpect(status().isNotFound());
@@ -262,7 +262,7 @@ class DocumentFeaturesTest {
         assertThat(resumeSkills.findByResumeId(resumeId)).extracting("skillName").containsExactly("Java", "SQL", "JavaScript");
         String page = mvc.perform(get("/student/resume").with(user("pdf@test.com").roles("STUDENT")))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(page).contains("resume.pdf").contains("NLP Processing Complete");
+        assertThat(page).contains("resume.pdf").contains("อ่านทักษะแล้ว");
     }
 
     @Test

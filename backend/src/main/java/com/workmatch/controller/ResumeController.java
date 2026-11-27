@@ -143,7 +143,7 @@ public class ResumeController {
         resumeExtras.discardPending(student, (Long) session.getAttribute(PENDING_PDF));
         session.removeAttribute(PENDING_PDF);
         boolean deleted = resumeExtras.deleteResume(student);
-        redirect.addFlashAttribute("message", deleted ? "ลบเรซูเม่ทั้งฉบับแล้ว (ข้อความ ทักษะ ผลจับคู่ และไฟล์ PDF)" : "ยังไม่มีเรซูเม่ให้ลบ");
+        redirect.addFlashAttribute("message", deleted ? "ลบเรซูเม่ทั้งฉบับแล้ว (ข้อความ ทักษะ ผลจับคู่ ไฟล์ PDF และใบสมัครที่ส่งไป)" : "ยังไม่มีเรซูเม่ให้ลบ");
         return "redirect:/student/resume";
     }
 
