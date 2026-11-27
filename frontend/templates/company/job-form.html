@@ -21,7 +21,7 @@
   <div class="alert error" role="alert" th:if="${error != null}" th:text="${error}"></div>
   <form method="post" th:action="${editingId == null} ? @{/company/jobs} : @{/company/jobs/{id}(id=${editingId})}" data-busy="กำลังบันทึก...">
     <div class="field"><label for="title">ชื่อตำแหน่งงาน <span class="req" aria-hidden="true">*</span></label><input id="title" name="title" maxlength="200" required="required" th:value="${f?.title()}" placeholder="เช่น Software Engineer (Intern)" /></div>
-    <div class="field"><label for="description">รายละเอียดงาน <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" aria-describedby="description-help" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea><p id="description-help" class="field-note">ระบบอ่านทักษะจากข้อความนี้ให้อัตโนมัติ แล้วแสดงในช่องทักษะด้านล่าง</p></div>
+    <div class="field"><label for="description">รายละเอียดงาน <span class="req" aria-hidden="true">*</span></label><textarea id="description" name="description" rows="7" required="required" th:text="${f?.description()}" placeholder="ระบุขอบเขตความรับผิดชอบของตำแหน่งนี้ และทักษะที่ต้องการ"></textarea></div>
     <!--/* ช่องทักษะ: app.js ซ่อนรายการติ๊กทั้งหมด แล้วแสดงเป็นป้ายทักษะที่เลือก (กด × ลบได้) + ช่องพิมพ์ค้นหาเพิ่ม
          ทักษะที่สกัดจากรายละเอียดงานขึ้นเป็นป้ายให้เอง ส่ง skillsEdited=true = ใช้ชุดทักษะในช่องนี้ตามที่เห็น
          ถ้าปิด JavaScript จะเห็นรายการติ๊กแบบเดิม */-->
