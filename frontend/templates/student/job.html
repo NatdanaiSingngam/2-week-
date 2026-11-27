@@ -69,7 +69,7 @@
     <dl class="criteria-list" th:if="${c != null and !c.isEmpty()}">
       <div th:if="${c.minMatchScore() != null}"><dt>คะแนนความสอดคล้องขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minMatchScore(), 1, 1) + '%'}">50.0%</dd></div>
       <div th:if="${c.minGpa() != null}"><dt>GPA ขั้นต่ำ</dt><dd th:text="${#numbers.formatDecimal(c.minGpa(), 1, 2)}">2.50</dd></div>
-      <div th:if="${c.requiredMajor() != null}"><dt>สาขาวิชา</dt><dd th:text="${c.requiredMajor()}">วิทยาการคอมพิวเตอร์</dd></div>
+      <div th:if="${c.requiredMajorText() != null}"><dt>สาขาวิชาที่รับ</dt><dd th:text="${c.requiredMajorText()}">วิทยาการคอมพิวเตอร์</dd></div>
       <div th:if="${not #lists.isEmpty(c.requiredSkills())}"><dt>ทักษะบังคับ</dt><dd><span class="badge badge-required" th:each="sk : ${c.requiredSkills()}" th:text="${sk}">Java</span></dd></div>
     </dl>
   </section>

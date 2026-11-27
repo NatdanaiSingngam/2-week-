@@ -51,7 +51,10 @@
       <p class="field-note" style="margin-top:0">เว้นว่างข้อที่ไม่ใช้ นักศึกษาจะเห็นเกณฑ์นี้ในหน้ารายละเอียดงานก่อนสมัคร</p>
       <div class="form-grid">
         <div class="field"><label for="minGpa">GPA ขั้นต่ำ</label><input id="minGpa" name="minGpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 2.50" th:value="${c.minGpa()}" /></div>
-        <div class="field"><label for="requiredMajor">สาขาวิชาที่รับ</label><select id="requiredMajor" name="requiredMajor" class="select"><option value="">ทุกสาขา</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == c.requiredMajor()}">วิทยาการคอมพิวเตอร์</option></select></div>
+        <fieldset class="field span-2 major-picker">
+          <legend>สาขาวิชาที่รับ <span class="field-note" style="font-weight:400">เลือกได้หลายสาขา ไม่เลือกเลย = รับทุกสาขา</span></legend>
+          <div class="skill-toggles major-toggles"><label class="skill-toggle" th:each="m : ${majors}"><input type="checkbox" name="requiredMajor" th:value="${m}" th:checked="${c.requiredMajors() != null and c.requiredMajors().contains(m)}" /><span th:text="${m}">วิทยาการคอมพิวเตอร์</span></label></div>
+        </fieldset>
       </div>
     </section>
     <div class="form-grid" style="border-top:1px solid var(--border);padding-top:14px;margin-top:6px">

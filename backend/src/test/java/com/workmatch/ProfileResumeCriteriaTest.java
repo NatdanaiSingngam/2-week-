@@ -314,11 +314,12 @@ class ProfileResumeCriteriaTest {
         String location = mvc.perform(post("/company/jobs").with(csrf()).with(co)
                         .param("title", "Backend Intern").param("description", "Java SQL").param("action", "publish")
                         .param("criteriaIncluded", "true").param("minGpa", "2.5")
-                        .param("requiredMajor", "วิทยาการคอมพิวเตอร์").param("requiredSkills", "Java"))
+                        .param("requiredMajor", "วิศวกรรมซอฟต์แวร์", "วิทยาการคอมพิวเตอร์").param("requiredSkills", "Java"))
                 .andExpect(status().is3xxRedirection()).andReturn().getResponse().getRedirectedUrl();
         Long jobId = Long.valueOf(location.substring(location.lastIndexOf('/') + 1));
         JobScreeningCriteria c = criteria.findByJobId(jobId).orElseThrow();
         assertThat(c.getMinMatchScore()).isNull();
+        assertThat(c.getRequiredMajors()).containsExactly("วิทยาการคอมพิวเตอร์", "วิศวกรรมซอฟต์แวร์"); // หลายสาขา เรียงตามรายการมาตรฐาน
         assertThat(c.getMinGpa()).isEqualByComparingTo("2.50");
         assertThat(requiredSkills(jobId)).containsExactly("Java");
 

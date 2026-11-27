@@ -22,7 +22,10 @@
     <div class="form-grid">
       <div class="field"><label for="minMatchScore">คะแนนความสอดคล้องขั้นต่ำ (%)</label><input id="minMatchScore" name="minMatchScore" type="number" min="0" max="100" step="0.01" placeholder="เช่น 50" th:value="${f.minMatchScore()}" aria-describedby="score-note" /><p id="score-note" class="field-note">0–100</p></div>
       <div class="field"><label for="minGpa">GPA ขั้นต่ำ</label><input id="minGpa" name="minGpa" type="number" min="0" max="4" step="0.01" placeholder="เช่น 2.50" th:value="${f.minGpa()}" aria-describedby="gpa-note" /><p id="gpa-note" class="field-note">0.00–4.00</p></div>
-      <div class="field span-2"><label for="requiredMajor">สาขาวิชาที่รับ</label><select id="requiredMajor" name="requiredMajor" class="select"><option value="">ทุกสาขา</option><option th:each="m : ${majors}" th:value="${m}" th:text="${m}" th:selected="${m == f.requiredMajor()}">วิทยาการคอมพิวเตอร์</option></select></div>
+      <fieldset class="field span-2 major-picker">
+        <legend>สาขาวิชาที่รับ <span class="field-note" style="font-weight:400">เลือกได้หลายสาขา ไม่เลือกเลย = รับทุกสาขา</span></legend>
+        <div class="skill-toggles major-toggles"><label class="skill-toggle" th:each="m : ${majors}"><input type="checkbox" name="requiredMajor" th:value="${m}" th:checked="${f.requiredMajors() != null and f.requiredMajors().contains(m)}" /><span th:text="${m}">วิทยาการคอมพิวเตอร์</span></label></div>
+      </fieldset>
     </div>
     <fieldset class="field" style="border:0;padding:0;margin:8px 0 0">
       <legend style="font-weight:600;margin-bottom:6px">ทักษะที่ผู้สมัครต้องมี</legend>

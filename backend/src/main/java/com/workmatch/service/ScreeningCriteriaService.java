@@ -34,26 +34,30 @@ import java.util.Set;
 public class ScreeningCriteriaService {
 
     /** ค่าที่ผู้ใช้กรอกในฟอร์ม (ข้อความดิบ ยังไม่ตรวจ) ช่องว่าง = ไม่ใช้เกณฑ์ข้อนั้น */
-    public record CriteriaInput(String minMatchScore, String minGpa, String requiredMajor,
+    public record CriteriaInput(String minMatchScore, String minGpa, List<String> requiredMajors,
                                 List<String> requiredSkills) {
         public static CriteriaInput empty() {
-            return new CriteriaInput("", "", "", List.of());
+            return new CriteriaInput("", "", List.of(), List.of());
         }
     }
 
     /** เกณฑ์ที่บันทึกแล้ว + ทักษะทั้งหมดของประกาศ (ให้ติ๊กบังคับ) */
     public record CriteriaView(Long jobId, String jobTitle, BigDecimal minMatchScore, BigDecimal minGpa,
-                               String requiredMajor, List<String> jobSkills, List<String> requiredSkills) {
+                               List<String> requiredMajors, List<String> jobSkills, List<String> requiredSkills) {
         /** ยังไม่ได้ตั้งเกณฑ์ข้อใดเลย (รวมทักษะบังคับ) */
         public boolean isEmpty() {
-            return minMatchScore == null && minGpa == null && requiredMajor == null && requiredSkills.isEmpty();
+            return minMatchScore == null && minGpa == null && requiredMajors.isEmpty() && requiredSkills.isEmpty();
+        }
+
+        /** สาขาที่รับสำหรับแสดงผล เช่น "วิทยาการคอมพิวเตอร์, วิศวกรรมซอฟต์แวร์" (ว่าง = null) */
+        public String requiredMajorText() {
+            return requiredMajors.isEmpty() ? null : String.join(", ", requiredMajors);
         }
 
         /** ค่าตั้งต้นของฟอร์ม */
         public CriteriaInput toInput() {
             return new CriteriaInput(minMatchScore == null ? "" : minMatchScore.stripTrailingZeros().toPlainString(),
-                    minGpa == null ? "" : minGpa.toPlainString(), requiredMajor == null ? "" : requiredMajor,
-                    requiredSkills);
+                    minGpa == null ? "" : minGpa.toPlainString(), requiredMajors, requiredSkills);
         }
     }
 
@@ -89,8 +93,15 @@ public class ScreeningCriteriaService {
         Job job = owned(company, jobId);
         BigDecimal score = decimal(in.minMatchScore(), "100", 2, "คะแนนความสอดคล้องขั้นต่ำต้องอยู่ระหว่าง 0–100 (ทศนิยมไม่เกิน 2 ตำแหน่ง)");
         BigDecimal gpa = decimal(in.minGpa(), "4", 2, "GPA ขั้นต่ำต้องอยู่ระหว่าง 0.00–4.00 (ทศนิยมไม่เกิน 2 ตำแหน่ง)");
-        String major = ProfileService.trim(in.requiredMajor());
-        if (!major.isEmpty() && !Majors.isStandard(major)) throw new IllegalArgumentException("กรุณาเลือกสาขาจากรายการ");
+        // สาขาที่รับ: เลือกได้หลายสาขา ทุกค่าต้องอยู่ในรายการมาตรฐาน (ไม่เลือกเลย = ทุกสาขา)
+        List<String> majors = new java.util.ArrayList<>();
+        for (String m : in.requiredMajors() == null ? List.<String>of() : in.requiredMajors()) {
+            String v = ProfileService.trim(m);
+            if (v.isEmpty() || majors.contains(v)) continue;
+            if (!Majors.isStandard(v)) throw new IllegalArgumentException("กรุณาเลือกสาขาจากรายการ");
+            majors.add(v);
+        }
+        majors.sort(java.util.Comparator.comparingInt(Majors.ALL::indexOf));
 
         List<JobSkill> skills = jobSkills.findByJobId(job.getId());
         Set<String> names = new HashSet<>();
@@ -107,7 +118,7 @@ public class ScreeningCriteriaService {
         });
         c.setMinMatchScore(score);
         c.setMinGpa(gpa);
-        c.setRequiredMajor(major.isEmpty() ? null : major);
+        c.setRequiredMajors(majors);
         criteria.save(c);
         for (JobSkill s : skills) s.setRequired(required.contains(s.getSkillName()));
         jobSkills.saveAll(skills);
@@ -119,7 +130,7 @@ public class ScreeningCriteriaService {
         return new CriteriaView(job.getId(), job.getTitle(),
                 c.map(JobScreeningCriteria::getMinMatchScore).orElse(null),
                 c.map(JobScreeningCriteria::getMinGpa).orElse(null),
-                c.map(JobScreeningCriteria::getRequiredMajor).orElse(null),
+                c.map(JobScreeningCriteria::getRequiredMajors).orElse(List.of()),
                 skills.stream().map(JobSkill::getSkillName).toList(),
                 skills.stream().filter(JobSkill::isRequired).map(JobSkill::getSkillName).toList());
     }

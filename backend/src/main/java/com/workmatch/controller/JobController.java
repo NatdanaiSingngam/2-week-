@@ -90,11 +90,11 @@ public class JobController {
     public String saveCriteria(@PathVariable Long id,
                                @RequestParam(required = false) String minMatchScore,
                                @RequestParam(required = false) String minGpa,
-                               @RequestParam(required = false) String requiredMajor,
+                               @RequestParam(name = "requiredMajor", required = false) List<String> requiredMajor,
                                @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
                                Model model, RedirectAttributes redirect) {
         User company = currentUserService.getCurrentUser();
-        CriteriaInput input = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
+        CriteriaInput input = new CriteriaInput(minMatchScore, minGpa, requiredMajor == null ? List.of() : requiredMajor,
                 requiredSkills == null ? List.of() : requiredSkills);
         try {
             screening.save(company, id, input);
@@ -109,7 +109,7 @@ public class JobController {
     private String criteriaForm(Model model, ScreeningCriteriaService.CriteriaView view, CriteriaInput input, String error) {
         model.addAttribute("job", view);
         model.addAttribute("f", input);
-        model.addAttribute("majors", Majors.optionsWith(input.requiredMajor()));
+        model.addAttribute("majors", Majors.ALL);
         if (error != null) model.addAttribute("error", error);
         return "company/criteria";
     }
@@ -150,7 +150,7 @@ public class JobController {
                          @RequestParam(required = false) String action,
                          @RequestParam(required = false) String minMatchScore,
                          @RequestParam(required = false) String minGpa,
-                         @RequestParam(required = false) String requiredMajor,
+                         @RequestParam(name = "requiredMajor", required = false) List<String> requiredMajor,
                          @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
                          @RequestParam(defaultValue = "false") boolean criteriaIncluded,
                          Model model, RedirectAttributes redirect) {
@@ -158,7 +158,7 @@ public class JobController {
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
                 skills == null ? List.of() : skills, "draft".equals(action),
                 location, workMode, openings, deadline, skillsEdited);
-        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
+        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor == null ? List.of() : requiredMajor,
                 requiredSkills == null ? List.of() : requiredSkills);
         Long id;
         try {
@@ -207,14 +207,14 @@ public class JobController {
                          @RequestParam(required = false) String action,
                          @RequestParam(required = false) String minMatchScore,
                          @RequestParam(required = false) String minGpa,
-                         @RequestParam(required = false) String requiredMajor,
+                         @RequestParam(name = "requiredMajor", required = false) List<String> requiredMajor,
                          @RequestParam(name = "requiredSkills", required = false) List<String> requiredSkills,
                          @RequestParam(defaultValue = "false") boolean criteriaIncluded,
                          Model model, RedirectAttributes redirect) {
         JobInput input = new JobInput(title, description, compensation, workSchedule, accommodation, transport,
                 skills == null ? List.of() : skills, "draft".equals(action),
                 location, workMode, openings, deadline, skillsEdited);
-        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor,
+        CriteriaInput crit = new CriteriaInput(minMatchScore, minGpa, requiredMajor == null ? List.of() : requiredMajor,
                 requiredSkills == null ? List.of() : requiredSkills);
         try {
             jobPostingService.update(currentUserService.getCurrentUser(), id, input, criteriaIncluded ? crit : null);
@@ -286,7 +286,7 @@ public class JobController {
     private String form(Model model, JobInput input, Long editingId, CriteriaInput criteria) {
         model.addAttribute("form", input);
         model.addAttribute("criteria", criteria);
-        model.addAttribute("majors", Majors.optionsWith(criteria.requiredMajor()));
+        model.addAttribute("majors", Majors.ALL);
         model.addAttribute("editingId", editingId);
         model.addAttribute("dictionarySkills", dictionary.activeSkills());
         return "company/job-form";

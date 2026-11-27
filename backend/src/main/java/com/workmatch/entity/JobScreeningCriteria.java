@@ -41,8 +41,11 @@ public class JobScreeningCriteria {
     @Column(name = "min_gpa", precision = 3, scale = 2)
     private BigDecimal minGpa;
 
-    /** สาขาที่รับ จากรายการเดียวกับ StudentProfile.major (Majors) NULL = ทุกสาขา */
-    @Column(name = "required_major", length = 100)
+    /**
+     * สาขาที่รับ เลือกได้หลายสาขาจากรายการเดียวกับ StudentProfile.major (Majors) เก็บคั่นด้วย "|"
+     * เช่น "วิทยาการคอมพิวเตอร์|วิศวกรรมซอฟต์แวร์"  NULL = ทุกสาขา
+     */
+    @Column(name = "required_major", length = 1000)
     private String requiredMajor;
 
     public Long getId() { return id; }
@@ -54,6 +57,16 @@ public class JobScreeningCriteria {
     public void setMinGpa(BigDecimal minGpa) { this.minGpa = minGpa; }
     public String getRequiredMajor() { return requiredMajor; }
     public void setRequiredMajor(String requiredMajor) { this.requiredMajor = requiredMajor; }
+
+    /** สาขาที่รับเป็นรายการ (ว่าง = ทุกสาขา) */
+    public java.util.List<String> getRequiredMajors() {
+        if (requiredMajor == null || requiredMajor.isBlank()) return java.util.List.of();
+        return java.util.Arrays.stream(requiredMajor.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+    }
+
+    public void setRequiredMajors(java.util.List<String> majors) {
+        this.requiredMajor = majors == null || majors.isEmpty() ? null : String.join("|", majors);
+    }
 
     /** ยังไม่ได้ตั้งเกณฑ์ข้อใดเลย */
     public boolean isEmpty() {
